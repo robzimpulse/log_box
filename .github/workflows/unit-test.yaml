@@ -1,0 +1,27 @@
+name: Unit Test
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Git Checkout"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "Install Flutter"
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.3'
+          cache: true
+
+      - name: "Install Packages"
+        run: flutter pub get
+
+      - name: 'Run Test'
+        run: flutter test
