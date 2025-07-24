@@ -38,7 +38,7 @@ class LogEntryModel extends EntryModel {
       timestamp: timestamp,
       name: other.name ?? name,
       message: other.message,
-      extra: other.extra ?? extra,
+      extra: {...?other.extra, ...?extra},
       error: other.error ?? error,
       stackTrace: other.stackTrace ?? stackTrace,
     );
