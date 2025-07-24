@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 
 import '../model/entry_model.dart';
 import '../storage/storage.dart';
-import 'detail_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key, required this.storage});
+  const DashboardScreen({super.key, required this.storage, this.onTap});
 
   final Storage storage;
+
+  final ValueSetter<EntryModel>? onTap;
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -53,20 +54,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _item({required BuildContext context, required EntryModel value}) {
-    void onTap() {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          settings: const RouteSettings(name: 'Log Box Detail'),
-          builder: (context) => DetailScreen(data: value),
-        ),
-      );
-    }
-
     final hasDetail = value.tabs(context).isNotEmpty;
 
     return ListTile(
-      onTap: hasDetail ? onTap : null,
+      onTap: hasDetail ? () => widget.onTap?.call(value) : null,
       visualDensity: VisualDensity.compact,
       title: value.title(context),
       subtitle: value.subtitle(context),
