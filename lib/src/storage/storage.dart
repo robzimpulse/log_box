@@ -4,15 +4,6 @@ import 'package:flutter/foundation.dart';
 
 import '../model/entry_model.dart';
 
-final class _Identifier extends LinkedListEntry<_Identifier> {
-  String value;
-
-  _Identifier(this.value);
-
-  @override
-  String toString() => value;
-}
-
 class Storage with ChangeNotifier {
   /// Handle mapping between data and id
   final LinkedHashMap<String, EntryModel> _logs;

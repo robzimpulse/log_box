@@ -21,7 +21,7 @@ class HumanReadableWidget extends StatelessWidget {
           children: [
             Flexible(
               child: Text(
-                name ?? 'Unknown',
+                name,
                 style: const TextStyle(fontWeight: FontWeight.bold),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
