@@ -15,39 +15,29 @@ final class _Identifier extends LinkedListEntry<_Identifier> {
 
 class Storage with ChangeNotifier {
   /// Handle mapping between data and id
-  Map<String, EntryModel> _logs;
-
-  /// Ids reference to track insert order
-  final LinkedList<_Identifier> _ids;
+  LinkedHashMap<String, EntryModel> _logs;
 
   /// max capacity of this storage
   final int _capacity;
 
   Storage({required int capacity})
-    : _logs = {},
-      _ids = LinkedList(),
+    : _logs = LinkedHashMap(),
       _capacity = capacity;
 
   Map<String, EntryModel> get data => _logs;
 
   void add({required EntryModel log}) {
-    _ids.remove(_Identifier(log.id));
-    _ids.add(_Identifier(log.id));
-
     _logs.update(log.id, (old) => old.merge(log), ifAbsent: () => log);
 
-    final evicted = _ids.length > _capacity ? _ids.firstOrNull : null;
-    if (evicted != null) {
-      _ids.remove(evicted);
-      _logs.remove(evicted.value);
+    if (_logs.keys.length > _capacity) {
+      _logs.remove(_logs.keys.firstOrNull);
     }
 
     notifyListeners();
   }
 
   void clear() {
-    _logs = {};
-    _ids.clear();
+    _logs.clear();
     notifyListeners();
   }
 

@@ -170,4 +170,7 @@ class LogEntryModel extends EntryModel {
 
   @override
   String display() => 'Log';
+
+  @override
+  String toString() => 'LogEntryModel($name,$message)';
 }
