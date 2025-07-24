@@ -15,7 +15,7 @@ final class _Identifier extends LinkedListEntry<_Identifier> {
 
 class Storage with ChangeNotifier {
   /// Handle mapping between data and id
-  LinkedHashMap<String, EntryModel> _logs;
+  final LinkedHashMap<String, EntryModel> _logs;
 
   /// max capacity of this storage
   final int _capacity;
