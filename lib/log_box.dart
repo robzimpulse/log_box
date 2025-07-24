@@ -6,7 +6,7 @@ import 'src/screen/dashboard_screen.dart';
 
 class LogBox {
   static final LogBox _instance = LogBox._();
-  final _storage = Storage(capacity: 1000);
+  final _storage = Storage(capacity: 5);
   factory LogBox() => _instance;
   LogBox._();
 
