@@ -1,0 +1,18 @@
+name: LogBox
+repository: https://github.com/robzimpulse/log_box
+
+ide:
+  intellij:
+    enabled: false
+
+packages:
+  - packages/**
+  - example
+
+command:
+  bootstrap:
+    # It seems so that running "pub get" in parallel has some issues (like
+    # https://github.com/dart-lang/pub/issues/3404). Disabling this feature
+    # makes the CI much more stable.
+    runPubGetInParallel: false
+    usePubspecOverrides: true
