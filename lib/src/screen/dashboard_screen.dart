@@ -161,6 +161,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         },
                         style: OutlinedButton.styleFrom(
                           backgroundColor: selected ? Colors.grey : null,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(4),
+                          ),
                         ),
                         child: Text(key),
                       );
@@ -186,14 +189,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         );
 
-        if (data.isEmpty) {
+        final reversed = [...data].reversed;
+
+        if (reversed.isEmpty) {
           return Center(child: Text('No Data'));
         }
 
         return ListView.separated(
-          itemCount: data.length,
+          itemCount: reversed.length,
           itemBuilder: (context, index) {
-            final entry = data.elementAtOrNull(index);
+            final entry = reversed.elementAtOrNull(index);
             if (entry == null) return null;
             return _item(context: context, value: entry);
           },
