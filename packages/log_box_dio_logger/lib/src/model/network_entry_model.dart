@@ -46,38 +46,284 @@ class NetworkEntryModel extends EntryModel {
   }
 
   @override
+  String toString() => 'NetworkEntryModel($uri)';
+
+  @override
   bool contains(String keyword) {
-    // TODO: implement contains
-    throw UnimplementedError();
+    return [
+      uri?.path.toLowerCase().contains(keyword.toLowerCase()) ?? false,
+      uri?.host.toLowerCase().contains(keyword.toLowerCase()) ?? false,
+      response?.status.toString().contains(keyword.toLowerCase()) ?? false,
+      method?.toLowerCase().contains(keyword.toLowerCase()) ?? false,
+    ].contains(true);
   }
 
   @override
-  String display() {
-    // TODO: implement display
-    throw UnimplementedError();
-  }
+  String display() => 'Network';
+
 
   @override
-  EntryModel merge(other) {
-    // TODO: implement merge
-    throw UnimplementedError();
+  NetworkEntryModel merge(other) {
+    if (other is! NetworkEntryModel) return this;
+    return NetworkEntryModel(
+      id: id,
+      timestamp: timestamp,
+      client: client,
+      method: method,
+      uri: uri,
+      loading: other.loading ?? loading,
+      request: other.request ?? request,
+      response: other.response ?? response,
+      error: other.error ?? error,
+    );
   }
 
   @override
   Map<Tab, Widget> tabs(BuildContext context) {
-    // TODO: implement tabs
-    throw UnimplementedError();
+    return Map.fromEntries([
+      _overview(context),
+      _request(context),
+      _response(context),
+      _errors(context),
+    ]);
   }
 
   @override
   Widget title(BuildContext context) {
-    // TODO: implement title
-    throw UnimplementedError();
+    final theme = Theme.of(context);
+
+    Color? color() {
+      final status = response?.status;
+      if (status == null) return null;
+      if (status >= 200 && status < 300) {
+        return Colors.green;
+      } else if (status >= 300 && status < 400) {
+        return Colors.orange;
+      } else {
+        return Colors.red;
+      }
+    }
+
+    Widget status0(BuildContext context) {
+      if (loading == true) {
+        return const SizedBox(
+          width: 16,
+          height: 16,
+          child: CircularProgressIndicator(),
+        );
+      }
+
+      final status = response?.status;
+      if (status != null) {
+        return Text(
+          '$status',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.labelLarge?.copyWith(color: color()),
+        );
+      }
+
+      return Text(
+        'ERROR',
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: theme.textTheme.labelLarge?.copyWith(color: Colors.red),
+      );
+    }
+
+    return Column(
+      children: [
+        Row(
+          children: [
+            Icon(Icons.public, size: 16, color: color()),
+            const SizedBox(width: 8),
+            status0(context),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                '${method ?? 'Undefined'} ${uri?.path}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.labelLarge,
+              ),
+            ),
+          ],
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                '${uri?.host}',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.labelMedium,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  MapEntry<Tab, Widget> _overview(BuildContext context) {
+    return MapEntry(
+      const Tab(text: 'Overview', icon: Icon(Icons.info, color: Colors.white)),
+      CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(child: SizedBox(height: 8)),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverToBoxAdapter(
+              child: HumanReadableWidget(name: 'Method', value: method),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverToBoxAdapter(
+              child: HumanReadableWidget(name: 'Url', value: uri.toString()),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverToBoxAdapter(
+              child: HumanReadableWidget(
+                name: 'Timestamp',
+                value: timestamp.toIso8601String(),
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(child: SizedBox(height: 8)),
+        ],
+      ),
+    );
+  }
+
+  MapEntry<Tab, Widget> _request(BuildContext context) {
+    return MapEntry(
+      const Tab(text: 'Detail', icon: Icon(Icons.list, color: Colors.white)),
+      CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(child: SizedBox(height: 8)),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverToBoxAdapter(
+              child: HumanReadableWidget(
+                name: 'Timestamp',
+                value: request?.time.toIso8601String(),
+              ),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverToBoxAdapter(
+              child: HumanReadableWidget(
+                name: 'Headers',
+                value: request?.headers?.json,
+              ),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverToBoxAdapter(
+              child: HumanReadableWidget(
+                name: 'Query',
+                value: request?.queryParameters.json,
+              ),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverToBoxAdapter(
+              child: HumanReadableWidget(
+                name: 'Size (bytes)',
+                value: request?.size.toString(),
+              ),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverToBoxAdapter(
+              child: HumanReadableWidget(name: 'Body', value: request?.body),
+            ),
+          ),
+          SliverToBoxAdapter(child: SizedBox(height: 8)),
+        ],
+      ),
+    );
+  }
+
+  MapEntry<Tab, Widget> _response(BuildContext context) {
+    return MapEntry(
+      const Tab(text: 'Response', icon: Icon(Icons.list, color: Colors.white)),
+      CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(child: SizedBox(height: 8)),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverToBoxAdapter(
+              child: HumanReadableWidget(
+                name: 'Timestamp',
+                value: response?.time.toIso8601String(),
+              ),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverToBoxAdapter(
+              child: HumanReadableWidget(
+                name: 'Size (bytes)',
+                value: response?.size.toString(),
+              ),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverToBoxAdapter(
+              child: HumanReadableWidget(
+                name: 'Headers',
+                value: response?.headers?.json,
+              ),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverToBoxAdapter(
+              child: HumanReadableWidget(name: 'Body', value: response?.body),
+            ),
+          ),
+          SliverToBoxAdapter(child: SizedBox(height: 8)),
+        ],
+      ),
+    );
+  }
+
+  MapEntry<Tab, Widget> _errors(BuildContext context) {
+    return MapEntry(
+      const Tab(text: 'Error', icon: Icon(Icons.warning, color: Colors.white)),
+      CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(child: SizedBox(height: 8)),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverToBoxAdapter(
+              child: HumanReadableWidget(
+                name: 'Error',
+                value: error?.error.toString(),
+              ),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverToBoxAdapter(
+              child: HumanReadableWidget(
+                name: 'Stack Trace',
+                value: error?.stackTrace.toString(),
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(child: SizedBox(height: 8)),
+        ],
+      ),
+    );
   }
 }
-
-
-
-
-
-

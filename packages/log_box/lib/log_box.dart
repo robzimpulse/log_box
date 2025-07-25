@@ -1,3 +1,5 @@
 export 'src/log_box.dart';
 export 'src/model/entry_model.dart';
 export 'src/storage/storage.dart';
+export 'src/widget/human_readable_widget.dart';
+export 'src/common/extension.dart';
