@@ -36,6 +36,8 @@ dependencies:
   cupertino_icons: ^1.0.8
   log_box:
     path: ../packages/log_box
+  log_box_dio_logger:
+    path: ../packages/log_box_dio_logger
 
 dev_dependencies:
   flutter_test:
