@@ -134,8 +134,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       builder: (context, _) {
         if (widget.storage.types.isEmpty) return const SizedBox.shrink();
 
-        final data = [...widget.storage.types]
-          ..sort((a, b) => a.toString().compareTo(b.toString()));
+        final mappedTypes = {...widget.storage.types};
+        final keys = [...mappedTypes.keys]..sort((a, b) => a.compareTo(b));
 
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -147,9 +147,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
               runSpacing: 8,
               direction: Axis.horizontal,
               children: [
-                for (final type in data)
+                for (final key in keys)
                   Builder(
                     builder: (context) {
+                      final type = mappedTypes[key];
+                      if (type == null) return SizedBox.shrink();
                       final selected = selectedTypes.value.contains(type);
                       return OutlinedButton(
                         onPressed: () {
@@ -160,7 +162,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         style: OutlinedButton.styleFrom(
                           backgroundColor: selected ? Colors.grey : null,
                         ),
-                        child: Text(type.toString()),
+                        child: Text(key),
                       );
                     },
                   ),

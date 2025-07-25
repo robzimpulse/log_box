@@ -32,5 +32,9 @@ class Storage with ChangeNotifier {
     notifyListeners();
   }
 
-  Set<Type> get types => {..._logs.values.map((e) => e.runtimeType)};
+  Map<String, Type> get types {
+    return _logs.map(
+      (key, value) => MapEntry(value.display(), value.runtimeType),
+    );
+  }
 }
