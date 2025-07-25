@@ -31,6 +31,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final LogBox box = LogBox(capacity: 100);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,12 +41,13 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Center(
-        child: TextButton(onPressed: () {
-          LogBox().log('testing message');
-        }, child: Text('Send Log')),
+        child: TextButton(
+          onPressed: () => box.log('testing message'),
+          child: Text('Send Log'),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => LogBox().dashboard(context: context),
+        onPressed: () => box.dashboard(context: context),
         child: const Icon(Icons.bug_report),
       ),
     );

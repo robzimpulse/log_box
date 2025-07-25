@@ -12,3 +12,11 @@ command:
     # makes the CI much more stable.
     runPubGetInParallel: false
     usePubspecOverrides: true
+
+scripts:
+  flutter_clean:
+    description: Clean all packages.
+    run: melos exec -c 1 -- "flutter clean"
+  get:
+    description: Get dependencies for all packages.
+    run: melos exec -- "flutter pub get"
