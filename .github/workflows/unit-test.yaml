@@ -3,9 +3,13 @@ name: Unit Test
 on:
   workflow_dispatch:
   push:
+    paths:
+      - packages/**
     branches:
       - main
   pull_request:
+    paths:
+      - packages/**
     branches:
       - main
 
@@ -25,7 +29,9 @@ jobs:
           cache: true
 
       - name: "Install Packages"
+        working-directory: ./packages/log_box_core
         run: flutter pub get
 
       - name: 'Run Test'
+        working-directory: ./packages/log_box_core
         run: flutter test
