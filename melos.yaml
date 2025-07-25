@@ -1,10 +1,6 @@
 name: LogBox
 repository: https://github.com/robzimpulse/log_box
 
-ide:
-  intellij:
-    enabled: false
-
 packages:
   - packages/**
   - example

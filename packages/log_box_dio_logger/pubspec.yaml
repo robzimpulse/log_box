@@ -1,6 +1,6 @@
-name: log_box
-description: "Just another extendable logger"
-version: 0.1.0
+name: log_box_dio_logger
+description: "Log Box extension for Dio Library"
+version: 0.0.1
 
 environment:
   sdk: ^3.7.2
@@ -9,7 +9,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  uuid: ^4.5.1
 
 dev_dependencies:
   flutter_test:
