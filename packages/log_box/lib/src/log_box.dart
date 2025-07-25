@@ -7,8 +7,12 @@ import 'screen/detail_screen.dart';
 
 class LogBox {
   final Storage storage;
-  final dashboardRouteName = const RouteSettings(name: 'Log Box Dashboard');
-  final detailRouteName = const RouteSettings(name: 'Log Box Detail');
+
+  // variable for storing dynamic value between extension library
+  final Map<String, dynamic> configuration = {
+    'dashboard_route': const RouteSettings(name: 'Log Box Dashboard'),
+    'detail_route': const RouteSettings(name: 'Log Box Detail')
+  };
 
   LogBox({required int capacity}) : storage = Storage(capacity: capacity);
 
@@ -36,7 +40,7 @@ class LogBox {
     Navigator.push(
       context,
       MaterialPageRoute(
-        settings: dashboardRouteName,
+        settings: configuration['dashboard_route'],
         builder: (context) {
           return Theme(
             data: theme ?? Theme.of(context),
@@ -46,7 +50,7 @@ class LogBox {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    settings: detailRouteName,
+                    settings: configuration['detail_route'],
                     builder: (context) => DetailScreen(data: item),
                   ),
                 );

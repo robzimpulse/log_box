@@ -5,7 +5,7 @@ import 'package:universal_io/io.dart';
 import '../interceptor/log_box_network_interceptor.dart';
 import '../model/network_entry_model.dart';
 
-extension LogBoxDioLogger on LogBox {
+extension LogBoxDioLoggerExtension on LogBox {
   Interceptor get interceptor => LogBoxNetworkInterceptor(storage: storage);
 }
 
