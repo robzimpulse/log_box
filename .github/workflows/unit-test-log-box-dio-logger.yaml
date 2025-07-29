@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - 'packages/log_box/**'
+      - 'packages/log_box_dio_logger/**'
   pull_request:
     paths:
-      - 'packages/log_box/**'
+      - 'packages/log_box_dio_logger/**'
 
 jobs:
   test:
