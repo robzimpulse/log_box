@@ -70,7 +70,7 @@ class NavigationEntryModel extends EntryModel {
   String display() => 'Navigation';
 
   @override
-  EntryModel merge(other) {
+  NavigationEntryModel merge(other) {
     if (other is! NavigationEntryModel) return this;
     return copyWith(
       previousRoute: other.previousRoute ?? previousRoute,
