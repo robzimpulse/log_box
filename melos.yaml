@@ -16,7 +16,26 @@ command:
 scripts:
   flutter_clean:
     description: Clean all packages.
-    run: melos exec -c 1 -- "flutter clean"
+    run: flutter clean
+    exec:
+      concurrency: 5
+      failFast: true
+      orderDependents: true
+
   get:
     description: Get dependencies for all packages.
-    run: melos exec -- "flutter pub get"
+    run: flutter pub get
+    exec:
+      concurrency: 5
+      failFast: true
+      orderDependents: true
+
+  test:
+    description: Test for all packages.
+    run: flutter test
+    exec:
+      concurrency: 5
+      failFast: true
+      orderDependents: true
+    packageFilters:
+      dirExists: "test"
