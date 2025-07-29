@@ -1,4 +1,4 @@
-name: Unit Test Log Box
+name: Unit Test Log Box Navigation Observer
 
 on:
   workflow_dispatch:
