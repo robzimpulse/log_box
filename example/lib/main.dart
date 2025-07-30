@@ -23,11 +23,40 @@ class App extends StatelessWidget {
     return MaterialApp.router(
       routerConfig: GoRouter(
         observers: [box.observer],
+        initialLocation: '/',
         routes: [
           GoRoute(
             path: '/',
             builder: (context, state) {
               return Home(title: 'Flutter Demo Home Page', box: box, dio: dio);
+            },
+          ),
+          GoRoute(
+            path: '/screen_1',
+            builder: (context, state) {
+              return Scaffold(
+                appBar: AppBar(title: Text('Screen 1')),
+                body: Center(
+                  child: TextButton(
+                    onPressed: () => context.push('/screen_2'),
+                    child: Text('Push Screen 2'),
+                  ),
+                ),
+              );
+            },
+          ),
+          GoRoute(
+            path: '/screen_2',
+            builder: (context, state) {
+              return Scaffold(
+                appBar: AppBar(title: Text('Screen 2')),
+                body: Center(
+                  child: TextButton(
+                    onPressed: () => context.pushReplacement('/screen_1'),
+                    child: Text('Replace to Screen 1'),
+                  ),
+                ),
+              );
             },
           ),
         ],
@@ -57,6 +86,7 @@ class Home extends StatelessWidget {
       ),
       body: Center(
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             TextButton(
               onPressed: () => box.log('testing message'),
@@ -70,6 +100,14 @@ class Home extends StatelessWidget {
                 ScaffoldMessenger.of(context).showSnackBar(snackbar);
               },
               child: Text('Send Get Request'),
+            ),
+            TextButton(
+              onPressed: () => context.push('/screen_1'),
+              child: Text('Go to Screen 1'),
+            ),
+            TextButton(
+              onPressed: () => context.push('/screen_2'),
+              child: Text('Go to Screen 2'),
             ),
           ],
         ),

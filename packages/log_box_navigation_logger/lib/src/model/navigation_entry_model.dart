@@ -39,22 +39,27 @@ class NavigationEntryModel extends EntryModel {
       NavigationAction.replace => Colors.blue,
     };
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Icon(icon, size: 16, color: color),
-            const SizedBox(width: 8),
-            Text(
-              action.name.toUpperCase(),
-              style: theme.textTheme.labelLarge?.copyWith(color: color),
-            ),
-          ],
-        ),
-        Text('Route: $route', style: theme.textTheme.labelMedium),
-        Text('Previous: $previousRoute', style: theme.textTheme.labelMedium),
-      ],
+    final preposition = switch (action) {
+      NavigationAction.push => 'To',
+      NavigationAction.pop => 'From',
+      NavigationAction.remove => 'Route',
+      NavigationAction.replace => 'With',
+    };
+
+    return Text.rich(
+      TextSpan(
+        children: [
+          WidgetSpan(child: Icon(icon, size: 16, color: color)),
+          WidgetSpan(child: SizedBox(width: 8)),
+          TextSpan(
+            text: action.name.toUpperCase(),
+            style: theme.textTheme.labelLarge?.copyWith(color: color),
+          ),
+          TextSpan(text: ' $preposition '),
+          TextSpan(text: route),
+        ],
+      ),
+      style: theme.textTheme.labelLarge,
     );
   }
 
