@@ -9,19 +9,10 @@ extension LogBoxNavigatorObserverExtension on LogBox {
       onEvent: (event) {
         final route = event.route;
         final prev = event.previousRoute;
-        final shouldSkip = [
-          route == configuration['dashboard_route'],
-          prev == configuration['detail_route'],
-          route == configuration['detail_route'],
-          prev == configuration['dashboard_route'],
-        ].contains(true);
-
-        if (shouldSkip) return;
-
-        final name = event.previousRoute ?? configuration['prevRouteName'];
-
-        storage.add(log: event.copyWith(previousRoute: name));
-        if (event.route != null) configuration['prevRouteName'] = event.route;
+        final names = routes.values.map((e) => e.name).nonNulls;
+        final skip = names.contains(route) || names.contains(prev);
+        if (skip) return;
+        storage.add(log: event);
       },
     );
   }

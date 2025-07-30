@@ -1,5 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:log_box/log_box.dart';
+import 'package:log_box_dio_logger/log_box_dio_logger.dart';
 
 void main() {
   runApp(const MyApp());
@@ -33,6 +35,14 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final LogBox box = LogBox(capacity: 100);
 
+  final dio = Dio();
+
+  @override
+  void initState() {
+    super.initState();
+    dio.interceptors.add(box.interceptor);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,9 +51,23 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Center(
-        child: TextButton(
-          onPressed: () => box.log('testing message'),
-          child: Text('Send Log'),
+        child: Column(
+          children: [
+            TextButton(
+              onPressed: () => box.log('testing message'),
+              child: Text('Send Log'),
+            ),
+            TextButton(
+              onPressed: () async {
+                final response = await dio.get('https://google.com');
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(response.toString())));
+              },
+              child: Text('Send Get Request'),
+            ),
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
