@@ -1,54 +1,59 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:log_box/log_box.dart';
 import 'package:log_box_dio_logger/log_box_dio_logger.dart';
+import 'package:log_box_navigation_logger/log_box_navigation_logger.dart';
 
 void main() {
-  runApp(const MyApp());
+  final box = LogBox(capacity: 100);
+  final dio = Dio()..interceptors.add(box.interceptor);
+  runApp(App(box: box, dio: dio));
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class App extends StatelessWidget {
+  const App({super.key, required this.box, required this.dio});
+
+  final LogBox box;
+  final Dio dio;
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
+    return MaterialApp.router(
+      routerConfig: GoRouter(
+        observers: [box.observer],
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (context, state) {
+              return Home(title: 'Flutter Demo Home Page', box: box, dio: dio);
+            },
+          ),
+        ],
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
+class Home extends StatelessWidget {
   final String title;
+  final LogBox box;
+  final Dio dio;
 
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  final LogBox box = LogBox(capacity: 100);
-
-  final dio = Dio();
-
-  @override
-  void initState() {
-    super.initState();
-    dio.interceptors.add(box.interceptor);
-  }
+  const Home({
+    super.key,
+    required this.title,
+    required this.box,
+    required this.dio,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        title: Text(title),
       ),
       body: Center(
         child: Column(
@@ -61,9 +66,8 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () async {
                 final response = await dio.get('https://google.com');
                 if (!context.mounted) return;
-                ScaffoldMessenger.of(
-                  context,
-                ).showSnackBar(SnackBar(content: Text(response.toString())));
+                final snackbar = SnackBar(content: Text(response.toString()));
+                ScaffoldMessenger.of(context).showSnackBar(snackbar);
               },
               child: Text('Send Get Request'),
             ),

@@ -31,6 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
   dio: ^5.7.0
+  go_router: ^16.0.0
   log_box:
     git:
       url: https://github.com/robzimpulse/log_box.git
