@@ -1,5 +1,5 @@
-name: log_box_navigation_observer
-description: "Log Box extension for Navigation Observer"
+name: log_box_navigation_logger
+description: "Log Box extension for Navigation"
 version: 0.0.1
 publish_to: none
 
@@ -11,7 +11,10 @@ dependencies:
   flutter:
     sdk: flutter
   log_box:
-    path: ../log_box
+    git:
+      url: https://github.com/robzimpulse/log_box.git
+      ref: master
+      path: packages/log_box
 
 dev_dependencies:
   flutter_test:

@@ -35,9 +35,20 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   log_box:
-    path: ../packages/log_box
+    git:
+      url: https://github.com/robzimpulse/log_box.git
+      ref: master
+      path: packages/log_box
   log_box_dio_logger:
-    path: ../packages/log_box_dio_logger
+    git:
+      url: https://github.com/robzimpulse/log_box.git
+      ref: master
+      path: packages/log_box_dio_logger
+  log_box_navigation_logger:
+    git:
+      url: https://github.com/robzimpulse/log_box.git
+      ref: master
+      path: packages/log_box_navigation_logger
 
 dev_dependencies:
   flutter_test:

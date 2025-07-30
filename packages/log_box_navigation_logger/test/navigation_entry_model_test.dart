@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:log_box_navigation_observer/src/enum/enum.dart';
-import 'package:log_box_navigation_observer/src/model/navigation_entry_model.dart';
+import 'package:log_box_navigation_logger/log_box_navigation_logger.dart';
 
 void main() {
   final entry1 = NavigationEntryModel(

@@ -11,7 +11,10 @@ dependencies:
   flutter:
     sdk: flutter
   log_box:
-    path: ../log_box
+    git:
+      url: https://github.com/robzimpulse/log_box.git
+      ref: master
+      path: packages/log_box
   dio: ^5.7.0
   equatable: ^2.0.5
   universal_io: ^2.2.2
