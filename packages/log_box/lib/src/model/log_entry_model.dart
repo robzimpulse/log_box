@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../src/extension/map_json_extension.dart';
 import '../widget/human_readable_widget.dart';
-import '../common/extension.dart';
 import 'entry_model.dart';
 
 class LogEntryModel extends EntryModel {
