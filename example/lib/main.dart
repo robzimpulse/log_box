@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:log_box/log_box.dart';
 import 'package:log_box_dio_logger/log_box_dio_logger.dart';
 import 'package:log_box_navigation_logger/log_box_navigation_logger.dart';
+import 'package:log_box_in_app_webview_logger/log_box_in_app_webview_logger.dart';
 
 void main() {
   final box = LogBox(capacity: 100);
@@ -21,6 +22,9 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+      ),
       routerConfig: GoRouter(
         observers: [box.observer],
         initialLocation: '/',
@@ -35,7 +39,10 @@ class App extends StatelessWidget {
             path: '/screen_1',
             builder: (context, state) {
               return Scaffold(
-                appBar: AppBar(title: Text('Screen 1')),
+                appBar: AppBar(
+                  title: Text('Screen 1'),
+                  backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+                ),
                 body: Center(
                   child: TextButton(
                     onPressed: () => context.push('/screen_2'),
@@ -49,7 +56,10 @@ class App extends StatelessWidget {
             path: '/screen_2',
             builder: (context, state) {
               return Scaffold(
-                appBar: AppBar(title: Text('Screen 2')),
+                appBar: AppBar(
+                  title: Text('Screen 2'),
+                  backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+                ),
                 body: Center(
                   child: TextButton(
                     onPressed: () => context.pushReplacement('/screen_1'),
@@ -100,6 +110,15 @@ class Home extends StatelessWidget {
                 ScaffoldMessenger.of(context).showSnackBar(snackbar);
               },
               child: Text('Send Get Request'),
+            ),
+            TextButton(
+              onPressed: () {
+                box.webview(
+                  context: context,
+                  uri: Uri.parse('https://google.com'),
+                );
+              },
+              child: Text('Open Webview'),
             ),
             TextButton(
               onPressed: () => context.push('/screen_1'),

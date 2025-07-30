@@ -1,0 +1,24 @@
+name: log_box_in_app_webview_logger
+description: "A new Flutter project."
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: ^3.7.2
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  uuid: ^4.5.1
+  flutter_inappwebview: ^6.1.0
+  log_box:
+    git:
+      url: https://github.com/robzimpulse/log_box.git
+      ref: master
+      path: packages/log_box
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
