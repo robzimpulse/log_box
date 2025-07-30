@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../src/extension/copyable_text_extension.dart';
-import '../../src/extension/json_helper_extension.dart';
+import '../../src/extension/extension.dart';
 
 class HumanReadableWidget extends StatelessWidget {
   const HumanReadableWidget({super.key, required this.name, this.value});

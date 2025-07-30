@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:log_box/src/storage/storage.dart';
 
+import 'model/log_entry_model.dart';
 import 'screen/dashboard_screen.dart';
 import 'screen/detail_screen.dart';
 
@@ -11,6 +12,26 @@ class LogBox {
   Map<String, RouteSettings> routes = {};
 
   LogBox({required int capacity}) : storage = Storage(capacity: capacity);
+
+  void log(
+    String message, {
+    String? id,
+    Map<String, dynamic>? extra,
+    String? name,
+    Object? error,
+    StackTrace? stackTrace,
+  }) {
+    storage.add(
+      log: LogEntryModel(
+        id: id,
+        name: name,
+        message: message,
+        extra: extra ?? {},
+        error: error,
+        stackTrace: stackTrace,
+      ),
+    );
+  }
 
   void dashboard({required BuildContext context, ThemeData? theme}) {
     Navigator.push(
