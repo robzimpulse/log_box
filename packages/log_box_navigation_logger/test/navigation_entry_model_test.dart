@@ -38,7 +38,7 @@ void main() {
     );
     test(
       'data should have entry 2 previous route',
-      () => expect(data.previousRoute, entry1.previousRoute),
+      () => expect(data.previousRoute, entry2.previousRoute),
     );
   });
 }
