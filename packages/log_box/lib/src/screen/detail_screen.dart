@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../log_box.dart';
 import '../model/entry_model.dart';
 
 class DetailScreen extends StatelessWidget {
-  const DetailScreen({super.key, required this.data});
+  const DetailScreen({super.key, required this.data, required this.box});
 
   final EntryModel data;
+  final LogBox box;
 
   @override
   Widget build(BuildContext context) {
@@ -20,9 +22,7 @@ class DetailScreen extends StatelessWidget {
             onPressed: () => Navigator.pop(context),
             icon: const Icon(Icons.arrow_back),
           ),
-          actions: [
-            // TODO: add action based on data
-          ],
+          actions: data.menus(context, box),
           bottom: TabBar(
             labelColor: Colors.white,
             unselectedLabelColor: Colors.white,

@@ -4,6 +4,7 @@ import 'package:log_box/log_box.dart';
 import 'http_error_model.dart';
 import 'http_request_model.dart';
 import 'http_response_model.dart';
+import '../extension/extension.dart';
 
 class NetworkEntryModel extends EntryModel {
   final String? client;
@@ -60,7 +61,6 @@ class NetworkEntryModel extends EntryModel {
 
   @override
   String display() => 'Network';
-
 
   @override
   NetworkEntryModel merge(other) {
@@ -325,5 +325,15 @@ class NetworkEntryModel extends EntryModel {
         ],
       ),
     );
+  }
+
+  @override
+  List<Widget> menus(BuildContext context, LogBox box) {
+    return [
+      IconButton(
+        onPressed: () => curl.copyToClipboard(context: context),
+        icon: Icon(Icons.copy),
+      ),
+    ];
   }
 }

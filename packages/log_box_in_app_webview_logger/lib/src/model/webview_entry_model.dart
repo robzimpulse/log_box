@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:log_box/log_box.dart';
+import 'package:log_box_in_app_webview_logger/log_box_in_app_webview_logger.dart';
 
 import '../enum/enum.dart';
 
@@ -153,43 +154,61 @@ class WebviewEntryModel extends EntryModel {
   MapEntry<Tab, Widget> _events(BuildContext context) {
     final theme = Theme.of(context);
 
+    final slivers = [];
+    for (final event in events.reversed) {
+      final json = event.extra?.json;
+      if (json == null) {
+        slivers.add(
+          SliverToBoxAdapter(
+            child: ListTile(
+              visualDensity: VisualDensity.compact,
+              title: Text(
+                event.event.name,
+                maxLines: 1,
+                style: theme.textTheme.labelLarge,
+                overflow: TextOverflow.ellipsis,
+              ),
+              subtitle: Text(
+                event.timestamp.toIso8601String(),
+                style: theme.textTheme.labelSmall?.copyWith(color: Colors.grey),
+              ),
+            ),
+          ),
+        );
+      } else {
+        slivers.add(
+          SliverToBoxAdapter(
+            child: ExpansionTile(
+              visualDensity: VisualDensity.compact,
+              title: Text(
+                event.event.name,
+                maxLines: 1,
+                style: theme.textTheme.labelLarge,
+                overflow: TextOverflow.ellipsis,
+              ),
+              subtitle: Text(
+                event.timestamp.toIso8601String(),
+                style: theme.textTheme.labelSmall?.copyWith(color: Colors.grey),
+              ),
+              showTrailingIcon: event.extra?.json != null,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: HumanReadableWidget(name: 'Extra', value: json),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+    }
+
     return MapEntry(
       const Tab(text: 'Events', icon: Icon(Icons.event, color: Colors.white)),
       CustomScrollView(
         slivers: [
           SliverToBoxAdapter(child: SizedBox(height: 8)),
-          for (final event in events.reversed)
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              sliver: SliverToBoxAdapter(
-                child: ExpansionTile(
-                  visualDensity: VisualDensity.compact,
-                  title: Text(
-                    event.event.name,
-                    maxLines: 1,
-                    style: theme.textTheme.labelLarge,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  subtitle: Text(
-                    event.timestamp.toIso8601String(),
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: Colors.grey,
-                    ),
-                  ),
-                  showTrailingIcon: event.extra?.json != null,
-                  children: [
-                    if (event.extra?.json != null)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: HumanReadableWidget(
-                          name: 'Extra',
-                          value: event.extra?.json,
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ),
+          ...slivers,
           SliverToBoxAdapter(child: SizedBox(height: 8)),
         ],
       ),
@@ -233,5 +252,17 @@ class WebviewEntryModel extends EntryModel {
         ],
       ),
     );
+  }
+
+  @override
+  List<Widget> menus(BuildContext context, LogBox box) {
+    final uri = this.uri;
+    return [
+      if (uri != null)
+        IconButton(
+          onPressed: () => box.webview(context: context, uri: uri),
+          icon: Icon(Icons.public),
+        ),
+    ];
   }
 }

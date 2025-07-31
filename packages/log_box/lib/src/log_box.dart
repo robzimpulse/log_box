@@ -54,7 +54,7 @@ class LogBox {
                       'detail_route',
                       () => const RouteSettings(name: 'Log Box Detail'),
                     ),
-                    builder: (context) => DetailScreen(data: item),
+                    builder: (context) => DetailScreen(data: item, box: this),
                   ),
                 );
               },

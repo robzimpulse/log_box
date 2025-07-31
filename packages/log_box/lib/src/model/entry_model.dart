@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:log_box/log_box.dart';
 import 'package:uuid/uuid.dart';
 
 abstract class EntryModel {
@@ -25,6 +26,9 @@ abstract class EntryModel {
 
   /// Renders the tab and its content on detail screen
   Map<Tab, Widget> tabs(BuildContext context);
+
+  /// Renders the action menu on detail screen
+  List<Widget> menus(BuildContext context, LogBox box) => [];
 
   /// Logic for filtering in dashboard screen
   bool contains(String keyword);

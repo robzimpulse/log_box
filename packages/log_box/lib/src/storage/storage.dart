@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 import '../model/entry_model.dart';
 
@@ -24,12 +25,12 @@ class Storage with ChangeNotifier {
       _logs.remove(_logs.keys.firstOrNull);
     }
 
-    notifyListeners();
+    Future.microtask(() => notifyListeners());
   }
 
   void clear() {
     _logs.clear();
-    notifyListeners();
+    Future.microtask(() => notifyListeners());
   }
 
   Map<String, Type> get types {
