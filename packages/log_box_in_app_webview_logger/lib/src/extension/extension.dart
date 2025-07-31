@@ -28,7 +28,6 @@ extension InAppWebviewLoggerExtension on LogBox {
             child: InAppWebviewScreen(
               uri: uri,
               html: html,
-              observer: inAppWebviewObserver,
               onTapSnapshot: onTapSnapshot,
             ),
           );

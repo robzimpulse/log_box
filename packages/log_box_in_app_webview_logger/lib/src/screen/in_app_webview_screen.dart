@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:log_box_in_app_webview_logger/src/observer/in_app_webview_observer.dart';
 
 class InAppWebviewScreen extends StatefulWidget {
   const InAppWebviewScreen({
     super.key,
     required this.uri,
-    required this.observer,
     this.html,
     this.scripts = const [],
     this.headers,
     this.onTapSnapshot,
   });
 
-  final InAppWebviewObserver observer;
   final String? html;
   final Uri uri;
   final List<String> scripts;
@@ -38,14 +35,8 @@ class _InAppWebviewScreenState extends State<InAppWebviewScreen> {
 
   @override
   void dispose() {
-    widget.observer.set(loading: false);
+    webViewController?.dispose();
     super.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    widget.observer.set(loading: true);
   }
 
   Widget _drawer(BuildContext context) {
@@ -154,7 +145,6 @@ class _InAppWebviewScreenState extends State<InAppWebviewScreen> {
       initialData: initialData,
       onWebViewCreated: (controller) {
         webViewController = controller;
-        widget.observer.onWebViewCreated(uri: widget.uri);
       },
       initialSettings: InAppWebViewSettings(
         isInspectable: true,
@@ -163,43 +153,25 @@ class _InAppWebviewScreenState extends State<InAppWebviewScreen> {
       ),
       onContentSizeChanged: (_, curr, prev) {
         _log('onContentSizeChanged: $curr - $prev');
-        widget.observer.onContentSizeChanged(previous: prev, current: curr);
       },
       onLoadStart: (_, url) {
         _log('onLoadStart: $url');
-        widget.observer.onLoadStart(uri: url?.uriValue);
       },
       onLoadStop: (_, url) async {
         _log('onLoadStop: $url');
-        widget.observer.onLoadStop(uri: url?.uriValue);
-      },
-      onAjaxProgress: (_, request) async {
-        widget.observer.onAjaxRequest(extra: request.toMap());
-        return AjaxRequestAction.PROCEED;
-      },
-      onAjaxReadyStateChange: (_, request) async {
-        widget.observer.onAjaxRequest(extra: request.toMap());
-        return null;
       },
       onProgressChanged: (controller, progress) async {
         _log('onProgress: $progress');
-        widget.observer.onProgressChanged(progress: progress);
       },
       onReceivedError: (_, request, error) {
         _log('onReceivedError: ${request.url} - ${error.description}');
-        widget.observer.onReceivedError(
-          message: error.description,
-          extra: {'request': request.toMap(), 'error': error.toMap()},
-        );
       },
       onConsoleMessage: (controller, message) async {
         _log('onConsoleMessage: ${message.message}');
-        widget.observer.onConsoleMessage(extra: message.toMap());
       },
       shouldOverrideUrlLoading: (_, action) async {
         final destination = action.request.url;
         _log('shouldOverrideUrlLoading: $destination');
-        widget.observer.shouldOverrideUrlLoading(extra: action.toMap());
 
         if (destination == null) {
           return NavigationActionPolicy.CANCEL;
