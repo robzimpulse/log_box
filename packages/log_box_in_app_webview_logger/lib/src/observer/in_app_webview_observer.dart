@@ -108,14 +108,14 @@ class InAppWebviewObserver {
     );
   }
 
-  void onReceivedError({String? message, Map<String, dynamic>? extra}) {
+  void onReceivedError({Map<String, dynamic>? extra}) {
     _storage.add(
       log: WebviewEntryModel(
         id: _id,
         events: [
           WebviewEntryModelLog(
             event: WebviewEvent.onProgressChanged,
-            extra: {'message': message, ...?extra},
+            extra: extra,
           ),
         ],
       ),
