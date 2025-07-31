@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:log_box/log_box.dart';
@@ -18,13 +19,33 @@ class App extends StatelessWidget {
   final LogBox box;
   final Dio dio;
 
-  // This widget is the root of your application.
+  ThemeData _themeLight() {
+    return FlexThemeData.light(
+      scheme: FlexScheme.outerSpace,
+      surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
+      blendLevel: 7,
+      subThemesData: const FlexSubThemesData(
+        blendOnLevel: 10,
+        blendOnColors: false,
+        useTextTheme: true,
+        useM2StyleDividerInM3: true,
+        alignedDropdown: true,
+        useInputDecoratorThemeInDialogs: true,
+        inputDecoratorUnfocusedHasBorder: false,
+        inputDecoratorFocusedHasBorder: false,
+        appBarBackgroundSchemeColor: SchemeColor.primary,
+        outlinedButtonRadius: 8,
+      ),
+      visualDensity: FlexColorScheme.comfortablePlatformDensity,
+      useMaterial3: true,
+      swapLegacyOnMaterial3: true,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-      ),
+      theme: _themeLight(),
       routerConfig: GoRouter(
         observers: [box.observer],
         initialLocation: '/',
@@ -39,10 +60,7 @@ class App extends StatelessWidget {
             path: '/screen_1',
             builder: (context, state) {
               return Scaffold(
-                appBar: AppBar(
-                  title: Text('Screen 1'),
-                  backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-                ),
+                appBar: AppBar(title: Text('Screen 1')),
                 body: Center(
                   child: TextButton(
                     onPressed: () => context.push('/screen_2'),
@@ -56,10 +74,7 @@ class App extends StatelessWidget {
             path: '/screen_2',
             builder: (context, state) {
               return Scaffold(
-                appBar: AppBar(
-                  title: Text('Screen 2'),
-                  backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-                ),
+                appBar: AppBar(title: Text('Screen 2')),
                 body: Center(
                   child: TextButton(
                     onPressed: () => context.pushReplacement('/screen_1'),
@@ -90,10 +105,7 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(title),
-      ),
+      appBar: AppBar(title: Text(title)),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,

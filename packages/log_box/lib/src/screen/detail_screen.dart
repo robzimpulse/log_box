@@ -13,7 +13,6 @@ class DetailScreen extends StatelessWidget {
       length: data.tabs(context).length,
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           title: const Text('Detail Log'),
           elevation: 3,
           centerTitle: false,

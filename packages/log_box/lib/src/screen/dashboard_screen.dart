@@ -74,7 +74,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       onPopInvokedWithResult: (success, _) => !success ? _toggleSearch() : {},
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: theme.colorScheme.inversePrimary,
           actions: [
             ValueListenableBuilder(
               valueListenable: isSearchMode,
