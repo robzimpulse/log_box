@@ -13,7 +13,7 @@ extension InAppWebviewLoggerExtension on LogBox {
     required Uri uri,
     String? html,
     ThemeData? theme,
-    Function(String? url, String? html)? onTapSnapshot,
+    void Function(String? url, String? html)? onTapSnapshot,
   }) async {
     await Navigator.push(
       context,

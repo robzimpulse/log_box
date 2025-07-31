@@ -15,7 +15,7 @@ class InAppWebviewScreen extends StatefulWidget {
   final Uri uri;
   final List<String> scripts;
   final Map<String, String>? headers;
-  final Function(String? url, String? html)? onTapSnapshot;
+  final void Function(String? url, String? html)? onTapSnapshot;
 
   @override
   State<InAppWebviewScreen> createState() => _InAppWebviewScreenState();
