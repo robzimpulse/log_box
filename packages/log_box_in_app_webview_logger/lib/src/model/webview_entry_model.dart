@@ -74,6 +74,7 @@ class WebviewEntryModel extends EntryModel {
   @override
   Widget title(BuildContext context) {
     final theme = Theme.of(context);
+    final path = uri?.path ?? '/';
 
     return Column(
       children: [
@@ -91,7 +92,7 @@ class WebviewEntryModel extends EntryModel {
             ],
             Expanded(
               child: Text(
-                uri?.path ?? '/',
+                path.isEmpty ? '/' : path,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.labelLarge,
