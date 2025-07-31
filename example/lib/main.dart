@@ -50,11 +50,100 @@ class App extends StatelessWidget {
         observers: [box.observer],
         initialLocation: '/',
         routes: [
-          GoRoute(
-            path: '/',
-            builder: (context, state) {
-              return Home(title: 'Flutter Demo Home Page', box: box, dio: dio);
+          StatefulShellRoute.indexedStack(
+            builder: (context, state, shell) {
+              return Scaffold(
+                bottomNavigationBar: BottomNavigationBar(
+                  currentIndex: shell.currentIndex,
+                  type: BottomNavigationBarType.fixed,
+                  showUnselectedLabels: true,
+                  items: [
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.home),
+                      label: 'Home',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.search),
+                      label: 'Search',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.person),
+                      label: 'Account',
+                    ),
+                  ],
+                  onTap: (index) {
+                    shell.goBranch(
+                      index,
+                      initialLocation: index == shell.currentIndex,
+                    );
+                  },
+                ),
+                body: shell,
+                floatingActionButton: FloatingActionButton(
+                  onPressed: () => box.dashboard(context: context),
+                  child: const Icon(Icons.bug_report),
+                ),
+              );
             },
+            branches: [
+              StatefulShellBranch(
+                observers: [box.observer],
+                routes: [
+                  GoRoute(
+                    path: '/',
+                    builder: (context, state) {
+                      return Scaffold(
+                        appBar: AppBar(title: Text('Home')),
+                        body: Center(
+                          child: TextButton(
+                            onPressed: () => context.push('/screen_1'),
+                            child: Text('Push to Screen 1'),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+              StatefulShellBranch(
+                observers: [box.observer],
+                routes: [
+                  GoRoute(
+                    path: '/search',
+                    builder: (context, state) {
+                      return Scaffold(
+                        appBar: AppBar(title: Text('Search')),
+                        body: Center(
+                          child: TextButton(
+                            onPressed: () => context.push('/screen_1'),
+                            child: Text('Push to Screen 1'),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+              StatefulShellBranch(
+                observers: [box.observer],
+                routes: [
+                  GoRoute(
+                    path: '/account',
+                    builder: (context, state) {
+                      return Scaffold(
+                        appBar: AppBar(title: Text('Account')),
+                        body: Center(
+                          child: TextButton(
+                            onPressed: () => context.push('/screen_1'),
+                            child: Text('Push to Screen 1'),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ],
           ),
           GoRoute(
             path: '/screen_1',
@@ -62,9 +151,18 @@ class App extends StatelessWidget {
               return Scaffold(
                 appBar: AppBar(title: Text('Screen 1')),
                 body: Center(
-                  child: TextButton(
-                    onPressed: () => context.push('/screen_2'),
-                    child: Text('Push Screen 2'),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextButton(
+                        onPressed: () => context.push('/screen_2'),
+                        child: Text('Push Screen 2'),
+                      ),
+                      TextButton(
+                        onPressed: () => context.push('/features'),
+                        child: Text('Push Screen Feature'),
+                      ),
+                    ],
                   ),
                 ),
               );
@@ -78,7 +176,46 @@ class App extends StatelessWidget {
                 body: Center(
                   child: TextButton(
                     onPressed: () => context.pushReplacement('/screen_1'),
-                    child: Text('Replace to Screen 1'),
+                    child: Text('Push Screen 1'),
+                  ),
+                ),
+              );
+            },
+          ),
+          GoRoute(
+            path: '/features',
+            builder: (context, state) {
+              return Scaffold(
+                appBar: AppBar(title: Text('Screen 2')),
+                body: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextButton(
+                        onPressed: () => box.log('testing message'),
+                        child: Text('Send Log'),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          final response = await dio.get('https://google.com');
+                          if (!context.mounted) return;
+                          final snackbar = SnackBar(
+                            content: Text(response.toString()),
+                          );
+                          ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                        },
+                        child: Text('Send Get Request'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          box.webview(
+                            context: context,
+                            uri: Uri.parse('https://google.com/'),
+                          );
+                        },
+                        child: Text('Open Webview'),
+                      ),
+                    ],
                   ),
                 ),
               );
@@ -90,63 +227,63 @@ class App extends StatelessWidget {
   }
 }
 
-class Home extends StatelessWidget {
-  final String title;
-  final LogBox box;
-  final Dio dio;
-
-  const Home({
-    super.key,
-    required this.title,
-    required this.box,
-    required this.dio,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(title)),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextButton(
-              onPressed: () => box.log('testing message'),
-              child: Text('Send Log'),
-            ),
-            TextButton(
-              onPressed: () async {
-                final response = await dio.get('https://google.com');
-                if (!context.mounted) return;
-                final snackbar = SnackBar(content: Text(response.toString()));
-                ScaffoldMessenger.of(context).showSnackBar(snackbar);
-              },
-              child: Text('Send Get Request'),
-            ),
-            TextButton(
-              onPressed: () {
-                box.webview(
-                  context: context,
-                  uri: Uri.parse('https://google.com'),
-                );
-              },
-              child: Text('Open Webview'),
-            ),
-            TextButton(
-              onPressed: () => context.push('/screen_1'),
-              child: Text('Go to Screen 1'),
-            ),
-            TextButton(
-              onPressed: () => context.push('/screen_2'),
-              child: Text('Go to Screen 2'),
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => box.dashboard(context: context),
-        child: const Icon(Icons.bug_report),
-      ),
-    );
-  }
-}
+// class Home extends StatelessWidget {
+//   final String title;
+//   final LogBox box;
+//   final Dio dio;
+//
+//   const Home({
+//     super.key,
+//     required this.title,
+//     required this.box,
+//     required this.dio,
+//   });
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(title: Text(title)),
+//       body: Center(
+//         child: Column(
+//           mainAxisSize: MainAxisSize.min,
+//           children: [
+//             TextButton(
+//               onPressed: () => box.log('testing message'),
+//               child: Text('Send Log'),
+//             ),
+//             TextButton(
+//               onPressed: () async {
+//                 final response = await dio.get('https://google.com');
+//                 if (!context.mounted) return;
+//                 final snackbar = SnackBar(content: Text(response.toString()));
+//                 ScaffoldMessenger.of(context).showSnackBar(snackbar);
+//               },
+//               child: Text('Send Get Request'),
+//             ),
+//             TextButton(
+//               onPressed: () {
+//                 box.webview(
+//                   context: context,
+//                   uri: Uri.parse('https://google.com'),
+//                 );
+//               },
+//               child: Text('Open Webview'),
+//             ),
+//             TextButton(
+//               onPressed: () => context.push('/screen_1'),
+//               child: Text('Go to Screen 1'),
+//             ),
+//             TextButton(
+//               onPressed: () => context.push('/screen_2'),
+//               child: Text('Go to Screen 2'),
+//             ),
+//           ],
+//         ),
+//       ),
+//       floatingActionButton: FloatingActionButton(
+//         onPressed: () => box.dashboard(context: context),
+//         child: const Icon(Icons.bug_report),
+//       ),
+//     );
+//   }
+// }

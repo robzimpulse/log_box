@@ -90,7 +90,7 @@ class WebviewEntryModel extends EntryModel {
             ],
             Expanded(
               child: Text(
-                '${uri?.path}',
+                uri?.path ?? '/',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.labelLarge,
