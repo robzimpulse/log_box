@@ -35,9 +35,7 @@ class LogBox {
       ),
     );
 
-    if (kDebugMode) {
-      dev.log(message, name: name ?? '', error: error, stackTrace: stackTrace);
-    }
+    dev.log(message, name: name ?? '', error: error, stackTrace: stackTrace);
   }
 
   void dashboard({required BuildContext context, ThemeData? theme}) {
