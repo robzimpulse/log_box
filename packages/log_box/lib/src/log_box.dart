@@ -1,3 +1,6 @@
+import 'dart:developer' as dev;
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:log_box/src/storage/storage.dart';
 
@@ -31,6 +34,10 @@ class LogBox {
         stackTrace: stackTrace,
       ),
     );
+
+    if (kDebugMode) {
+      dev.log(message, name: name ?? '', error: error, stackTrace: stackTrace);
+    }
   }
 
   void dashboard({required BuildContext context, ThemeData? theme}) {
