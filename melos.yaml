@@ -43,3 +43,11 @@ scripts:
       orderDependents: true
     packageFilters:
       dirExists: "test"
+
+  upgrade:
+    description: Upgrade dependencies for all packages.
+    run: flutter pub upgrade
+    exec:
+      concurrency: 1
+      failFast: true
+      orderDependents: true
