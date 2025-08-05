@@ -1,4 +1,8 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:equatable/equatable.dart';
+import 'package:universal_io/io.dart';
 
 class HttpResponseModel extends Equatable {
   factory HttpResponseModel.create({
@@ -32,4 +36,18 @@ class HttpResponseModel extends Equatable {
 
   @override
   List<Object?> get props => [status, size, time, body, headers];
+
+  bool get isImage {
+    final result = headers?[HttpHeaders.contentTypeHeader]
+        ?.map((e) => e.contains(RegExp(r'image/.*')))
+        .contains(true);
+
+    return result ?? false;
+  }
+
+  Uint8List? get image {
+    final body = this.body;
+    if (body == null || body.isEmpty) return null;
+    return Uint8List.fromList(List.from(json.decode(body)));
+  }
 }
