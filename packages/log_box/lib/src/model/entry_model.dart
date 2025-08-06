@@ -24,6 +24,9 @@ abstract class EntryModel {
     );
   }
 
+  /// Total tabs count that will be rendered
+  int tabLength(BuildContext context);
+
   /// Renders the tab and its content on detail screen
   Map<Tab, Widget> tabs(BuildContext context);
 

@@ -17,6 +17,9 @@ class NavigationEntryModel extends EntryModel {
   });
 
   @override
+  int tabLength(BuildContext context) => 0;
+
+  @override
   Map<Tab, Widget> tabs(BuildContext context) {
     return {};
   }

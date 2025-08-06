@@ -79,6 +79,9 @@ class NetworkEntryModel extends EntryModel {
   }
 
   @override
+  int tabLength(BuildContext context) => 4;
+
+  @override
   Map<Tab, Widget> tabs(BuildContext context) {
     return Map.fromEntries([
       _overview(context),

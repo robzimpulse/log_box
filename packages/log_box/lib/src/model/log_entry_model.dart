@@ -45,6 +45,9 @@ class LogEntryModel extends EntryModel {
   }
 
   @override
+  int tabLength(BuildContext context) => 3;
+
+  @override
   Map<Tab, Widget> tabs(BuildContext context) {
     return Map.fromEntries([
       _overview(context),

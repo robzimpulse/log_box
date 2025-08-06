@@ -54,7 +54,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _item({required BuildContext context, required EntryModel value}) {
-    final hasDetail = value.tabs(context).isNotEmpty;
+    final hasDetail = value.tabLength(context) > 0;
 
     return ListTile(
       onTap: hasDetail ? () => widget.onTap?.call(value) : null,

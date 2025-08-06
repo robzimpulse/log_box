@@ -12,7 +12,7 @@ class DetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: data.tabs(context).length,
+      length: data.tabLength(context),
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Detail Log'),
