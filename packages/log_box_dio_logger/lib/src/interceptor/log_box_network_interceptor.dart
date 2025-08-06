@@ -102,7 +102,7 @@ class LogBoxNetworkInterceptor extends Interceptor {
           stackTrace: err.stackTrace,
         ),
         response: HttpResponseModel.create(
-          status: response == null ? -1 : response.statusCode,
+          status: response?.statusCode,
           headers: err.response?.headers.map,
           size: data == null ? 0 : utf8.encode(data.toString()).length,
           body: _rawJson(data),

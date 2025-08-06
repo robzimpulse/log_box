@@ -253,7 +253,6 @@ class NetworkEntryModel extends EntryModel {
   }
 
   MapEntry<Tab, Widget> _response(BuildContext context) {
-    final image = response?.image;
     return MapEntry(
       const Tab(text: 'Response', icon: Icon(Icons.list, color: Colors.white)),
       CustomScrollView(
@@ -286,20 +285,16 @@ class NetworkEntryModel extends EntryModel {
               ),
             ),
           ),
-          if (response?.isImage == true && image != null)
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              sliver: SliverToBoxAdapter(
-                child: Image.memory(image, height: 300),
-              ),
-            )
-          else
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              sliver: SliverToBoxAdapter(
-                child: HumanReadableWidget(name: 'Body', value: response?.body),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverToBoxAdapter(
+              child: HumanReadableWidget(
+                name: 'Body',
+                value: response?.body,
+                image: response?.image,
               ),
             ),
+          ),
           SliverToBoxAdapter(child: SizedBox(height: 8)),
         ],
       ),

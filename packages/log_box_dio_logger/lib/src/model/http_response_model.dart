@@ -48,6 +48,10 @@ class HttpResponseModel extends Equatable {
   Uint8List? get image {
     final body = this.body;
     if (body == null || body.isEmpty) return null;
-    return Uint8List.fromList(List.from(json.decode(body)));
+    try {
+      return Uint8List.fromList(List.from(json.decode(body)));
+    } catch (e) {
+      return null;
+    }
   }
 }

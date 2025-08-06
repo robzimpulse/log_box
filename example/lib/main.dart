@@ -198,7 +198,10 @@ class App extends StatelessWidget {
                       ),
                       TextButton(
                         onPressed: () async {
-                          final response = await dio.get('https://google.com');
+                          final response = await dio.get(
+                            options: Options(responseType: ResponseType.bytes),
+                            'https://toonclash.com/wp-content/uploads/2020/03/cropped-22.jpg',
+                          );
                           if (!context.mounted) return;
                           final snackbar = SnackBar(
                             content: Text(response.toString()),

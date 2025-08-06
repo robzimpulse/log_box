@@ -1,16 +1,22 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import '../../src/extension/extension.dart';
 
 class HumanReadableWidget extends StatelessWidget {
-  const HumanReadableWidget({super.key, required this.name, this.value});
+  const HumanReadableWidget({
+    super.key,
+    required this.name,
+    this.value,
+    this.image,
+  });
 
   final String name;
   final String? value;
+  final Uint8List? image;
 
   @override
   Widget build(BuildContext context) {
-    final value = this.value;
-    if (value == null) return const SizedBox();
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -27,9 +33,19 @@ class HumanReadableWidget extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            IconButton(
-              icon: const Icon(Icons.copy, size: 16, color: Colors.grey),
-              onPressed: () => value.copyToClipboard(context: context),
+            Builder(
+              builder: (context) {
+                final value = this.value;
+
+                if (value != null && image == null) {
+                  return IconButton(
+                    icon: const Icon(Icons.copy, size: 16, color: Colors.grey),
+                    onPressed: () => value.copyToClipboard(context: context),
+                  );
+                }
+
+                return SizedBox();
+              }
             ),
           ],
         ),
@@ -42,11 +58,25 @@ class HumanReadableWidget extends StatelessWidget {
             ),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: SelectionArea(
-                child: Text(
-                  value.isJson ? value.prettify : value,
-                  style: Theme.of(context).textTheme.labelSmall,
-                ),
+              child: Builder(
+                builder: (context) {
+                  final image = this.image;
+                  if (image != null) {
+                    return Image.memory(image);
+                  }
+
+                  final value = this.value;
+                  if (value != null) {
+                    return SelectionArea(
+                      child: Text(
+                        value.isJson ? value.prettify : value,
+                        style: Theme.of(context).textTheme.labelSmall,
+                      ),
+                    );
+                  }
+
+                  return SizedBox();
+                }
               ),
             ),
           ),
