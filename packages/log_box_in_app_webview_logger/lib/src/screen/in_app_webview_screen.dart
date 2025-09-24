@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:log_box_in_app_webview_logger/src/extension/extension.dart';
 
 class InAppWebviewScreen extends StatefulWidget {
   const InAppWebviewScreen({
@@ -15,7 +16,7 @@ class InAppWebviewScreen extends StatefulWidget {
   final Uri uri;
   final List<String> scripts;
   final Map<String, String>? headers;
-  final void Function(String? url, String? html)? onTapSnapshot;
+  final SnapshotCallback? onTapSnapshot;
 
   @override
   State<InAppWebviewScreen> createState() => _InAppWebviewScreenState();
@@ -107,9 +108,12 @@ class _InAppWebviewScreenState extends State<InAppWebviewScreen> {
         if (widget.onTapSnapshot != null)
           IconButton(
             onPressed: () async {
+              final manager = CookieManager.instance();
+
               widget.onTapSnapshot?.call(
                 (await webViewController?.getUrl()).toString(),
                 await webViewController?.getHtml(),
+                await manager.getAllCookies(),
               );
             },
             icon: const Icon(Icons.camera_alt),
@@ -181,6 +185,10 @@ class _InAppWebviewScreenState extends State<InAppWebviewScreen> {
           destination.scheme == widget.uri.scheme,
           destination.host == widget.uri.host,
         ].every((e) => e);
+
+        if (action.isCloudFlare(widget.uri)) {
+          return NavigationActionPolicy.ALLOW;
+        }
 
         return isSame
             ? NavigationActionPolicy.ALLOW

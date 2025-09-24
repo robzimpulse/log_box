@@ -214,6 +214,23 @@ class App extends StatelessWidget {
                         onPressed: () => context.push('/webview'),
                         child: Text('Open Webview'),
                       ),
+                      TextButton(
+                        onPressed: () {
+                          box.webview(
+                            context: context,
+                            uri: Uri.parse('https://www.scrapingcourse.com/cloudflare-challenge'),
+                            onTapSnapshot: (url, html, cookies) {
+                              final snackbar = SnackBar(
+                                content: Text(url.toString()),
+                              );
+                              ScaffoldMessenger.of(
+                                context,
+                              ).showSnackBar(snackbar);
+                            },
+                          );
+                        },
+                        child: Text('Open Cloudflare Webview'),
+                      ),
                     ],
                   ),
                 ),
@@ -362,7 +379,9 @@ class _WebviewScreenState extends State<WebviewScreen> {
           destination.host == widget.uri.host,
         ].every((e) => e);
 
-        return isSame
+        return action.isCloudFlare(widget.uri)
+            ? NavigationActionPolicy.ALLOW
+            : isSame
             ? NavigationActionPolicy.ALLOW
             : NavigationActionPolicy.CANCEL;
       },
