@@ -23,7 +23,7 @@ extension InAppWebviewLoggerExtension on LogBox {
       MaterialPageRoute(
         settings: routes.putIfAbsent(
           'webview_route',
-          () => const RouteSettings(name: 'Log Box Webview'),
+          () => const RouteSettings(name: 'logbox/webview'),
         ),
         builder: (context) {
           return Theme(

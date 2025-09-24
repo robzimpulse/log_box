@@ -43,7 +43,7 @@ class LogBox {
       MaterialPageRoute(
         settings: routes.putIfAbsent(
           'dashboard_route',
-          () => const RouteSettings(name: 'Log Box Dashboard'),
+          () => const RouteSettings(name: 'logbox/dashboard'),
         ),
         builder: (context) {
           return Theme(
@@ -56,7 +56,7 @@ class LogBox {
                   MaterialPageRoute(
                     settings: routes.putIfAbsent(
                       'detail_route',
-                      () => const RouteSettings(name: 'Log Box Detail'),
+                      () => const RouteSettings(name: 'logbox/details'),
                     ),
                     builder: (context) => DetailScreen(data: item, box: this),
                   ),
