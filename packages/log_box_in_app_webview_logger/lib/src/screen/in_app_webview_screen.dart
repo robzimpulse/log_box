@@ -108,12 +108,9 @@ class _InAppWebviewScreenState extends State<InAppWebviewScreen> {
         if (widget.onTapSnapshot != null)
           IconButton(
             onPressed: () async {
-              final manager = CookieManager.instance();
-
               widget.onTapSnapshot?.call(
                 (await webViewController?.getUrl()).toString(),
                 await webViewController?.getHtml(),
-                await manager.getAllCookies(),
               );
             },
             icon: const Icon(Icons.camera_alt),

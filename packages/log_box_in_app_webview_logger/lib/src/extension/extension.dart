@@ -4,8 +4,7 @@ import 'package:log_box/log_box.dart';
 import 'package:log_box_in_app_webview_logger/src/observer/in_app_webview_observer.dart';
 import 'package:log_box_in_app_webview_logger/src/screen/in_app_webview_screen.dart';
 
-typedef SnapshotCallback =
-    void Function(String? url, String? html, List<Cookie> cookies);
+typedef SnapshotCallback = void Function(String? url, String? html);
 
 extension InAppWebviewLoggerExtension on LogBox {
   InAppWebviewObserver get inAppWebviewObserver {

@@ -219,7 +219,7 @@ class App extends StatelessWidget {
                           box.webview(
                             context: context,
                             uri: Uri.parse('https://www.scrapingcourse.com/cloudflare-challenge'),
-                            onTapSnapshot: (url, html, cookies) {
+                            onTapSnapshot: (url, html) {
                               final snackbar = SnackBar(
                                 content: Text(url.toString()),
                               );
