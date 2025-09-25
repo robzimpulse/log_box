@@ -218,14 +218,23 @@ class App extends StatelessWidget {
                         onPressed: () {
                           box.webview(
                             context: context,
-                            uri: Uri.parse('https://www.scrapingcourse.com/cloudflare-challenge'),
-                            onTapSnapshot: (url, html) {
+                            uri: Uri.parse(
+                              'https://www.scrapingcourse.com/cloudflare-challenge',
+                            ),
+                            onTapSnapshot: (url, html) async {
                               final snackbar = SnackBar(
                                 content: Text(url.toString()),
                               );
                               ScaffoldMessenger.of(
                                 context,
                               ).showSnackBar(snackbar);
+
+                              final manager = CookieManager.instance();
+                              final cookies = await manager.getAllCookies();
+
+                              for (final cookie in cookies) {
+                                print(cookie);
+                              }
                             },
                           );
                         },
