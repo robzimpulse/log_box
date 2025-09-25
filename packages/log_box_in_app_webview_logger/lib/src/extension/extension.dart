@@ -48,12 +48,16 @@ extension CloudFlareNavigationAction on NavigationAction {
     final targetUrl = targetFrame?.request?.url;
     const cloudFlare = 'challenges.cloudflare.com';
     const cloudFlareTokenKey = '__cf_chl_tk';
+    const aboutBlank = 'about:blank';
 
     if (destination == null) return false;
 
     return [
       // check if host contains cloud flare challenges
       destination.host == cloudFlare,
+
+      // check if host contains about:blank
+      destination.host == aboutBlank,
 
       // check if header contains cloud flare challenges
       ...?header?.values.map((e) => e.contains(cloudFlare)),
