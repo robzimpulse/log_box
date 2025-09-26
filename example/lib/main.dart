@@ -356,6 +356,9 @@ class _WebviewScreenState extends State<WebviewScreen> {
       onContentSizeChanged: (_, curr, prev) {
         widget.observer.onContentSizeChanged(previous: prev, current: curr);
       },
+      onTitleChanged: (_, title) {
+        widget.observer.onTitleChanged(title: title);
+      },
       onLoadStart: (_, url) {
         widget.observer.onLoadStart(uri: url?.uriValue);
       },
@@ -370,7 +373,7 @@ class _WebviewScreenState extends State<WebviewScreen> {
           extra: {'error': error.toMap(), 'request': request.toMap()},
         );
       },
-      onConsoleMessage: (_, message) async {
+      onConsoleMessage: (_, message) {
         widget.observer.onConsoleMessage(extra: {'message': message.toMap()});
       },
       shouldOverrideUrlLoading: (_, action) async {

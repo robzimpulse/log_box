@@ -9,4 +9,5 @@ enum WebviewEvent {
   onAjaxRequest,
   onRunJavascript,
   shouldOverrideUrlLoading,
+  onTitleChanged,
 }

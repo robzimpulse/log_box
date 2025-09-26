@@ -27,6 +27,20 @@ class InAppWebviewObserver {
     );
   }
 
+  void onTitleChanged({String? title}) {
+    _storage.add(
+      log: WebviewEntryModel(
+        id: _id,
+        events: [
+          WebviewEntryModelLog(
+            event: WebviewEvent.onTitleChanged,
+            extra: {'title': title},
+          ),
+        ],
+      ),
+    );
+  }
+
   void onWebViewCreated({required Uri uri, List<String> scripts = const []}) {
     _storage.add(
       log: WebviewEntryModel(

@@ -152,22 +152,25 @@ class _InAppWebviewScreenState extends State<InAppWebviewScreen> {
         javaScriptEnabled: true,
         supportZoom: false,
       ),
+      onTitleChanged: (_, name) {
+        _log('On Title Change: $name');
+      },
       onContentSizeChanged: (_, curr, prev) {
         _log('onContentSizeChanged: $curr - $prev');
       },
       onLoadStart: (_, url) {
         _log('onLoadStart: $url');
       },
-      onLoadStop: (_, url) async {
+      onLoadStop: (_, url) {
         _log('onLoadStop: $url');
       },
-      onProgressChanged: (controller, progress) async {
+      onProgressChanged: (controller, progress) {
         _log('onProgress: $progress');
       },
       onReceivedError: (_, request, error) {
         _log('onReceivedError: ${request.url} - ${error.description}');
       },
-      onConsoleMessage: (controller, message) async {
+      onConsoleMessage: (controller, message) {
         _log('onConsoleMessage: ${message.message}');
       },
       shouldOverrideUrlLoading: (_, action) async {
