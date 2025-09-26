@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import '../../src/extension/extension.dart';
+import 'searchable_text_widget.dart';
 
 class HumanReadableWidget extends StatelessWidget {
   const HumanReadableWidget({
@@ -9,14 +10,18 @@ class HumanReadableWidget extends StatelessWidget {
     required this.name,
     this.value,
     this.image,
+    this.searchTerm,
   });
 
   final String name;
   final String? value;
   final Uint8List? image;
+  final String? searchTerm;
 
   @override
   Widget build(BuildContext context) {
+    final searchTerm = this.searchTerm;
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -45,7 +50,7 @@ class HumanReadableWidget extends StatelessWidget {
                 }
 
                 return SizedBox();
-              }
+              },
             ),
           ],
         ),
@@ -66,17 +71,25 @@ class HumanReadableWidget extends StatelessWidget {
                   }
 
                   final value = this.value;
+
                   if (value != null) {
                     return SelectionArea(
-                      child: Text(
-                        value.isJson ? value.prettify : value,
-                        style: Theme.of(context).textTheme.labelSmall,
-                      ),
+                      child:
+                          searchTerm != null
+                              ? SearchableTextWidget(
+                                value.isJson ? value.prettify : value,
+                                searchTerm: searchTerm,
+                                style: Theme.of(context).textTheme.labelSmall,
+                              )
+                              : Text(
+                                value.isJson ? value.prettify : value,
+                                style: Theme.of(context).textTheme.labelSmall,
+                              ),
                     );
                   }
 
                   return SizedBox();
-                }
+                },
               ),
             ),
           ),
