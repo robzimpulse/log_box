@@ -71,14 +71,26 @@ class _InAppWebviewScreenState extends State<InAppWebviewScreen> {
       actions: [
         IconButton(
           onPressed: () async {
-            final controller = TextEditingController();
-
             await showDialog(
               context: context,
               builder: (context) {
                 return AlertDialog(
                   title: const Text('Run JavaScript'),
-                  content: TextField(controller: controller),
+                  content: TextField(
+                    onSubmitted: (text) async {
+                      if (text.isEmpty) return;
+
+                      final result = await webViewController
+                          ?.evaluateJavascript(source: text);
+
+                      _log('Evaluated Script: $text - $result');
+
+                      widget.observer.onRunJavascript(
+                        script: text,
+                        extra: {'result': result},
+                      );
+                    },
+                  ),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(context),
@@ -88,14 +100,6 @@ class _InAppWebviewScreenState extends State<InAppWebviewScreen> {
                 );
               },
             );
-
-            final script = controller.text;
-
-            controller.dispose();
-
-            if (script.isEmpty) return;
-
-            webViewController?.evaluateJavascript(source: script);
           },
           icon: const Icon(Icons.javascript),
         ),
