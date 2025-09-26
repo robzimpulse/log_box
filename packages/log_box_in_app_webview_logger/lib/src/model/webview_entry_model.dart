@@ -65,7 +65,7 @@ class WebviewEntryModel extends EntryModel {
   int tabLength(BuildContext context) => 4;
 
   @override
-  Map<Tab, Widget> tabs(BuildContext context) {
+  Map<Tab, Widget> tabs(BuildContext context, {String? searchTerm}) {
     return Map.fromEntries([
       _overview(context),
       _html(context),

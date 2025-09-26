@@ -20,7 +20,7 @@ class NavigationEntryModel extends EntryModel {
   int tabLength(BuildContext context) => 0;
 
   @override
-  Map<Tab, Widget> tabs(BuildContext context) {
+  Map<Tab, Widget> tabs(BuildContext context, {String? searchTerm}) {
     return {};
   }
 

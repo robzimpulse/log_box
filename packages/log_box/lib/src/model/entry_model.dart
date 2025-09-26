@@ -28,7 +28,7 @@ abstract class EntryModel {
   int tabLength(BuildContext context);
 
   /// Renders the tab and its content on detail screen
-  Map<Tab, Widget> tabs(BuildContext context);
+  Map<Tab, Widget> tabs(BuildContext context, {String? searchTerm});
 
   /// Renders the action menu on detail screen
   List<Widget> menus(BuildContext context, LogBox box) => [];
