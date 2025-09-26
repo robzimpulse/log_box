@@ -27,27 +27,36 @@ class InAppWebviewObserver {
     );
   }
 
-  void onTitleChanged({String? title}) {
+  void onTitleChanged({String? title, Map<String, dynamic>? extra}) {
     _storage.add(
       log: WebviewEntryModel(
         id: _id,
         events: [
           WebviewEntryModelLog(
             event: WebviewEvent.onTitleChanged,
-            extra: {'title': title},
+            extra: {'title': title, ...?extra},
           ),
         ],
       ),
     );
   }
 
-  void onWebViewCreated({required Uri uri, List<String> scripts = const []}) {
+  void onWebViewCreated({
+    required Uri uri,
+    List<String> scripts = const [],
+    Map<String, dynamic>? extra,
+  }) {
     _storage.add(
       log: WebviewEntryModel(
         id: _id,
         scripts: scripts,
         uri: uri,
-        events: [WebviewEntryModelLog(event: WebviewEvent.onWebViewCreated)],
+        events: [
+          WebviewEntryModelLog(
+            event: WebviewEvent.onWebViewCreated,
+            extra: extra,
+          ),
+        ],
       ),
     );
   }
@@ -63,7 +72,11 @@ class InAppWebviewObserver {
     );
   }
 
-  void onContentSizeChanged({Size? previous, Size? current}) {
+  void onContentSizeChanged({
+    Size? previous,
+    Size? current,
+    Map<String, dynamic>? extra,
+  }) {
     _storage.add(
       log: WebviewEntryModel(
         id: _id,
@@ -73,6 +86,7 @@ class InAppWebviewObserver {
             extra: {
               'previous': previous.toString(),
               'current': current.toString(),
+              ...?extra,
             },
           ),
         ],
@@ -80,98 +94,105 @@ class InAppWebviewObserver {
     );
   }
 
-  void onLoadStart({Uri? uri}) {
+  void onLoadStart({Uri? uri, Map<String, dynamic>? extra}) {
     _storage.add(
       log: WebviewEntryModel(
         id: _id,
         events: [
           WebviewEntryModelLog(
             event: WebviewEvent.onLoadStart,
-            extra: {'uri': uri.toString()},
+            extra: {'uri': uri.toString(), ...?extra},
           ),
         ],
       ),
     );
   }
 
-  void onLoadStop({Uri? uri}) {
+  void onLoadStop({Uri? uri, Map<String, dynamic>? extra}) {
     _storage.add(
       log: WebviewEntryModel(
         id: _id,
         events: [
           WebviewEntryModelLog(
             event: WebviewEvent.onLoadStop,
-            extra: {'uri': uri.toString()},
+            extra: {'uri': uri.toString(), ...?extra},
           ),
         ],
       ),
     );
   }
 
-  void onProgressChanged({int? progress}) {
+  void onProgressChanged({int? progress, Map<String, dynamic>? extra}) {
     _storage.add(
       log: WebviewEntryModel(
         id: _id,
         events: [
           WebviewEntryModelLog(
             event: WebviewEvent.onProgressChanged,
-            extra: {'progress': progress},
+            extra: {'progress': progress, ...?extra},
           ),
         ],
       ),
     );
   }
 
-  void onReceivedError({Map<String, dynamic>? extra}) {
+  void onReceivedError({
+    Map<String, dynamic>? request,
+    Map<String, dynamic>? error,
+    Map<String, dynamic>? extra,
+  }) {
     _storage.add(
       log: WebviewEntryModel(
         id: _id,
         events: [
           WebviewEntryModelLog(
             event: WebviewEvent.onProgressChanged,
-            extra: extra,
+            extra: {'request': request, 'error': error, ...?extra},
           ),
         ],
       ),
     );
   }
 
-  void onConsoleMessage({Map<String, dynamic>? extra}) {
+  void onConsoleMessage({String? message, Map<String, dynamic>? extra}) {
     _storage.add(
       log: WebviewEntryModel(
         id: _id,
         events: [
           WebviewEntryModelLog(
             event: WebviewEvent.onConsoleMessage,
-            extra: extra,
+            extra: {'message': message, ...?extra},
           ),
         ],
       ),
     );
   }
 
-  void shouldOverrideUrlLoading({Map<String, dynamic>? extra}) {
+  void shouldOverrideUrlLoading({
+    Map<String, dynamic>? action,
+    Map<String, dynamic>? extra,
+  }) {
     _storage.add(
       log: WebviewEntryModel(
         id: _id,
         events: [
           WebviewEntryModelLog(
             event: WebviewEvent.shouldOverrideUrlLoading,
-            extra: extra,
+            extra: {'action': action, ...?extra},
           ),
         ],
       ),
     );
   }
 
-  void onRunJavascript({required String script}) {
+  void onRunJavascript({required String script, Map<String, dynamic>? extra}) {
     _storage.add(
       log: WebviewEntryModel(
         id: _id,
         events: [
           WebviewEntryModelLog(
             event: WebviewEvent.onRunJavascript,
-            extra: {'script': script},
+            extra: {'script': script, ...?extra},
           ),
         ],
       ),

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:log_box_in_app_webview_logger/src/extension/extension.dart';
+import 'package:log_box_in_app_webview_logger/log_box_in_app_webview_logger.dart';
 
 class InAppWebviewScreen extends StatefulWidget {
   const InAppWebviewScreen({
     super.key,
     required this.uri,
+    required this.observer,
     this.html,
     this.scripts = const [],
     this.headers,
@@ -17,6 +18,7 @@ class InAppWebviewScreen extends StatefulWidget {
   final List<String> scripts;
   final Map<String, String>? headers;
   final SnapshotCallback? onTapSnapshot;
+  final InAppWebviewObserver observer;
 
   @override
   State<InAppWebviewScreen> createState() => _InAppWebviewScreenState();
@@ -154,28 +156,45 @@ class _InAppWebviewScreenState extends State<InAppWebviewScreen> {
       ),
       onTitleChanged: (_, name) {
         _log('On Title Change: $name');
+        widget.observer.onTitleChanged(title: name);
       },
       onContentSizeChanged: (_, curr, prev) {
         _log('onContentSizeChanged: $curr - $prev');
+        widget.observer.onContentSizeChanged(previous: prev, current: curr);
       },
       onLoadStart: (_, url) {
         _log('onLoadStart: $url');
+        widget.observer.onLoadStart(uri: url?.uriValue);
       },
       onLoadStop: (_, url) {
         _log('onLoadStop: $url');
+        widget.observer.onLoadStop(uri: url?.uriValue);
       },
       onProgressChanged: (controller, progress) {
         _log('onProgress: $progress');
+        widget.observer.onProgressChanged(progress: progress);
       },
       onReceivedError: (_, request, error) {
         _log('onReceivedError: ${request.url} - ${error.description}');
+        widget.observer.onReceivedError(
+          request: request.toMap(),
+          error: error.toMap(),
+        );
       },
       onConsoleMessage: (controller, message) {
         _log('onConsoleMessage: ${message.message}');
+        widget.observer.onConsoleMessage(
+          message: message.message,
+          extra: message.toMap(),
+        );
       },
       shouldOverrideUrlLoading: (_, action) async {
         final destination = action.request.url;
         _log('shouldOverrideUrlLoading: $destination');
+        widget.observer.shouldOverrideUrlLoading(
+          action: action.toMap(),
+          extra: {'is_cloudflare': action.isCloudFlare(widget.uri)},
+        );
 
         if (destination == null) {
           return NavigationActionPolicy.CANCEL;

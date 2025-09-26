@@ -32,6 +32,7 @@ extension InAppWebviewLoggerExtension on LogBox {
               uri: uri,
               html: html,
               onTapSnapshot: onTapSnapshot,
+              observer: inAppWebviewObserver,
             ),
           );
         },
