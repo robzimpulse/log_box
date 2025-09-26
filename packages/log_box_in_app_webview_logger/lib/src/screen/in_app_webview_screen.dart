@@ -83,7 +83,7 @@ class _InAppWebviewScreenState extends State<InAppWebviewScreen> {
                       final result = await webViewController
                           ?.evaluateJavascript(source: text);
 
-                      _log('Evaluated Script: $text - $result');
+                      _log('On Run Javascript: $text - $result');
 
                       widget.observer.onRunJavascript(
                         script: text,
