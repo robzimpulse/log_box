@@ -50,9 +50,9 @@ class LogEntryModel extends EntryModel {
   @override
   Map<Tab, Widget> tabs(BuildContext context, {String? searchTerm}) {
     return Map.fromEntries([
-      _overview(context),
-      _details(context),
-      _errors(context),
+      _overview(context, searchTerm: searchTerm),
+      _details(context, searchTerm: searchTerm),
+      _errors(context, searchTerm: searchTerm),
     ]);
   }
 
@@ -90,7 +90,7 @@ class LogEntryModel extends EntryModel {
     );
   }
 
-  MapEntry<Tab, Widget> _overview(BuildContext context) {
+  MapEntry<Tab, Widget> _overview(BuildContext context, {String? searchTerm}) {
     return MapEntry(
       const Tab(text: 'Overview', icon: Icon(Icons.info, color: Colors.white)),
       CustomScrollView(
@@ -99,13 +99,21 @@ class LogEntryModel extends EntryModel {
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             sliver: SliverToBoxAdapter(
-              child: HumanReadableWidget(name: 'Name', value: name),
+              child: HumanReadableWidget(
+                name: 'Name',
+                value: name,
+                searchTerm: searchTerm,
+              ),
             ),
           ),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             sliver: SliverToBoxAdapter(
-              child: HumanReadableWidget(name: 'Message', value: message),
+              child: HumanReadableWidget(
+                name: 'Message',
+                value: message,
+                searchTerm: searchTerm,
+              ),
             ),
           ),
           SliverPadding(
@@ -114,6 +122,7 @@ class LogEntryModel extends EntryModel {
               child: HumanReadableWidget(
                 name: 'Timestamp',
                 value: timestamp.toIso8601String(),
+                searchTerm: searchTerm,
               ),
             ),
           ),
@@ -123,7 +132,7 @@ class LogEntryModel extends EntryModel {
     );
   }
 
-  MapEntry<Tab, Widget> _details(BuildContext context) {
+  MapEntry<Tab, Widget> _details(BuildContext context, {String? searchTerm}) {
     return MapEntry(
       const Tab(text: 'Detail', icon: Icon(Icons.list, color: Colors.white)),
       CustomScrollView(
@@ -132,7 +141,11 @@ class LogEntryModel extends EntryModel {
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             sliver: SliverToBoxAdapter(
-              child: HumanReadableWidget(name: 'Extra', value: extra?.json),
+              child: HumanReadableWidget(
+                name: 'Extra',
+                value: extra?.json,
+                searchTerm: searchTerm,
+              ),
             ),
           ),
           SliverToBoxAdapter(child: SizedBox(height: 8)),
@@ -141,7 +154,7 @@ class LogEntryModel extends EntryModel {
     );
   }
 
-  MapEntry<Tab, Widget> _errors(BuildContext context) {
+  MapEntry<Tab, Widget> _errors(BuildContext context, {String? searchTerm}) {
     return MapEntry(
       const Tab(text: 'Error', icon: Icon(Icons.warning, color: Colors.white)),
       CustomScrollView(
@@ -153,6 +166,7 @@ class LogEntryModel extends EntryModel {
               child: HumanReadableWidget(
                 name: 'Error',
                 value: error.toString(),
+                searchTerm: searchTerm,
               ),
             ),
           ),
@@ -162,6 +176,7 @@ class LogEntryModel extends EntryModel {
               child: HumanReadableWidget(
                 name: 'Stack Trace',
                 value: stackTrace.toString(),
+                searchTerm: searchTerm,
               ),
             ),
           ),

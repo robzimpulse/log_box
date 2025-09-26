@@ -84,10 +84,10 @@ class NetworkEntryModel extends EntryModel {
   @override
   Map<Tab, Widget> tabs(BuildContext context, {String? searchTerm}) {
     return Map.fromEntries([
-      _overview(context),
-      _request(context),
-      _response(context),
-      _errors(context),
+      _overview(context, searchTerm: searchTerm),
+      _request(context, searchTerm: searchTerm),
+      _response(context, searchTerm: searchTerm),
+      _errors(context, searchTerm: searchTerm),
     ]);
   }
 
@@ -168,7 +168,7 @@ class NetworkEntryModel extends EntryModel {
     );
   }
 
-  MapEntry<Tab, Widget> _overview(BuildContext context) {
+  MapEntry<Tab, Widget> _overview(BuildContext context, {String? searchTerm}) {
     return MapEntry(
       const Tab(text: 'Overview', icon: Icon(Icons.info, color: Colors.white)),
       CustomScrollView(
@@ -177,13 +177,21 @@ class NetworkEntryModel extends EntryModel {
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             sliver: SliverToBoxAdapter(
-              child: HumanReadableWidget(name: 'Method', value: method),
+              child: HumanReadableWidget(
+                name: 'Method',
+                value: method,
+                searchTerm: searchTerm,
+              ),
             ),
           ),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             sliver: SliverToBoxAdapter(
-              child: HumanReadableWidget(name: 'Url', value: uri.toString()),
+              child: HumanReadableWidget(
+                name: 'Url',
+                value: uri.toString(),
+                searchTerm: searchTerm,
+              ),
             ),
           ),
           SliverPadding(
@@ -192,6 +200,7 @@ class NetworkEntryModel extends EntryModel {
               child: HumanReadableWidget(
                 name: 'Timestamp',
                 value: timestamp.toIso8601String(),
+                searchTerm: searchTerm,
               ),
             ),
           ),
@@ -201,7 +210,7 @@ class NetworkEntryModel extends EntryModel {
     );
   }
 
-  MapEntry<Tab, Widget> _request(BuildContext context) {
+  MapEntry<Tab, Widget> _request(BuildContext context, {String? searchTerm}) {
     return MapEntry(
       const Tab(text: 'Detail', icon: Icon(Icons.list, color: Colors.white)),
       CustomScrollView(
@@ -213,6 +222,7 @@ class NetworkEntryModel extends EntryModel {
               child: HumanReadableWidget(
                 name: 'Timestamp',
                 value: request?.time.toIso8601String(),
+                searchTerm: searchTerm,
               ),
             ),
           ),
@@ -222,6 +232,7 @@ class NetworkEntryModel extends EntryModel {
               child: HumanReadableWidget(
                 name: 'Headers',
                 value: request?.headers?.json,
+                searchTerm: searchTerm,
               ),
             ),
           ),
@@ -231,6 +242,7 @@ class NetworkEntryModel extends EntryModel {
               child: HumanReadableWidget(
                 name: 'Query',
                 value: request?.queryParameters.json,
+                searchTerm: searchTerm,
               ),
             ),
           ),
@@ -240,13 +252,18 @@ class NetworkEntryModel extends EntryModel {
               child: HumanReadableWidget(
                 name: 'Size (bytes)',
                 value: request?.size.toString(),
+                searchTerm: searchTerm,
               ),
             ),
           ),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             sliver: SliverToBoxAdapter(
-              child: HumanReadableWidget(name: 'Body', value: request?.body),
+              child: HumanReadableWidget(
+                name: 'Body',
+                value: request?.body,
+                searchTerm: searchTerm,
+              ),
             ),
           ),
           SliverToBoxAdapter(child: SizedBox(height: 8)),
@@ -255,7 +272,7 @@ class NetworkEntryModel extends EntryModel {
     );
   }
 
-  MapEntry<Tab, Widget> _response(BuildContext context) {
+  MapEntry<Tab, Widget> _response(BuildContext context, {String? searchTerm}) {
     return MapEntry(
       const Tab(text: 'Response', icon: Icon(Icons.list, color: Colors.white)),
       CustomScrollView(
@@ -267,6 +284,7 @@ class NetworkEntryModel extends EntryModel {
               child: HumanReadableWidget(
                 name: 'Timestamp',
                 value: response?.time.toIso8601String(),
+                searchTerm: searchTerm,
               ),
             ),
           ),
@@ -276,6 +294,7 @@ class NetworkEntryModel extends EntryModel {
               child: HumanReadableWidget(
                 name: 'Size (bytes)',
                 value: response?.size.toString(),
+                searchTerm: searchTerm,
               ),
             ),
           ),
@@ -285,6 +304,7 @@ class NetworkEntryModel extends EntryModel {
               child: HumanReadableWidget(
                 name: 'Headers',
                 value: response?.headers?.json,
+                searchTerm: searchTerm,
               ),
             ),
           ),
@@ -295,6 +315,7 @@ class NetworkEntryModel extends EntryModel {
                 name: 'Body',
                 value: response?.body,
                 image: response?.image,
+                searchTerm: searchTerm,
               ),
             ),
           ),
@@ -304,7 +325,7 @@ class NetworkEntryModel extends EntryModel {
     );
   }
 
-  MapEntry<Tab, Widget> _errors(BuildContext context) {
+  MapEntry<Tab, Widget> _errors(BuildContext context, {String? searchTerm}) {
     return MapEntry(
       const Tab(text: 'Error', icon: Icon(Icons.warning, color: Colors.white)),
       CustomScrollView(
@@ -316,6 +337,7 @@ class NetworkEntryModel extends EntryModel {
               child: HumanReadableWidget(
                 name: 'Error',
                 value: error?.error.toString(),
+                searchTerm: searchTerm,
               ),
             ),
           ),
@@ -325,6 +347,7 @@ class NetworkEntryModel extends EntryModel {
               child: HumanReadableWidget(
                 name: 'Stack Trace',
                 value: error?.stackTrace.toString(),
+                searchTerm: searchTerm,
               ),
             ),
           ),

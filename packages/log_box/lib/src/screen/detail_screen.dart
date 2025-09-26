@@ -27,6 +27,11 @@ class _DetailScreenState extends State<DetailScreen> {
       return TextField(
         cursorColor: appBarForegroundColor,
         style: hintStyle,
+        onSubmitted: (text) {
+          setState(() {
+            searchTerm = text;
+          });
+        },
         decoration: InputDecoration(
           hintText: 'Search...',
           filled: false,

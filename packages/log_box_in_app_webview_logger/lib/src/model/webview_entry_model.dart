@@ -67,10 +67,10 @@ class WebviewEntryModel extends EntryModel {
   @override
   Map<Tab, Widget> tabs(BuildContext context, {String? searchTerm}) {
     return Map.fromEntries([
-      _overview(context),
-      _html(context),
-      _events(context),
-      _error(context),
+      _overview(context, searchTerm: searchTerm),
+      _html(context, searchTerm: searchTerm),
+      _events(context, searchTerm: searchTerm),
+      _error(context, searchTerm: searchTerm),
     ]);
   }
 
@@ -119,7 +119,7 @@ class WebviewEntryModel extends EntryModel {
     );
   }
 
-  MapEntry<Tab, Widget> _overview(BuildContext context) {
+  MapEntry<Tab, Widget> _overview(BuildContext context, {String? searchTerm}) {
     return MapEntry(
       const Tab(text: 'Overview', icon: Icon(Icons.info, color: Colors.white)),
       CustomScrollView(
@@ -128,7 +128,11 @@ class WebviewEntryModel extends EntryModel {
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             sliver: SliverToBoxAdapter(
-              child: HumanReadableWidget(name: 'url', value: uri.toString()),
+              child: HumanReadableWidget(
+                name: 'url',
+                value: uri.toString(),
+                searchTerm: searchTerm,
+              ),
             ),
           ),
           SliverPadding(
@@ -137,6 +141,7 @@ class WebviewEntryModel extends EntryModel {
               child: HumanReadableWidget(
                 name: 'scripts',
                 value: jsonEncode(scripts),
+                searchTerm: searchTerm,
               ),
             ),
           ),
@@ -146,6 +151,7 @@ class WebviewEntryModel extends EntryModel {
               child: HumanReadableWidget(
                 name: 'Timestamp',
                 value: timestamp.toIso8601String(),
+                searchTerm: searchTerm,
               ),
             ),
           ),
@@ -155,7 +161,7 @@ class WebviewEntryModel extends EntryModel {
     );
   }
 
-  MapEntry<Tab, Widget> _events(BuildContext context) {
+  MapEntry<Tab, Widget> _events(BuildContext context, {String? searchTerm}) {
     final theme = Theme.of(context);
 
     final slivers = [];
@@ -198,7 +204,11 @@ class WebviewEntryModel extends EntryModel {
               children: [
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: HumanReadableWidget(name: 'Extra', value: json),
+                  child: HumanReadableWidget(
+                    name: 'Extra',
+                    value: json,
+                    searchTerm: searchTerm,
+                  ),
                 ),
               ],
             ),
@@ -219,7 +229,7 @@ class WebviewEntryModel extends EntryModel {
     );
   }
 
-  MapEntry<Tab, Widget> _html(BuildContext context) {
+  MapEntry<Tab, Widget> _html(BuildContext context, {String? searchTerm}) {
     return MapEntry(
       const Tab(text: 'Html', icon: Icon(Icons.html, color: Colors.white)),
       CustomScrollView(
@@ -228,7 +238,11 @@ class WebviewEntryModel extends EntryModel {
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             sliver: SliverToBoxAdapter(
-              child: HumanReadableWidget(name: 'Html', value: html),
+              child: HumanReadableWidget(
+                name: 'Html',
+                value: html,
+                searchTerm: searchTerm,
+              ),
             ),
           ),
           SliverToBoxAdapter(child: SizedBox(height: 8)),
@@ -237,7 +251,7 @@ class WebviewEntryModel extends EntryModel {
     );
   }
 
-  MapEntry<Tab, Widget> _error(BuildContext context) {
+  MapEntry<Tab, Widget> _error(BuildContext context, {String? searchTerm}) {
     return MapEntry(
       const Tab(text: 'Error', icon: Icon(Icons.warning, color: Colors.white)),
       CustomScrollView(
@@ -249,6 +263,7 @@ class WebviewEntryModel extends EntryModel {
               child: HumanReadableWidget(
                 name: 'Error',
                 value: error.toString(),
+                searchTerm: searchTerm,
               ),
             ),
           ),
