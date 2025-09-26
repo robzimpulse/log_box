@@ -20,8 +20,6 @@ class HumanReadableWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final searchTerm = this.searchTerm;
-
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,17 +72,11 @@ class HumanReadableWidget extends StatelessWidget {
 
                   if (value != null) {
                     return SelectionArea(
-                      child:
-                          searchTerm != null
-                              ? SearchableTextWidget(
-                                value.isJson ? value.prettify : value,
-                                searchTerm: searchTerm,
-                                style: Theme.of(context).textTheme.labelSmall,
-                              )
-                              : Text(
-                                value.isJson ? value.prettify : value,
-                                style: Theme.of(context).textTheme.labelSmall,
-                              ),
+                      child: HighlightedTextWidget(
+                        text: value.isJson ? value.prettify : value,
+                        style: Theme.of(context).textTheme.labelSmall,
+                        searchTerm: searchTerm,
+                      ),
                     );
                   }
 

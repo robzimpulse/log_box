@@ -1,27 +1,18 @@
 import 'package:flutter/material.dart';
 
 /// A widget for displaying text with highlighted search terms.
-class SearchableTextWidget extends StatelessWidget {
+class HighlightedTextWidget extends StatelessWidget {
   /// Original text to display.
   final String text;
 
   /// Term to highlight.
-  final String searchTerm;
+  final String? searchTerm;
 
   /// Style for non-highlighted text.
   final TextStyle? style;
 
   /// Style for highlighted text.
-  final TextStyle? highlightedStyle;
-
-  /// Decoration for highlighted area (optional).
-  /// Default is a yellow container
-  ///
-  /// ```dart
-  /// BoxDecoration(color: Colors.yellow)
-  /// ```
-
-  final BoxDecoration? highlightedDecoration;
+  final Color highlightedColor;
 
   /// Creates a text widget with highlighted search terms.
   ///
@@ -31,31 +22,28 @@ class SearchableTextWidget extends StatelessWidget {
   ///
   /// The [style] parameter defines the style for non-highlighted text.
   ///
-  /// The [highlightedTextStyle] parameter defines the style for highlighted text.
-  ///
-  /// The [highlighterDecoration] parameter defines decoration for the highlighted area.
-  const SearchableTextWidget(
-    this.text, {
+  /// The [highlightedColor] parameter defines the color for highlighted text.
+  const HighlightedTextWidget({
     super.key,
-    required this.searchTerm,
+    required this.text,
+    this.searchTerm,
     this.style,
-    this.highlightedStyle,
-    this.highlightedDecoration,
+    this.highlightedColor = Colors.yellow,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(children: _highlightOccurrences);
+    final terms = searchTerm;
+    if (terms == null) return Text(text, style: style);
+    return RichText(
+      text: TextSpan(text: '', children: _buildSpan(context, terms)),
+    );
   }
 
-  BoxDecoration get _defaultHighlightDecoration {
-    return BoxDecoration(color: Colors.yellow);
-  }
-
-  List<Widget> get _highlightOccurrences {
-    final List<Widget> widgets = [];
+  List<InlineSpan> _buildSpan(BuildContext context, String term) {
+    final List<InlineSpan> widgets = [];
     final String lowerCaseText = text.toLowerCase();
-    final String lowerCaseSearchTerm = searchTerm.toLowerCase();
+    final String lowerCaseSearchTerm = term.toLowerCase();
     final List<String> parts =
         lowerCaseSearchTerm.isEmpty
             ? [lowerCaseText]
@@ -66,8 +54,8 @@ class SearchableTextWidget extends StatelessWidget {
     for (String part in parts) {
       if (lowerCaseText.indexOf(part, startIndex) != -1) {
         widgets.add(
-          Text(
-            text.substring(startIndex, startIndex + part.length),
+          TextSpan(
+            text: text.substring(startIndex, startIndex + part.length),
             style: style,
           ),
         );
@@ -76,15 +64,12 @@ class SearchableTextWidget extends StatelessWidget {
 
       if (startIndex < text.length) {
         widgets.add(
-          Container(
-            decoration: highlightedDecoration ?? _defaultHighlightDecoration,
-            child: Text(
-              text.substring(
-                startIndex,
-                startIndex + lowerCaseSearchTerm.length,
-              ),
-              style: highlightedStyle ?? style,
+          TextSpan(
+            text: text.substring(
+              startIndex,
+              startIndex + lowerCaseSearchTerm.length,
             ),
+            style: style?.copyWith(backgroundColor: highlightedColor),
           ),
         );
         startIndex += lowerCaseSearchTerm.length;
