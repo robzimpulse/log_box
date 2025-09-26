@@ -71,12 +71,10 @@ class HumanReadableWidget extends StatelessWidget {
                   final value = this.value;
 
                   if (value != null) {
-                    return SelectionArea(
-                      child: HighlightedTextWidget(
-                        text: value.isJson ? value.prettify : value,
-                        style: Theme.of(context).textTheme.labelSmall,
-                        searchTerm: searchTerm,
-                      ),
+                    return HighlightedTextWidget(
+                      text: value.isJson ? value.prettify : value,
+                      style: Theme.of(context).textTheme.labelSmall,
+                      searchTerm: searchTerm,
                     );
                   }
 

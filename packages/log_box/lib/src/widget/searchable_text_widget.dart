@@ -34,9 +34,9 @@ class HighlightedTextWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final terms = searchTerm;
-    if (terms == null) return Text(text, style: style);
-    return RichText(
-      text: TextSpan(text: '', children: _buildSpan(context, terms)),
+    if (terms == null) return SelectionArea(child: Text(text, style: style));
+    return SelectableText.rich(
+      TextSpan(text: '', children: _buildSpan(context, terms)),
     );
   }
 
