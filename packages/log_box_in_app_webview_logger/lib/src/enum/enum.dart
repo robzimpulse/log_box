@@ -6,8 +6,11 @@ enum WebviewEvent {
   onProgressChanged,
   onReceivedError,
   onConsoleMessage,
-  onAjaxRequest,
   onRunJavascript,
   shouldOverrideUrlLoading,
   onTitleChanged,
+  onLoadResource,
+  shouldInterceptAjaxRequest,
+  onAjaxProgress,
+  onReceivedHttpError,
 }

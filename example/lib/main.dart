@@ -250,7 +250,7 @@ class App extends StatelessWidget {
             path: '/webview',
             builder: (context, state) {
               return WebviewScreen(
-                uri: Uri.parse('https://www.google.com'),
+                uri: Uri.parse('https://toonclash.com'),
                 observer: box.inAppWebviewObserver,
               );
             },
@@ -362,25 +362,78 @@ class _WebviewScreenState extends State<WebviewScreen> {
       onLoadStart: (_, url) {
         widget.observer.onLoadStart(uri: url?.uriValue);
       },
-      onLoadStop: (_, url) {
+      onLoadStop: (controller, url) async {
         widget.observer.onLoadStop(uri: url?.uriValue);
+        await controller.injectJavascriptFileFromUrl(
+          urlFile: WebUri('https://code.jquery.com/jquery-3.7.1.min.js'),
+          scriptHtmlTagAttributes: ScriptHtmlTagAttributes(
+            id: 'jquery',
+            onLoad: () async {
+              controller.evaluateJavascript(
+                source: '''
+              \$.ajax(
+    {
+        url: "/wp-admin/admin-ajax.php",
+        method: "POST",
+        contentType: "application/json",
+        dataType: "json",
+        data: JSON.stringify({
+          "action": "wp_manga_signin",
+          "login": "asdasd",
+          "pass": "adsadasd",
+          "rememberme": "forever"
+        }),
+        success: function (data, textStatus, jqXHR) {
+            console.log(data);
+            alert(data);
+        },
+        error: function (jqXHR, textStatus, errorThrown){
+              alert(textStatus);
+              console.log(textStatus);
+            }
+        });''',
+              );
+
+              print("jQuery loaded and ready to be used!");
+            },
+            onError: () {
+              print("jQuery not available! Some error occurred.");
+            },
+          ),
+        );
       },
       onProgressChanged: (_, progress) {
         widget.observer.onProgressChanged(progress: progress);
       },
       onReceivedError: (_, request, error) {
         widget.observer.onReceivedError(
-          extra: {'error': error.toMap(), 'request': request.toMap()},
+          request: request.toMap(),
+          error: error.toMap(),
         );
       },
+      shouldInterceptAjaxRequest: (_, request) async {
+        widget.observer.shouldInterceptAjaxRequest(extra: request.toMap());
+        return request;
+      },
+      onAjaxProgress: (_, request) async {
+        widget.observer.onAjaxProgress(extra: request.toMap());
+        return AjaxRequestAction.PROCEED;
+      },
+      onReceivedHttpError: (_, request, response) {
+        widget.observer.onReceivedHttpError(
+          request: request.toMap(),
+          response: response.toMap(),
+        );
+      },
+      onLoadResource: (_, resource) {
+        widget.observer.onLoadResource(extra: resource.toMap());
+      },
       onConsoleMessage: (_, message) {
-        widget.observer.onConsoleMessage(extra: {'message': message.toMap()});
+        widget.observer.onConsoleMessage(message: message.toMap());
       },
       shouldOverrideUrlLoading: (_, action) async {
         final destination = action.request.url;
-        widget.observer.shouldOverrideUrlLoading(
-          extra: {'action': action.toMap()},
-        );
+        widget.observer.shouldOverrideUrlLoading(action: action.toMap());
 
         if (destination == null) {
           return NavigationActionPolicy.CANCEL;

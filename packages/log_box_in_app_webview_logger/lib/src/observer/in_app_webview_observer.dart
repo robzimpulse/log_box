@@ -61,17 +61,6 @@ class InAppWebviewObserver {
     );
   }
 
-  void onAjaxRequest({Map<String, dynamic>? extra}) {
-    _storage.add(
-      log: WebviewEntryModel(
-        id: _id,
-        events: [
-          WebviewEntryModelLog(event: WebviewEvent.onAjaxRequest, extra: extra),
-        ],
-      ),
-    );
-  }
-
   void onContentSizeChanged({
     Size? previous,
     Size? current,
@@ -154,7 +143,10 @@ class InAppWebviewObserver {
     );
   }
 
-  void onConsoleMessage({String? message, Map<String, dynamic>? extra}) {
+  void onConsoleMessage({
+    Map<String, dynamic>? message,
+    Map<String, dynamic>? extra,
+  }) {
     _storage.add(
       log: WebviewEntryModel(
         id: _id,
@@ -193,6 +185,66 @@ class InAppWebviewObserver {
           WebviewEntryModelLog(
             event: WebviewEvent.onRunJavascript,
             extra: {'script': script, ...?extra},
+          ),
+        ],
+      ),
+    );
+  }
+
+  void shouldInterceptAjaxRequest({Map<String, dynamic>? extra}) {
+    _storage.add(
+      log: WebviewEntryModel(
+        id: _id,
+        events: [
+          WebviewEntryModelLog(
+            event: WebviewEvent.shouldInterceptAjaxRequest,
+            extra: {...?extra},
+          ),
+        ],
+      ),
+    );
+  }
+
+  void onAjaxProgress({Map<String, dynamic>? extra}) {
+    _storage.add(
+      log: WebviewEntryModel(
+        id: _id,
+        events: [
+          WebviewEntryModelLog(
+            event: WebviewEvent.onAjaxProgress,
+            extra: {...?extra},
+          ),
+        ],
+      ),
+    );
+  }
+
+  void onLoadResource({Map<String, dynamic>? extra}) {
+    _storage.add(
+      log: WebviewEntryModel(
+        id: _id,
+        events: [
+          WebviewEntryModelLog(
+            event: WebviewEvent.onAjaxProgress,
+            extra: {...?extra},
+          ),
+        ],
+      ),
+    );
+  }
+
+  void onReceivedHttpError({
+    Map<String, dynamic>? request,
+    Map<String, dynamic>? response,
+    Map<String, dynamic>? extra,
+  }) {
+    _storage.add(
+      log: WebviewEntryModel(
+        id: _id,
+        events: [
+          WebviewEntryModelLog(
+            event: WebviewEvent.onAjaxProgress,
+            extra: {'request': request, 'response': response, ...?extra},
           ),
         ],
       ),
