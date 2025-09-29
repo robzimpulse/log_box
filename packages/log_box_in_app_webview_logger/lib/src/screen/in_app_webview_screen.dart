@@ -187,12 +187,17 @@ class _InAppWebviewScreenState extends State<InAppWebviewScreen> {
       },
       shouldInterceptAjaxRequest: (_, request) async {
         _log('shouldInterceptAjaxRequest: ${request.url}');
-        widget.observer.shouldInterceptAjaxRequest(extra: request.toMap());
+        widget.observer.shouldInterceptAjaxRequest(request: request.toMap());
         return request;
       },
       onAjaxProgress: (_, request) async {
         _log('onAjaxProgress: ${request.url}');
-        widget.observer.onAjaxProgress(extra: request.toMap());
+        widget.observer.onAjaxProgress(request: request.toMap());
+        return AjaxRequestAction.PROCEED;
+      },
+      onAjaxReadyStateChange: (_, request) async {
+        _log('onAjaxReadyStateChange: ${request.url}');
+        widget.observer.onAjaxReadyStateChange(request: request.toMap());
         return AjaxRequestAction.PROCEED;
       },
       onReceivedHttpError: (_, request, response) {
@@ -204,7 +209,7 @@ class _InAppWebviewScreenState extends State<InAppWebviewScreen> {
       },
       onLoadResource: (_, resource) {
         _log('onLoadResource: ${resource.url}');
-        widget.observer.onLoadResource(extra: resource.toMap());
+        widget.observer.onLoadResource(resource: resource.toMap());
       },
       onConsoleMessage: (controller, message) {
         _log('onConsoleMessage: ${message.message}');

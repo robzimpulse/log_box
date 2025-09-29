@@ -191,42 +191,68 @@ class InAppWebviewObserver {
     );
   }
 
-  void shouldInterceptAjaxRequest({Map<String, dynamic>? extra}) {
+  void shouldInterceptAjaxRequest({
+    Map<String, dynamic>? request,
+    Map<String, dynamic>? extra,
+  }) {
     _storage.add(
       log: WebviewEntryModel(
         id: _id,
         events: [
           WebviewEntryModelLog(
             event: WebviewEvent.shouldInterceptAjaxRequest,
-            extra: {...?extra},
+            extra: {'request': request, ...?extra},
           ),
         ],
       ),
     );
   }
 
-  void onAjaxProgress({Map<String, dynamic>? extra}) {
+  void onAjaxProgress({
+    Map<String, dynamic>? request,
+    Map<String, dynamic>? extra,
+  }) {
     _storage.add(
       log: WebviewEntryModel(
         id: _id,
         events: [
           WebviewEntryModelLog(
             event: WebviewEvent.onAjaxProgress,
-            extra: {...?extra},
+            extra: {'request': request, ...?extra},
           ),
         ],
       ),
     );
   }
 
-  void onLoadResource({Map<String, dynamic>? extra}) {
+  void onAjaxReadyStateChange({
+    Map<String, dynamic>? request,
+    Map<String, dynamic>? extra,
+  }) {
+    _storage.add(
+      log: WebviewEntryModel(
+        id: _id,
+        events: [
+          WebviewEntryModelLog(
+            event: WebviewEvent.onAjaxReadyStateChange,
+            extra: {'request': request, ...?extra},
+          ),
+        ],
+      ),
+    );
+  }
+
+  void onLoadResource({
+    Map<String, dynamic>? resource,
+    Map<String, dynamic>? extra,
+  }) {
     _storage.add(
       log: WebviewEntryModel(
         id: _id,
         events: [
           WebviewEntryModelLog(
             event: WebviewEvent.onAjaxProgress,
-            extra: {...?extra},
+            extra: {'resource': resource, ...?extra},
           ),
         ],
       ),

@@ -13,4 +13,5 @@ enum WebviewEvent {
   shouldInterceptAjaxRequest,
   onAjaxProgress,
   onReceivedHttpError,
+  onAjaxReadyStateChange,
 }

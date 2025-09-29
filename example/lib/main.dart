@@ -412,11 +412,11 @@ class _WebviewScreenState extends State<WebviewScreen> {
         );
       },
       shouldInterceptAjaxRequest: (_, request) async {
-        widget.observer.shouldInterceptAjaxRequest(extra: request.toMap());
+        widget.observer.shouldInterceptAjaxRequest(request: request.toMap());
         return request;
       },
       onAjaxProgress: (_, request) async {
-        widget.observer.onAjaxProgress(extra: request.toMap());
+        widget.observer.onAjaxProgress(request: request.toMap());
         return AjaxRequestAction.PROCEED;
       },
       onReceivedHttpError: (_, request, response) {
@@ -425,8 +425,12 @@ class _WebviewScreenState extends State<WebviewScreen> {
           response: response.toMap(),
         );
       },
+      onAjaxReadyStateChange: (_, request) async {
+        widget.observer.onAjaxReadyStateChange(request: request.toMap());
+        return AjaxRequestAction.PROCEED;
+      },
       onLoadResource: (_, resource) {
-        widget.observer.onLoadResource(extra: resource.toMap());
+        widget.observer.onLoadResource(resource: resource.toMap());
       },
       onConsoleMessage: (_, message) {
         widget.observer.onConsoleMessage(message: message.toMap());
