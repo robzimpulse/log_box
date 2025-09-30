@@ -190,11 +190,37 @@ class WebviewEntryModel extends EntryModel {
           SliverToBoxAdapter(
             child: ExpansionTile(
               visualDensity: VisualDensity.compact,
-              title: Text(
-                event.event.name,
-                maxLines: 1,
-                style: theme.textTheme.labelLarge,
-                overflow: TextOverflow.ellipsis,
+              title: Row(
+                children: [
+                  Stack(
+                    alignment: Alignment.centerLeft,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 12),
+                        child: Text(
+                          event.event.name,
+                          maxLines: 1,
+                          style: theme.textTheme.labelLarge,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (searchTerm != null && json.contains(searchTerm))
+                        Positioned(
+                          width: 6,
+                          height: 6,
+                          right: 0,
+                          top: 0,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  Spacer(),
+                ],
               ),
               subtitle: Text(
                 event.timestamp.toIso8601String(),
