@@ -251,7 +251,7 @@ class InAppWebviewObserver {
         id: _id,
         events: [
           WebviewEntryModelLog(
-            event: WebviewEvent.onAjaxProgress,
+            event: WebviewEvent.onLoadResource,
             extra: {'resource': resource, ...?extra},
           ),
         ],
@@ -269,7 +269,7 @@ class InAppWebviewObserver {
         id: _id,
         events: [
           WebviewEntryModelLog(
-            event: WebviewEvent.onAjaxProgress,
+            event: WebviewEvent.onReceivedHttpError,
             extra: {'request': request, 'response': response, ...?extra},
           ),
         ],
