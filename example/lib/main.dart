@@ -212,7 +212,7 @@ class App extends StatelessWidget {
                       ),
                       TextButton(
                         onPressed: () => context.push('/webview'),
-                        child: Text('Open Webview'),
+                        child: Text('Open Webview Screen'),
                       ),
                       TextButton(
                         onPressed: () {
@@ -238,7 +238,7 @@ class App extends StatelessWidget {
                             },
                           );
                         },
-                        child: Text('Open Cloudflare Webview'),
+                        child: Text('Open Logbox Webview'),
                       ),
                     ],
                   ),
@@ -373,16 +373,9 @@ class _WebviewScreenState extends State<WebviewScreen> {
                 source: '''
               \$.ajax(
     {
-        url: "/wp-admin/admin-ajax.php",
+        url: "https://toonclash.com/wp-admin/admin-ajax.php",
         method: "POST",
-        contentType: "application/json",
-        dataType: "json",
-        data: JSON.stringify({
-          "action": "wp_manga_signin",
-          "login": "asdasd",
-          "pass": "adsadasd",
-          "rememberme": "forever"
-        }),
+        data: "action=wp_manga_signin&login=asdasd&pass=adsadasd&rememberme=forever",
         success: function (data, textStatus, jqXHR) {
             console.log(data);
             alert(data);
@@ -411,23 +404,11 @@ class _WebviewScreenState extends State<WebviewScreen> {
           error: error.toMap(),
         );
       },
-      shouldInterceptAjaxRequest: (_, request) async {
-        widget.observer.shouldInterceptAjaxRequest(request: request.toMap());
-        return request;
-      },
-      onAjaxProgress: (_, request) async {
-        widget.observer.onAjaxProgress(request: request.toMap());
-        return AjaxRequestAction.PROCEED;
-      },
       onReceivedHttpError: (_, request, response) {
         widget.observer.onReceivedHttpError(
           request: request.toMap(),
           response: response.toMap(),
         );
-      },
-      onAjaxReadyStateChange: (_, request) async {
-        widget.observer.onAjaxReadyStateChange(request: request.toMap());
-        return AjaxRequestAction.PROCEED;
       },
       onLoadResource: (_, resource) {
         widget.observer.onLoadResource(resource: resource.toMap());

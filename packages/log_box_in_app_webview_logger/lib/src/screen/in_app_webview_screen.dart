@@ -185,21 +185,6 @@ class _InAppWebviewScreenState extends State<InAppWebviewScreen> {
           error: error.toMap(),
         );
       },
-      shouldInterceptAjaxRequest: (_, request) async {
-        _log('shouldInterceptAjaxRequest: ${request.url}');
-        widget.observer.shouldInterceptAjaxRequest(request: request.toMap());
-        return request;
-      },
-      onAjaxProgress: (_, request) async {
-        _log('onAjaxProgress: ${request.url}');
-        widget.observer.onAjaxProgress(request: request.toMap());
-        return AjaxRequestAction.PROCEED;
-      },
-      onAjaxReadyStateChange: (_, request) async {
-        _log('onAjaxReadyStateChange: ${request.url}');
-        widget.observer.onAjaxReadyStateChange(request: request.toMap());
-        return AjaxRequestAction.PROCEED;
-      },
       onReceivedHttpError: (_, request, response) {
         _log('onReceivedHttpError: ${request.url} - ${response.reasonPhrase}');
         widget.observer.onReceivedHttpError(
