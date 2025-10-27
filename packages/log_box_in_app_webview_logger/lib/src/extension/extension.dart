@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:log_box/log_box.dart';
@@ -17,6 +19,8 @@ extension InAppWebviewLoggerExtension on LogBox {
     String? html,
     ThemeData? theme,
     SnapshotCallback? onTapSnapshot,
+    UnmodifiableListView<UserScript>? initialUserScripts,
+    Map<String, JavaScriptHandlerCallback>? javascriptHandlers,
   }) async {
     await Navigator.push(
       context,
@@ -32,6 +36,8 @@ extension InAppWebviewLoggerExtension on LogBox {
               uri: uri,
               html: html,
               onTapSnapshot: onTapSnapshot,
+              initialUserScripts: initialUserScripts,
+              javascriptHandlers: javascriptHandlers,
               observer: inAppWebviewObserver,
             ),
           );
