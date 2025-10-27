@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:log_box_in_app_webview_logger/log_box_in_app_webview_logger.dart';
@@ -8,14 +10,16 @@ class InAppWebviewScreen extends StatefulWidget {
     required this.uri,
     required this.observer,
     this.html,
-    this.scripts = const [],
+    this.initialUserScripts,
+    this.javascriptHandlers,
     this.headers,
     this.onTapSnapshot,
   });
 
   final String? html;
   final Uri uri;
-  final List<String> scripts;
+  final UnmodifiableListView<UserScript>? initialUserScripts;
+  final Map<String, JavaScriptHandlerCallback>? javascriptHandlers;
   final Map<String, String>? headers;
   final SnapshotCallback? onTapSnapshot;
   final InAppWebviewObserver observer;
@@ -150,8 +154,20 @@ class _InAppWebviewScreenState extends State<InAppWebviewScreen> {
         headers: widget.headers,
       ),
       initialData: initialData,
+      initialUserScripts: widget.initialUserScripts,
       onWebViewCreated: (controller) {
         webViewController = controller;
+
+        final entries = widget.javascriptHandlers?.entries.toList();
+
+        if (entries == null) return;
+
+        for (final handler in entries) {
+          controller.addJavaScriptHandler(
+            handlerName: handler.key,
+            callback: handler.value,
+          );
+        }
       },
       initialSettings: InAppWebViewSettings(
         isInspectable: true,
