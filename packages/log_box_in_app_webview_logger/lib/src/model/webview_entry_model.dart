@@ -39,6 +39,7 @@ class WebviewEntryModel extends EntryModel {
     return [
       uri?.path.toLowerCase().contains(keyword.toLowerCase()) ?? false,
       uri?.host.toLowerCase().contains(keyword.toLowerCase()) ?? false,
+      events.any((e) => e.extra?.containsKey(keyword.toLowerCase()) == true),
     ].contains(true);
   }
 
