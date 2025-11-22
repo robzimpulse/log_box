@@ -28,7 +28,7 @@ class App extends StatelessWidget {
       subThemesData: const FlexSubThemesData(
         blendOnLevel: 10,
         blendOnColors: false,
-        useTextTheme: true,
+        useMaterial3Typography: true,
         useM2StyleDividerInM3: true,
         alignedDropdown: true,
         useInputDecoratorThemeInDialogs: true,

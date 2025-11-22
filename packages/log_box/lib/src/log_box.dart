@@ -50,7 +50,7 @@ class LogBox {
             data: theme ?? Theme.of(context),
             child: DashboardScreen(
               storage: storage,
-              onTap: (item) {
+              onTap: (item, keyword) {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -58,7 +58,13 @@ class LogBox {
                       'detail_route',
                       () => const RouteSettings(name: 'logbox/details'),
                     ),
-                    builder: (context) => DetailScreen(data: item, box: this),
+                    builder: (context) {
+                      return DetailScreen(
+                        data: item,
+                        box: this,
+                        keyword: keyword,
+                      );
+                    },
                   ),
                 );
               },

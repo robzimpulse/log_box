@@ -8,7 +8,7 @@ class DashboardScreen extends StatefulWidget {
 
   final Storage storage;
 
-  final ValueSetter<EntryModel>? onTap;
+  final void Function(EntryModel value, String keyword)? onTap;
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -57,7 +57,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final hasDetail = value.tabLength(context) > 0;
 
     return ListTile(
-      onTap: hasDetail ? () => widget.onTap?.call(value) : null,
+      onTap: hasDetail ? () => widget.onTap?.call(value, keyword.value) : null,
       visualDensity: VisualDensity.compact,
       title: value.title(context),
       subtitle: value.subtitle(context),
