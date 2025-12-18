@@ -23,11 +23,27 @@ class LogBox {
   ) {
     final id = Uuid().v4();
 
-    storage.add(log: TraceLogEntryModel(id: id, name: name));
+    storage.add(
+      log: TraceLogEntryModel(
+        id: id,
+        name: name,
+        logs: [LogEntryModel(message: 'Start')],
+      ),
+    );
 
-    return process.call((log) {
+    final result = process.call((log) {
       storage.add(log: TraceLogEntryModel(id: id, name: name, logs: [log]));
     });
+
+    storage.add(
+      log: TraceLogEntryModel(
+        id: id,
+        name: name,
+        logs: [LogEntryModel(message: 'Finish')],
+      ),
+    );
+
+    return result;
   }
 
   void log(
