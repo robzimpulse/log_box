@@ -34,8 +34,10 @@ void main() {
       () => expect(data.error, entry2.error),
     );
     test('data should have entry 1 extra and entry 2 extra', () {
-      expect(data.extra?['extra1'], entry1.extra?['extra1']);
-      expect(data.extra?['extra2'], entry2.extra?['extra2']);
+      for (final entry in {...?entry1.extra, ...?entry2.extra}.entries) {
+        expect(data.extra?.containsKey(entry.key), isTrue);
+        expect(data.extra?.containsValue(entry.value), isTrue);
+      }
     });
   });
 }

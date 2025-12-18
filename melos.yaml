@@ -48,6 +48,6 @@ scripts:
     description: Upgrade dependencies for all packages.
     run: flutter pub upgrade
     exec:
-      concurrency: 1
+      concurrency: 5
       failFast: true
       orderDependents: true
