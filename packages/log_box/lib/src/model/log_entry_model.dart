@@ -26,6 +26,8 @@ class LogEntryModel extends EntryModel {
     return [
       message.toLowerCase().contains(keyword.toLowerCase()),
       name?.toLowerCase().contains(keyword.toLowerCase()),
+      extra?.containsKey(keyword) == true,
+      extra?.containsValue(keyword) == true,
     ].nonNulls.contains(true);
   }
 

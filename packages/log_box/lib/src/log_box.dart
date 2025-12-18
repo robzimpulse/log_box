@@ -1,7 +1,9 @@
 import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
+import 'package:log_box/src/model/trace_log_entry_model.dart';
 import 'package:log_box/src/storage/storage.dart';
+import 'package:uuid/uuid.dart';
 
 import 'model/log_entry_model.dart';
 import 'screen/dashboard_screen.dart';
@@ -14,6 +16,19 @@ class LogBox {
   Map<String, RouteSettings> routes = {};
 
   LogBox({required int capacity}) : storage = Storage(capacity: capacity);
+
+  FutureOr tracer<FutureOr>(
+    String name,
+    FutureOr Function(ValueSetter<LogEntryModel> trace) process,
+  ) {
+    final id = Uuid().v4();
+
+    storage.add(log: TraceLogEntryModel(id: id, name: name));
+
+    return process.call((log) {
+      storage.add(log: TraceLogEntryModel(id: id, name: name, logs: [log]));
+    });
+  }
 
   void log(
     String message, {

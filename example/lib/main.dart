@@ -43,6 +43,19 @@ class App extends StatelessWidget {
     );
   }
 
+  void _onTapTrace(BuildContext context) async {
+    return box.tracer('_onTapTrace', (tracer) async {
+      await Future.delayed(Duration(milliseconds: 100));
+      tracer(LogEntryModel(message: 'trace 1'));
+      await Future.delayed(Duration(milliseconds: 100));
+      tracer(LogEntryModel(message: 'trace 2'));
+      await Future.delayed(Duration(milliseconds: 100));
+      tracer(LogEntryModel(message: 'trace 3'));
+      await Future.delayed(Duration(milliseconds: 100));
+      tracer(LogEntryModel(message: 'done'));
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
@@ -195,6 +208,10 @@ class App extends StatelessWidget {
                       TextButton(
                         onPressed: () => box.log('testing message'),
                         child: Text('Send Log'),
+                      ),
+                      TextButton(
+                        onPressed: () => _onTapTrace(context),
+                        child: Text('Send Trace Log'),
                       ),
                       TextButton(
                         onPressed: () async {
