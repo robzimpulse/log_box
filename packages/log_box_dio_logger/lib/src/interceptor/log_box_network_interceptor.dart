@@ -99,7 +99,7 @@ class LogBoxNetworkInterceptor extends Interceptor {
         loading: false,
         error: HttpErrorModel(
           error: err.toString(),
-          stackTrace: err.stackTrace,
+          stackTrace: err.stackTrace.toString(),
         ),
         response: HttpResponseModel.create(
           status: response?.statusCode,

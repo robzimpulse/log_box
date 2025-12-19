@@ -6,7 +6,7 @@ void main() {
     id: '1',
     message: 'message entry 1',
     name: 'name entry 1',
-    error: Exception('exception entry 1'),
+    error: Exception('exception entry 1').toString(),
     extra: {'extra1': 'extra1'},
   );
 
@@ -14,7 +14,7 @@ void main() {
     id: '2',
     message: 'message entry 2',
     name: 'name entry 2',
-    error: Exception('exception entry 2'),
+    error: Exception('exception entry 2').toString(),
     extra: {'extra2': 'extra2'},
   );
 

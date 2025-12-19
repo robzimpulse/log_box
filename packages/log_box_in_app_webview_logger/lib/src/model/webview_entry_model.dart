@@ -1,20 +1,38 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:log_box/log_box.dart';
 import 'package:log_box_in_app_webview_logger/log_box_in_app_webview_logger.dart';
 
 import '../enum/enum.dart';
 
+part 'webview_entry_model.g.dart';
+
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class WebviewEntryModelLog {
   final WebviewEvent event;
   final DateTime timestamp;
   final Map<String, dynamic>? extra;
 
+  factory WebviewEntryModelLog.create({
+    required WebviewEvent event,
+    Map<String, dynamic>? extra,
+  }) {
+    return WebviewEntryModelLog(event: event, extra: extra);
+  }
+
   WebviewEntryModelLog({required this.event, this.extra})
     : timestamp = DateTime.timestamp();
+
+  Map<String, dynamic> toJson() => _$WebviewEntryModelLogToJson(this);
+
+  factory WebviewEntryModelLog.fromJson(Map<String, dynamic> json) {
+    return _$WebviewEntryModelLogFromJson(json);
+  }
 }
 
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class WebviewEntryModel extends EntryModel {
   final Uri? uri;
   final List<String> scripts;
@@ -33,6 +51,12 @@ class WebviewEntryModel extends EntryModel {
     this.html,
     this.error,
   });
+
+  Map<String, dynamic> toJson() => _$WebviewEntryModelToJson(this);
+
+  factory WebviewEntryModel.fromJson(Map<String, dynamic> json) {
+    return _$WebviewEntryModelFromJson(json);
+  }
 
   @override
   bool contains(String keyword) {

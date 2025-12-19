@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:log_box/log_box.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 import '../enum/enum.dart';
 
+part 'navigation_entry_model.g.dart';
+
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class NavigationEntryModel extends EntryModel {
   final NavigationAction action;
   final String? route;
@@ -15,6 +19,12 @@ class NavigationEntryModel extends EntryModel {
     this.route,
     this.previousRoute,
   });
+
+  Map<String, dynamic> toJson() => _$NavigationEntryModelToJson(this);
+
+  factory NavigationEntryModel.fromJson(Map<String, dynamic> json) {
+    return _$NavigationEntryModelFromJson(json);
+  }
 
   @override
   int tabLength(BuildContext context) => 0;

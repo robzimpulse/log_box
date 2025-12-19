@@ -16,7 +16,15 @@ class LogBox {
   // variable for storing known routes
   Map<String, RouteSettings> routes = {};
 
-  LogBox({required int capacity}) : storage = Storage(capacity: capacity);
+  LogBox({required int capacity, StorageCodec codec = const {}})
+    : storage = Storage(
+        capacity: capacity,
+        codec: {
+          ...codec,
+          LogEntryModel: LogEntryModel.fromJson,
+          TraceLogEntryModel: TraceLogEntryModel.fromJson,
+        },
+      );
 
   FutureOr<T> tracer<T>(
     String name,
@@ -61,8 +69,8 @@ class LogBox {
         name: name,
         message: message,
         extra: extra ?? {},
-        error: error,
-        stackTrace: stackTrace,
+        error: error?.toString(),
+        stackTrace: stackTrace?.toString(),
       ),
     );
 

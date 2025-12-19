@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:log_box/log_box.dart';
 
+part 'trace_log_entry_model.g.dart';
+
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class TraceLogEntryModel extends EntryModel {
   final String name;
   final List<LogEntryModel> logs;
@@ -18,6 +22,12 @@ class TraceLogEntryModel extends EntryModel {
       name.contains(keyword),
       logs.any((element) => element.contains(keyword)),
     ].contains(true);
+  }
+
+  Map<String, dynamic> toJson() => _$TraceLogEntryModelToJson(this);
+
+  factory TraceLogEntryModel.fromJson(Map<String, dynamic> json) {
+    return _$TraceLogEntryModelFromJson(json);
   }
 
   @override

@@ -2,8 +2,12 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:equatable/equatable.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:universal_io/io.dart';
 
+part 'http_response_model.g.dart';
+
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class HttpResponseModel extends Equatable {
   factory HttpResponseModel.create({
     int? status,
@@ -11,7 +15,7 @@ class HttpResponseModel extends Equatable {
     String? body,
     Map<String, List<String>>? headers,
   }) {
-    return HttpResponseModel._(
+    return HttpResponseModel(
       status: status,
       size: size,
       time: DateTime.timestamp(),
@@ -20,13 +24,19 @@ class HttpResponseModel extends Equatable {
     );
   }
 
-  const HttpResponseModel._({
+  const HttpResponseModel({
     this.status,
     required this.size,
     required this.time,
     this.body,
     this.headers,
   });
+
+  Map<String, dynamic> toJson() => _$HttpResponseModelToJson(this);
+
+  factory HttpResponseModel.fromJson(Map<String, dynamic> json) {
+    return _$HttpResponseModelFromJson(json);
+  }
 
   final int? status;
   final int size;
