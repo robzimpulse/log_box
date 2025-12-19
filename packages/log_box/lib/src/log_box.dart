@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer' as dev;
 
+import 'package:file/file.dart';
 import 'package:flutter/material.dart';
 import 'package:log_box/src/model/trace_log_entry_model.dart';
 import 'package:log_box/src/storage/storage.dart';
@@ -16,14 +17,14 @@ class LogBox {
   // variable for storing known routes
   Map<String, RouteSettings> routes = {};
 
-  LogBox({required int capacity, StorageCodec codec = const {}})
+  LogBox({StorageCodec codec = const {}, required Directory root})
     : storage = Storage(
-        capacity: capacity,
         codec: {
           ...codec,
-          LogEntryModel: LogEntryModel.fromJson,
-          TraceLogEntryModel: TraceLogEntryModel.fromJson,
+          (LogEntryModel).toString(): LogEntryModel.fromJson,
+          (TraceLogEntryModel).toString(): TraceLogEntryModel.fromJson,
         },
+        root: root,
       );
 
   FutureOr<T> tracer<T>(
