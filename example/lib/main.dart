@@ -217,7 +217,7 @@ class App extends StatelessWidget {
                         onPressed: () async {
                           final response = await dio.get(
                             options: Options(responseType: ResponseType.bytes),
-                            'https://toonclash.com/wp-content/uploads/2020/03/cropped-22.jpg',
+                            'https://picsum.photos/200/300',
                           );
                           if (!context.mounted) return;
                           final snackbar = SnackBar(

@@ -1,7 +1,10 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:log_box/log_box.dart';
+import 'package:rxdart/rxdart.dart';
 
 import '../model/form_data_field_model.dart';
 import '../model/form_data_file_model.dart';
@@ -72,20 +75,62 @@ class LogBoxNetworkInterceptor extends Interceptor {
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
     final data = response.data;
-    _storage.add(
-      log: NetworkEntryModel(
-        id: response.requestOptions.hashCode.toString(),
-        loading: false,
-        response: HttpResponseModel.create(
-          status: response.statusCode,
-          headers: response.headers.map,
-          body: _rawJson(data),
-          size: data == null ? 0 : utf8.encode(response.data.toString()).length,
-        ),
-      ),
-    );
 
-    super.onResponse(response, handler);
+    if (data is ResponseBody) {
+      final replay = ReplaySubject<Uint8List>();
+
+      replay.addStream(data.stream).whenComplete(() {
+        final interceptedData = replay.values;
+
+        _storage.add(
+          log: NetworkEntryModel(
+            id: response.requestOptions.hashCode.toString(),
+            loading: false,
+            response: HttpResponseModel.create(
+              status: response.statusCode,
+              headers: response.headers.map,
+              body: _rawJson(interceptedData),
+              size: interceptedData.length,
+            ),
+          ),
+        );
+      });
+
+      super.onResponse(
+        Response(
+          data: ResponseBody(
+            replay.stream,
+            data.statusCode,
+            isRedirect: data.isRedirect,
+            redirects: data.redirects,
+            headers: data.headers,
+            onClose: () => replay.close(),
+          ),
+          requestOptions: response.requestOptions,
+          statusCode: response.statusCode,
+          isRedirect: response.isRedirect,
+          redirects: response.redirects,
+          headers: response.headers,
+        ),
+        handler,
+      );
+    } else {
+      _storage.add(
+        log: NetworkEntryModel(
+          id: response.requestOptions.hashCode.toString(),
+          loading: false,
+          response: HttpResponseModel.create(
+            status: response.statusCode,
+            headers: response.headers.map,
+            body: _rawJson(data),
+            size:
+                data == null ? 0 : utf8.encode(response.data.toString()).length,
+          ),
+        ),
+      );
+
+      super.onResponse(response, handler);
+    }
   }
 
   @override
