@@ -25,6 +25,7 @@ class LogEntryModel extends EntryModel {
     this.stackTrace,
   });
 
+  @override
   Map<String, dynamic> toJson() => _$LogEntryModelToJson(this);
 
   factory LogEntryModel.fromJson(Map<String, dynamic> json) {

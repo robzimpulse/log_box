@@ -24,6 +24,7 @@ class TraceLogEntryModel extends EntryModel {
     ].contains(true);
   }
 
+  @override
   Map<String, dynamic> toJson() => _$TraceLogEntryModelToJson(this);
 
   factory TraceLogEntryModel.fromJson(Map<String, dynamic> json) {

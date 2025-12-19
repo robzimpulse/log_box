@@ -52,6 +52,7 @@ class WebviewEntryModel extends EntryModel {
     this.error,
   });
 
+  @override
   Map<String, dynamic> toJson() => _$WebviewEntryModelToJson(this);
 
   factory WebviewEntryModel.fromJson(Map<String, dynamic> json) {

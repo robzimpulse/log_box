@@ -31,6 +31,7 @@ class NetworkEntryModel extends EntryModel {
     this.error,
   });
 
+  @override
   Map<String, dynamic> toJson() => _$NetworkEntryModelToJson(this);
 
   factory NetworkEntryModel.fromJson(Map<String, dynamic> json) {

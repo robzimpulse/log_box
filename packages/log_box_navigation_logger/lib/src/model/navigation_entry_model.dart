@@ -20,6 +20,7 @@ class NavigationEntryModel extends EntryModel {
     this.previousRoute,
   });
 
+  @override
   Map<String, dynamic> toJson() => _$NavigationEntryModelToJson(this);
 
   factory NavigationEntryModel.fromJson(Map<String, dynamic> json) {
