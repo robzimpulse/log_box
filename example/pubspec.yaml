@@ -35,6 +35,8 @@ dependencies:
   flex_color_scheme: ^8.2.0
   flutter_inappwebview: ^6.1.0
   file: ^7.0.0
+  path_provider: ^2.1.5
+
   log_box:
     path: ../packages/log_box
   log_box_dio_logger:
