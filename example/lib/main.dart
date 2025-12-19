@@ -10,9 +10,18 @@ import 'package:log_box_in_app_webview_logger/log_box_in_app_webview_logger.dart
 import 'package:file/local.dart';
 import 'package:path_provider/path_provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final root = LocalFileSystem()
+      .directory(await getApplicationSupportDirectory())
+      .childDirectory('log_box_demo');
   final box = LogBox(
-    root: LocalFileSystem().directory(getApplicationSupportDirectory()),
+    root: root,
+    codec: [
+      NavigationLoggerStorageDecoder(),
+      InAppWebviewLoggerStorageDecoder(),
+      DioLoggerStorageDecoder(),
+    ],
   );
   final dio = Dio()..interceptors.add(box.interceptor);
   runApp(App(box: box, dio: dio));

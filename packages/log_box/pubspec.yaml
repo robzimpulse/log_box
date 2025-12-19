@@ -13,6 +13,7 @@ dependencies:
   uuid: ^4.5.1
   json_annotation: ^4.9.0
   file: ^7.0.0
+  queue: ^3.4.0
 
 dev_dependencies:
   flutter_test:

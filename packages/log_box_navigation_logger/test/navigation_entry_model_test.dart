@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:log_box_navigation_logger/log_box_navigation_logger.dart';
+import 'package:log_box_navigation_logger/src/model/navigation_entry_model.dart';
 
 void main() {
   final entry1 = NavigationEntryModel(

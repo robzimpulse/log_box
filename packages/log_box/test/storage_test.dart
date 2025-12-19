@@ -27,10 +27,10 @@ void main() {
 
   test('Adding with key that already exist', () async {
     for (final index in List.generate(5, (e) => e)) {
-      await storage.add(log: LogEntryModel(id: '$index', message: '$index'));
+      storage.add(log: LogEntryModel(id: '$index', message: '$index'));
     }
 
-    await storage.add(log: LogEntryModel(id: '4', message: 'custom'));
+    storage.add(log: LogEntryModel(id: '4', message: 'custom'));
 
     expect(storage.data.length, 5);
     expect(

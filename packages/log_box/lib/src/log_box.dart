@@ -3,11 +3,10 @@ import 'dart:developer' as dev;
 
 import 'package:file/file.dart';
 import 'package:flutter/material.dart';
+import 'package:log_box/log_box.dart';
 import 'package:log_box/src/model/trace_log_entry_model.dart';
-import 'package:log_box/src/storage/storage.dart';
 import 'package:uuid/uuid.dart';
 
-import 'model/log_entry_model.dart';
 import 'screen/dashboard_screen.dart';
 import 'screen/detail_screen.dart';
 
@@ -17,12 +16,11 @@ class LogBox {
   // variable for storing known routes
   Map<String, RouteSettings> routes = {};
 
-  LogBox({StorageCodec codec = const {}, required Directory root})
+  LogBox({List<StorageDecoder> codec = const [], required Directory root})
     : storage = Storage(
         codec: {
-          ...codec,
-          (LogEntryModel).toString(): LogEntryModel.fromJson,
-          (TraceLogEntryModel).toString(): TraceLogEntryModel.fromJson,
+          ...StorageDecoder().codec,
+          for (final coder in codec) ...coder.codec,
         },
         root: root,
       );
