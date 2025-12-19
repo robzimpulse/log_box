@@ -47,14 +47,6 @@ class HttpResponseModel extends Equatable {
   @override
   List<Object?> get props => [status, size, time, body, headers];
 
-  bool get isImage {
-    final result = headers?[HttpHeaders.contentTypeHeader]
-        ?.map((e) => e.contains(RegExp(r'image/.*')))
-        .contains(true);
-
-    return result ?? false;
-  }
-
   Uint8List? get image {
     final body = this.body;
     if (body == null || body.isEmpty) return null;
