@@ -48,7 +48,7 @@ class HumanReadableWidget extends StatelessWidget {
     final image = this.image;
 
     if (image != null) {
-      return Image.memory(image);
+      return Image.memory(image, fit: BoxFit.contain);
     }
 
     if (value != null) {
@@ -64,12 +64,10 @@ class HumanReadableWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     final shouldShrink = [
       value == null || value?.isEmpty == true,
       image == null || image?.isEmpty == true,
     ].every((e) => e);
-
 
     if (shouldShrink) return SizedBox.shrink();
 
@@ -92,7 +90,7 @@ class HumanReadableWidget extends StatelessWidget {
                 child: _content(context),
               ),
             ),
-          )
+          ),
         ],
       ),
     );
