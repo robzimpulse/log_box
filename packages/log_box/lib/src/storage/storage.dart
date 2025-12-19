@@ -12,7 +12,7 @@ class Storage with ChangeNotifier {
   /// Max capacity of this storage
   final int _capacity;
 
-  /// Callback when data being deleted caused by over capacity
+  /// Callback when data being deleted caused by over capacity or clearing data
   final ValueSetter<EntryModel>? _onDelete;
 
   Storage({required int capacity, ValueSetter<EntryModel>? onDelete})
@@ -27,17 +27,16 @@ class Storage with ChangeNotifier {
 
     if (_logs.keys.length > _capacity) {
       final key = _logs.keys.firstOrNull;
-      if (key != null) {
-        final deleted = _logs.remove(key);
-        if (deleted != null) _onDelete?.call(deleted);
-      }
+      if (key != null) _remove(key);
     }
 
     Future.microtask(() => notifyListeners());
   }
 
   void clear() {
-    _logs.clear();
+    for (final key in _logs.keys) {
+      _remove(key);
+    }
     Future.microtask(() => notifyListeners());
   }
 
@@ -45,5 +44,10 @@ class Storage with ChangeNotifier {
     return _logs.map(
       (key, value) => MapEntry(value.display(), value.runtimeType),
     );
+  }
+
+  void _remove(String id) {
+    final deleted = _logs.remove(id);
+    if (deleted != null) _onDelete?.call(deleted);
   }
 }
