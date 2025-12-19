@@ -8,9 +8,12 @@ import 'package:log_box_dio_logger/log_box_dio_logger.dart';
 import 'package:log_box_navigation_logger/log_box_navigation_logger.dart';
 import 'package:log_box_in_app_webview_logger/log_box_in_app_webview_logger.dart';
 import 'package:file/local.dart';
+import 'package:path_provider/path_provider.dart';
 
 void main() {
-  final box = LogBox(root: LocalFileSystem().systemTempDirectory);
+  final box = LogBox(
+    root: LocalFileSystem().directory(getApplicationSupportDirectory()),
+  );
   final dio = Dio()..interceptors.add(box.interceptor);
   runApp(App(box: box, dio: dio));
 }
