@@ -80,7 +80,7 @@ class LogBoxNetworkInterceptor extends Interceptor {
       final replay = ReplaySubject<Uint8List>();
 
       replay.addStream(data.stream).whenComplete(() {
-        final interceptedData = replay.values;
+        final interceptedData = replay.values.expand((e) => e);
 
         _storage.add(
           log: NetworkEntryModel(
