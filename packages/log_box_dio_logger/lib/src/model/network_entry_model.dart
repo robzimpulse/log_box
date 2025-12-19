@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:log_box/log_box.dart';
 
 import 'http_error_model.dart';
@@ -6,6 +7,9 @@ import 'http_request_model.dart';
 import 'http_response_model.dart';
 import '../extension/extension.dart';
 
+part 'network_entry_model.g.dart';
+
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class NetworkEntryModel extends EntryModel {
   final String? client;
   final bool? loading;
@@ -26,6 +30,13 @@ class NetworkEntryModel extends EntryModel {
     this.response,
     this.error,
   });
+
+  @override
+  Map<String, dynamic> toJson() => _$NetworkEntryModelToJson(this);
+
+  factory NetworkEntryModel.fromJson(Map<String, dynamic> json) {
+    return _$NetworkEntryModelFromJson(json);
+  }
 
   NetworkEntryModel copyWith({
     bool? loading,

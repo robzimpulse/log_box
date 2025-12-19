@@ -61,8 +61,8 @@ class LogBox {
         name: name,
         message: message,
         extra: extra ?? {},
-        error: error,
-        stackTrace: stackTrace,
+        error: error?.toString(),
+        stackTrace: stackTrace?.toString(),
       ),
     );
 

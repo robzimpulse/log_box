@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 import '../../src/extension/extension.dart';
 import '../widget/human_readable_widget.dart';
 import 'entry_model.dart';
 
+part 'log_entry_model.g.dart';
+
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class LogEntryModel extends EntryModel {
   final String message;
   final String? name;
-  final Object? error;
-  final StackTrace? stackTrace;
+  final String? error;
+  final String? stackTrace;
   final Map<String, dynamic>? extra;
 
   LogEntryModel({
@@ -20,6 +24,13 @@ class LogEntryModel extends EntryModel {
     this.error,
     this.stackTrace,
   });
+
+  @override
+  Map<String, dynamic> toJson() => _$LogEntryModelToJson(this);
+
+  factory LogEntryModel.fromJson(Map<String, dynamic> json) {
+    return _$LogEntryModelFromJson(json);
+  }
 
   @override
   bool contains(String keyword) {
@@ -167,7 +178,7 @@ class LogEntryModel extends EntryModel {
             sliver: SliverToBoxAdapter(
               child: HumanReadableWidget(
                 name: 'Error',
-                value: error?.toString(),
+                value: error,
                 searchTerm: searchTerm,
               ),
             ),
@@ -177,7 +188,7 @@ class LogEntryModel extends EntryModel {
             sliver: SliverToBoxAdapter(
               child: HumanReadableWidget(
                 name: 'Stack Trace',
-                value: stackTrace?.toString(),
+                value: stackTrace,
                 searchTerm: searchTerm,
               ),
             ),

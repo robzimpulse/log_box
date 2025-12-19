@@ -41,4 +41,7 @@ abstract class EntryModel {
 
   /// String that will be displayed on dashboard selector
   String display();
+
+  /// Convert to map
+  Map<String, dynamic> toJson();
 }

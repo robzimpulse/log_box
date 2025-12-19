@@ -51,3 +51,13 @@ scripts:
       concurrency: 5
       failFast: true
       orderDependents: true
+
+  generate:
+    description: Generate files for all packages.
+    run: flutter pub run build_runner build --delete-conflicting-outputs
+    exec:
+      concurrency: 5
+      failFast: true
+      orderDependents: true
+    packageFilters:
+      dependsOn: "build_runner"

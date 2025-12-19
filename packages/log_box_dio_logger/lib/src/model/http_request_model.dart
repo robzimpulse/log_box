@@ -1,21 +1,24 @@
 import 'package:equatable/equatable.dart';
-import 'package:universal_io/io.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 import 'form_data_field_model.dart';
 import 'form_data_file_model.dart';
 
+part 'http_request_model.g.dart';
+
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class HttpRequestModel extends Equatable {
   factory HttpRequestModel.create({
     int size = 0,
     Map<String, dynamic>? headers,
     String? body,
     String? contentType,
-    List<Cookie> cookies = const <Cookie>[],
+    Map<String, String> cookies = const {},
     Map<String, dynamic> queryParameters = const <String, dynamic>{},
     List<FormDataFileModel>? formDataFiles,
     List<FormDataFieldModel>? formDataFields,
   }) {
-    return HttpRequestModel._(
+    return HttpRequestModel(
       size: size,
       time: DateTime.timestamp(),
       headers: headers,
@@ -28,7 +31,7 @@ class HttpRequestModel extends Equatable {
     );
   }
 
-  const HttpRequestModel._({
+  const HttpRequestModel({
     required this.size,
     required this.time,
     this.headers,
@@ -45,10 +48,16 @@ class HttpRequestModel extends Equatable {
   final Map<String, dynamic>? headers;
   final String? body;
   final String? contentType;
-  final List<Cookie> cookies;
+  final Map<String, String>? cookies;
   final Map<String, dynamic> queryParameters;
   final List<FormDataFileModel>? formDataFiles;
   final List<FormDataFieldModel>? formDataFields;
+
+  Map<String, dynamic> toJson() => _$HttpRequestModelToJson(this);
+
+  factory HttpRequestModel.fromJson(Map<String, dynamic> json) {
+    return _$HttpRequestModelFromJson(json);
+  }
 
   @override
   List<Object?> get props => [
@@ -68,12 +77,12 @@ class HttpRequestModel extends Equatable {
     Map<String, dynamic>? headers,
     String? body,
     String? contentType,
-    List<Cookie>? cookies,
+    Map<String, String>? cookies,
     Map<String, dynamic>? queryParameters,
     List<FormDataFileModel>? formDataFiles,
     List<FormDataFieldModel>? formDataFields,
   }) {
-    return HttpRequestModel._(
+    return HttpRequestModel(
       size: size ?? this.size,
       time: time,
       headers: headers ?? this.headers,
