@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
@@ -12,13 +13,15 @@ class Storage with ChangeNotifier {
   /// Max capacity of this storage
   final int _capacity;
 
-  /// Callback when data being deleted caused by over capacity or clearing data
-  final ValueSetter<EntryModel>? _onDelete;
+  final StreamController<EntryModel> _controller;
 
-  Storage({required int capacity, ValueSetter<EntryModel>? onDelete})
+  /// Callback when data being deleted caused by over capacity or clearing data
+  Stream<EntryModel> get onDeleteEntry => _controller.stream;
+
+  Storage({required int capacity})
     : _logs = LinkedHashMap(),
       _capacity = capacity,
-      _onDelete = onDelete;
+      _controller = StreamController();
 
   Map<String, EntryModel> get data => _logs;
 
@@ -34,9 +37,7 @@ class Storage with ChangeNotifier {
   }
 
   void clear() {
-    for (final key in _logs.keys) {
-      _remove(key);
-    }
+    _logs.keys.forEach(_remove);
     Future.microtask(() => notifyListeners());
   }
 
@@ -48,6 +49,6 @@ class Storage with ChangeNotifier {
 
   void _remove(String id) {
     final deleted = _logs.remove(id);
-    if (deleted != null) _onDelete?.call(deleted);
+    if (deleted != null) _controller.add(deleted);
   }
 }
