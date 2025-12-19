@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
@@ -17,10 +18,10 @@ class LogBox {
 
   LogBox({required int capacity}) : storage = Storage(capacity: capacity);
 
-  FutureOr tracer<FutureOr>(
+  FutureOr<T> tracer<T>(
     String name,
-    FutureOr Function(ValueSetter<LogEntryModel> trace) process,
-  ) {
+    FutureOr<T> Function(ValueSetter<LogEntryModel> trace) process,
+  ) async {
     final id = Uuid().v4();
 
     storage.add(
@@ -31,7 +32,7 @@ class LogBox {
       ),
     );
 
-    final result = process.call((log) {
+    final result = await process((log) {
       storage.add(log: TraceLogEntryModel(id: id, name: name, logs: [log]));
     });
 
