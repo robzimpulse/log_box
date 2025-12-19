@@ -89,7 +89,7 @@ class LogBoxNetworkInterceptor extends Interceptor {
             response: HttpResponseModel.create(
               status: response.statusCode,
               headers: response.headers.map,
-              body: _rawJson(interceptedData),
+              body: _rawJson([...interceptedData]),
               size: interceptedData.length,
             ),
           ),
