@@ -131,7 +131,7 @@ class TraceLogEntryModel extends EntryModel {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: HumanReadableWidget(
                   name: 'Error',
-                  value: event.error.toString(),
+                  value: event.error?.toString(),
                   searchTerm: searchTerm,
                 ),
               ),
@@ -139,7 +139,7 @@ class TraceLogEntryModel extends EntryModel {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: HumanReadableWidget(
                   name: 'Stack Trace',
-                  value: event.stackTrace.toString(),
+                  value: event.stackTrace?.toString(),
                   searchTerm: searchTerm,
                 ),
               ),

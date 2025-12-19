@@ -167,7 +167,7 @@ class LogEntryModel extends EntryModel {
             sliver: SliverToBoxAdapter(
               child: HumanReadableWidget(
                 name: 'Error',
-                value: error.toString(),
+                value: error?.toString(),
                 searchTerm: searchTerm,
               ),
             ),
@@ -177,7 +177,7 @@ class LogEntryModel extends EntryModel {
             sliver: SliverToBoxAdapter(
               child: HumanReadableWidget(
                 name: 'Stack Trace',
-                value: stackTrace.toString(),
+                value: stackTrace?.toString(),
                 searchTerm: searchTerm,
               ),
             ),

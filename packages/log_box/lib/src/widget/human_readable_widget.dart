@@ -73,25 +73,28 @@ class HumanReadableWidget extends StatelessWidget {
 
     if (shouldShrink) return SizedBox.shrink();
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _header(context),
-        SizedBox(
-          width: double.infinity,
-          child: Card(
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(4),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _header(context),
+          SizedBox(
+            width: double.infinity,
+            child: Card(
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: _content(context),
+              ),
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: _content(context),
-            ),
-          ),
-        )
-      ],
+          )
+        ],
+      ),
     );
   }
 }
