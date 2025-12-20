@@ -1,5 +1,5 @@
-import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
@@ -94,6 +94,8 @@ class LogBoxNetworkInterceptor extends Interceptor {
             ),
           ),
         );
+
+        return replay.close();
       });
 
       super.onResponse(
@@ -123,8 +125,7 @@ class LogBoxNetworkInterceptor extends Interceptor {
             status: response.statusCode,
             headers: response.headers.map,
             body: _rawJson(data),
-            size:
-                data == null ? 0 : utf8.encode(response.data.toString()).length,
+            size: data == null ? 0 : utf8.encode(data.toString()).length,
           ),
         ),
       );

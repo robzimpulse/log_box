@@ -3,7 +3,6 @@ import 'dart:typed_data';
 
 import 'package:equatable/equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:universal_io/io.dart';
 
 part 'http_response_model.g.dart';
 
