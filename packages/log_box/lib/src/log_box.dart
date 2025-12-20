@@ -15,7 +15,8 @@ class LogBox {
   // variable for storing known routes
   Map<String, RouteSettings> routes = {};
 
-  LogBox({required int capacity}) : storage = MemoryStorage(capacity: capacity);
+  LogBox({Storage? storage})
+    : storage = storage ?? MemoryStorage(capacity: 10000);
 
   FutureOr<T> tracer<T>(
     String name,

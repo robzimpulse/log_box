@@ -8,7 +8,7 @@ import 'util/images_cache_manager.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  final box = LogBox(capacity: 100);
+  final box = LogBox();
   final dio = Dio()..interceptors.add(box.interceptor);
   final cache = ImagesCacheManager(dio: () => dio);
   runApp(AppScreen(box: box, dio: dio, cache: cache));
