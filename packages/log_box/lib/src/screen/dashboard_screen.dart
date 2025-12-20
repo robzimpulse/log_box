@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:log_box/log_box.dart';
 
+import '../log_box.dart';
 import '../model/entry_model.dart';
-import '../storage/storage.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key, required this.box, this.onTap});

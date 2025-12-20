@@ -2,7 +2,9 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:log_box_in_app_webview_logger/log_box_in_app_webview_logger.dart';
+
+import '../extension/extension.dart';
+import '../observer/in_app_webview_observer.dart';
 
 class InAppWebviewScreen extends StatefulWidget {
   const InAppWebviewScreen({

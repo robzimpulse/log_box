@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:collection';
 
-import 'package:flutter/cupertino.dart';
-import 'package:log_box/log_box.dart';
+import 'package:flutter/foundation.dart';
+
+import '../model/entry_model.dart';
+import 'storage.dart';
 
 class MemoryStorage with ChangeNotifier implements Storage {
   /// Handle mapping between data and id

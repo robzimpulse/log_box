@@ -2,12 +2,12 @@ import 'dart:async';
 import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
-import 'package:log_box/src/model/trace_log_entry_model.dart';
-import 'package:log_box/src/storage/memory_storage.dart';
-import 'package:log_box/src/storage/storage.dart';
 import 'package:uuid/uuid.dart';
 
 import 'model/log_entry_model.dart';
+import 'model/trace_log_entry_model.dart';
+import 'storage/storage.dart';
+import 'storage/memory_storage.dart';
 
 class LogBox {
   final Storage storage;

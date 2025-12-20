@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:log_box/log_box.dart';
+
+import '../widget/human_readable_widget.dart';
+import '../extension/map_json_extension.dart';
+import 'entry_model.dart';
+import 'log_entry_model.dart';
 
 part 'trace_log_entry_model.g.dart';
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:log_box/log_box.dart';
 import 'package:uuid/uuid.dart';
+
+import '../log_box.dart';
 
 abstract class EntryModel {
   final String id;
