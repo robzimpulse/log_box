@@ -14,7 +14,6 @@ class MemoryStorage with ChangeNotifier implements Storage {
 
   final StreamController<EntryModel> _controller;
 
-  @override
   Stream<EntryModel> get onDeleteEntry => _controller.stream;
 
   MemoryStorage({int capacity = 1000})

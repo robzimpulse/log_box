@@ -5,9 +5,6 @@ import 'package:flutter/foundation.dart';
 import '../model/entry_model.dart';
 
 abstract class Storage with ChangeNotifier {
-  /// Event when data being deleted caused by over capacity or clearing data
-  Stream<EntryModel> get onDeleteEntry;
-
   /// Get all data stored
   Map<String, EntryModel> get data;
 
