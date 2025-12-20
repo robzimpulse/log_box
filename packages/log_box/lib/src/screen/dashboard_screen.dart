@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:log_box/log_box.dart';
 
 import '../model/entry_model.dart';
 import '../storage/storage.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key, required this.storage, this.onTap});
+  const DashboardScreen({super.key, required this.box, this.onTap});
 
-  final Storage storage;
+  final LogBox box;
 
   final void Function(EntryModel value, String keyword)? onTap;
 
@@ -85,7 +86,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               },
             ),
             IconButton(
-              onPressed: () => widget.storage.clear(),
+              onPressed: () => widget.box.storage.clear(),
               icon: const Icon(Icons.delete),
             ),
           ],
@@ -129,11 +130,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _types() {
     return AnimatedBuilder(
-      animation: Listenable.merge([widget.storage, selectedTypes]),
+      animation: Listenable.merge([widget.box.storage, selectedTypes]),
       builder: (context, _) {
-        if (widget.storage.types.isEmpty) return const SizedBox.shrink();
+        if (widget.box.storage.types.isEmpty) return const SizedBox.shrink();
 
-        final mappedTypes = {...widget.storage.types};
+        final mappedTypes = {...widget.box.storage.types};
         final keys = [...mappedTypes.keys]..sort((a, b) => a.compareTo(b));
 
         return Padding(
@@ -178,9 +179,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _content() {
     return AnimatedBuilder(
-      animation: Listenable.merge([keyword, widget.storage, selectedTypes]),
+      animation: Listenable.merge([keyword, widget.box.storage, selectedTypes]),
       builder: (context, _) {
-        final data = widget.storage.data.values.where(
+        final data = widget.box.storage.data.values.where(
           (e) => _filter(
             value: e,
             keyword: keyword.value,

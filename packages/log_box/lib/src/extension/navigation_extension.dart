@@ -18,7 +18,7 @@ extension NavigationExtension on LogBox {
           return Theme(
             data: theme ?? Theme.of(context),
             child: DashboardScreen(
-              storage: storage,
+              box: this,
               onTap: (item, keyword) {
                 Navigator.push(
                   context,
