@@ -37,7 +37,8 @@ class Storage with ChangeNotifier {
   }
 
   void clear() {
-    _logs.keys.forEach(_remove);
+    _logs.values.forEach(_controller.add);
+    _logs.clear();
     Future.microtask(() => notifyListeners());
   }
 
