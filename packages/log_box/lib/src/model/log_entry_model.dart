@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-import '../../src/extension/extension.dart';
+import '../../src/extension/map_json_extension.dart';
 import '../widget/human_readable_widget.dart';
 import 'entry_model.dart';
 

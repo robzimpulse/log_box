@@ -1,8 +1,10 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import '../../src/extension/extension.dart';
 import 'searchable_text_widget.dart';
+
+import '../extension/copyable_text_extension.dart';
+import '../extension/json_helper_extension.dart';
 
 class HumanReadableWidget extends StatelessWidget {
   const HumanReadableWidget({
