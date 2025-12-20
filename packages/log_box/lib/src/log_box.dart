@@ -3,6 +3,7 @@ import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
 import 'package:log_box/src/model/trace_log_entry_model.dart';
+import 'package:log_box/src/storage/memory_storage.dart';
 import 'package:log_box/src/storage/storage.dart';
 import 'package:uuid/uuid.dart';
 
@@ -16,7 +17,7 @@ class LogBox {
   // variable for storing known routes
   Map<String, RouteSettings> routes = {};
 
-  LogBox({required int capacity}) : storage = Storage(capacity: capacity);
+  LogBox({required int capacity}) : storage = MemoryStorage(capacity: capacity);
 
   FutureOr<T> tracer<T>(
     String name,

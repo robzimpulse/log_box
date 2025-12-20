@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:log_box/src/model/log_entry_model.dart';
-import 'package:log_box/src/storage/storage.dart';
+import 'package:log_box/src/storage/memory_storage.dart';
 
 void main() {
-  final storage = Storage(capacity: 5);
+  final storage = MemoryStorage(capacity: 5);
 
   tearDown(() {
     storage.clear();
