@@ -29,7 +29,7 @@ extension NavigationExtension on LogBox {
                     ),
                     builder: (context) {
                       return DetailScreen(
-                        data: item,
+                        id: item.id,
                         box: this,
                         keyword: keyword,
                       );

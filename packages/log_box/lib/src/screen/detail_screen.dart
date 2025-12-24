@@ -6,12 +6,12 @@ import '../model/entry_model.dart';
 class DetailScreen extends StatefulWidget {
   const DetailScreen({
     super.key,
-    required this.data,
+    required this.id,
     required this.box,
     this.keyword = '',
   });
 
-  final EntryModel data;
+  final String id;
   final LogBox box;
   final String keyword;
 
@@ -71,67 +71,85 @@ class _DetailScreenState extends State<DetailScreen> {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: Listenable.merge([isSearchMode, keyword]),
-      builder: (context, _) {
-        final theme = Theme.of(context);
+      animation: Listenable.merge([widget.box.storage, isSearchMode, keyword]),
+      builder: (context, _) => _content(context),
+    );
+  }
 
-        final tabs = widget.data.tabs(
-          context,
-          searchTerm: keyword.value.isEmpty ? null : keyword.value,
-        );
+  Widget _content(BuildContext context) {
+    final theme = Theme.of(context);
 
-        return DefaultTabController(
-          length: widget.data.tabLength(context),
-          child: Scaffold(
-            appBar: AppBar(
-              title:
-                  !isSearchMode.value
-                      ? const Text('Detail Log')
-                      : Container(
-                        alignment: Alignment.centerLeft,
-                        child: TextField(
-                          autofocus: true,
-                          onChanged: (text) => keyword.value = text,
-                          focusNode: focusNode,
-                          controller: searchController,
-                          decoration: InputDecoration(
-                            hintText: 'Search...',
-                            filled: false,
-                            border: InputBorder.none,
-                            hintStyle: theme.textTheme.titleLarge?.copyWith(
-                              color: Colors.white,
-                            ),
-                          ),
-                          cursorColor: Colors.white,
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-              elevation: 3,
-              centerTitle: false,
-              leading: IconButton(
-                onPressed: () => Navigator.pop(context),
-                icon: const Icon(Icons.arrow_back),
-              ),
-              actions: [
-                IconButton(
-                  onPressed: _toggleSearch,
-                  icon: Icon(isSearchMode.value ? Icons.close : Icons.search),
-                ),
-                ...widget.data.menus(context, widget.box),
-              ],
-              bottom: TabBar(
-                labelColor: Colors.white,
-                unselectedLabelColor: Colors.white,
-                indicatorSize: TabBarIndicatorSize.tab,
-                tabs: tabs.keys.toList(),
-              ),
+    final data = widget.box.storage.data[widget.id];
+
+    if (data == null) {
+      return const Scaffold(body: Center(child: Text('No Data')));
+    }
+
+    final tabs = data.tabs(
+      context,
+      searchTerm: keyword.value.isEmpty ? null : keyword.value,
+    );
+
+    return DefaultTabController(
+      length: data.tabLength(context),
+      child: Scaffold(
+        appBar: _appBar(context, theme, data, tabs),
+        body: SafeArea(child: TabBarView(children: tabs.values.toList())),
+      ),
+    );
+  }
+
+  AppBar _appBar(
+    BuildContext context,
+    ThemeData theme,
+    EntryModel data,
+    Map<Tab, Widget> tabs,
+  ) {
+    Widget view = const Text('Detail Log');
+
+    if (isSearchMode.value) {
+      view = Container(
+        alignment: Alignment.centerLeft,
+        child: TextField(
+          autofocus: true,
+          onChanged: (text) => keyword.value = text,
+          focusNode: focusNode,
+          controller: searchController,
+          decoration: InputDecoration(
+            hintText: 'Search...',
+            filled: false,
+            border: InputBorder.none,
+            hintStyle: theme.textTheme.titleLarge?.copyWith(
+              color: Colors.white,
             ),
-            body: SafeArea(child: TabBarView(children: tabs.values.toList())),
           ),
-        );
-      },
+          cursorColor: Colors.white,
+          style: theme.textTheme.titleLarge?.copyWith(color: Colors.white),
+        ),
+      );
+    }
+
+    return AppBar(
+      title: view,
+      elevation: 3,
+      centerTitle: false,
+      leading: IconButton(
+        onPressed: () => Navigator.pop(context),
+        icon: const Icon(Icons.arrow_back),
+      ),
+      actions: [
+        IconButton(
+          onPressed: _toggleSearch,
+          icon: Icon(isSearchMode.value ? Icons.close : Icons.search),
+        ),
+        ...data.menus(context, widget.box),
+      ],
+      bottom: TabBar(
+        labelColor: Colors.white,
+        unselectedLabelColor: Colors.white,
+        indicatorSize: TabBarIndicatorSize.tab,
+        tabs: tabs.keys.toList(),
+      ),
     );
   }
 }
