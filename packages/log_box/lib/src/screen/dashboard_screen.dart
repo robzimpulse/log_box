@@ -34,12 +34,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void _toggleSearch() {
     final isSearch = isSearchMode.value;
-    isSearchMode.value = !isSearch;
-    if (!isSearch) {
+
+    if (isSearch) {
       keyword.value = '';
-      searchController.clear();
       focusNode.unfocus();
+    } else {
+      keyword.value = searchController.text;
+      focusNode.requestFocus();
     }
+
+    isSearchMode.value = !isSearch;
   }
 
   bool _filter({
