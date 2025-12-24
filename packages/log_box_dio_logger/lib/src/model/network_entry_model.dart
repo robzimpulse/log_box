@@ -223,7 +223,7 @@ class NetworkEntryModel extends EntryModel {
 
   MapEntry<Tab, Widget> _request(BuildContext context, {String? searchTerm}) {
     return MapEntry(
-      const Tab(text: 'Detail', icon: Icon(Icons.list, color: Colors.white)),
+      const Tab(text: 'Request', icon: Icon(Icons.upload, color: Colors.white)),
       CustomScrollView(
         slivers: [
           SliverToBoxAdapter(child: SizedBox(height: 8)),
@@ -285,7 +285,10 @@ class NetworkEntryModel extends EntryModel {
 
   MapEntry<Tab, Widget> _response(BuildContext context, {String? searchTerm}) {
     return MapEntry(
-      const Tab(text: 'Response', icon: Icon(Icons.list, color: Colors.white)),
+      const Tab(
+        text: 'Response',
+        icon: Icon(Icons.download, color: Colors.white),
+      ),
       CustomScrollView(
         slivers: [
           SliverToBoxAdapter(child: SizedBox(height: 8)),
