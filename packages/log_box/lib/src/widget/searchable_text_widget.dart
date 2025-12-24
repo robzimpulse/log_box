@@ -28,7 +28,7 @@ class HighlightedTextWidget extends StatelessWidget {
     required this.text,
     this.searchTerm,
     this.style,
-    this.highlightedColor = Colors.red,
+    this.highlightedColor = Colors.yellow,
   });
 
   @override
@@ -70,8 +70,8 @@ class HighlightedTextWidget extends StatelessWidget {
               startIndex + lowerCaseSearchTerm.length,
             ),
             style: style?.copyWith(
-              decoration: TextDecoration.underline,
-              decorationColor: highlightedColor,
+              backgroundColor: highlightedColor,
+              color: Colors.black,
             ),
           ),
         );
