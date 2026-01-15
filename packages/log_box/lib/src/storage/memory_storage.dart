@@ -22,9 +22,6 @@ class MemoryStorage with ChangeNotifier implements Storage {
       _controller = StreamController();
 
   @override
-  Map<String, EntryModel> get data => _logs;
-
-  @override
   void add({required EntryModel log}) {
     _logs.update(log.id, (old) => old.merge(log), ifAbsent: () => log);
     if (_logs.keys.length > _capacity) {
@@ -44,6 +41,9 @@ class MemoryStorage with ChangeNotifier implements Storage {
     _logs.clear();
     notifyListeners();
   }
+
+  @override
+  Map<String, EntryModel> get data => {..._logs};
 
   @override
   Map<String, Type> get types {
