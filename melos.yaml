@@ -18,7 +18,12 @@ command:
     usePubspecOverrides: true
 
 scripts:
-  flutter_clean:
+
+  refresh:
+    description: Refresh all packages dependencies.
+    run: melos clean && melos clean:flutter && melos bs && melos get
+
+  clean:flutter:
     description: Clean all packages.
     run: flutter clean
     exec:
