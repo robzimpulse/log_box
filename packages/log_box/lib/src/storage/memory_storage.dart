@@ -43,11 +43,13 @@ class MemoryStorage with ChangeNotifier implements Storage {
   }
 
   @override
-  Map<String, EntryModel> get data => {..._logs};
+  Future<Map<String, EntryModel>> get data => Future.value({..._logs});
 
   @override
-  Map<String, Type> get types {
-    return _logs.map((k, v) => MapEntry(v.display(), v.runtimeType));
+  Future<Map<String, Type>> get types {
+    return Future.value(
+      _logs.map((k, v) => MapEntry(v.display(), v.runtimeType)),
+    );
   }
 
   @override

@@ -124,7 +124,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
         body: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [_types(), Expanded(child: _content())],
+            children: [
+              _types(),
+              Expanded(child: _content()),
+            ],
           ),
         ),
       ),
@@ -135,46 +138,64 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return AnimatedBuilder(
       animation: Listenable.merge([widget.box.storage, selectedTypes]),
       builder: (context, _) {
-        if (widget.box.storage.types.isEmpty) return const SizedBox.shrink();
+        return FutureBuilder(
+          future: widget.box.storage.types,
+          builder: (context, snapshot) {
+            final data = snapshot.data;
+            final error = snapshot.error;
 
-        final mappedTypes = {...widget.box.storage.types};
-        final keys = [...mappedTypes.keys]..sort((a, b) => a.compareTo(b));
+            if (snapshot.connectionState != ConnectionState.done) {
+              return Center(child: CircularProgressIndicator());
+            }
 
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            scrollDirection: Axis.horizontal,
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              direction: Axis.horizontal,
-              children: [
-                for (final key in keys)
-                  Builder(
-                    builder: (context) {
-                      final type = mappedTypes[key];
-                      if (type == null) return SizedBox.shrink();
-                      final selected = selectedTypes.value.contains(type);
-                      return OutlinedButton(
-                        onPressed: () {
-                          var data = {...selectedTypes.value};
-                          selected ? data.remove(type) : data.add(type);
-                          selectedTypes.value = data;
+            if (error != null) {
+              return Center(child: Text(error.toString()));
+            }
+
+            if (data == null || data.isEmpty) {
+              return const SizedBox.shrink();
+            }
+
+            final mappedTypes = {...data};
+            final keys = [...mappedTypes.keys]..sort((a, b) => a.compareTo(b));
+
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                scrollDirection: Axis.horizontal,
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  direction: Axis.horizontal,
+                  children: [
+                    for (final key in keys)
+                      Builder(
+                        builder: (context) {
+                          final type = mappedTypes[key];
+                          if (type == null) return SizedBox.shrink();
+                          final selected = selectedTypes.value.contains(type);
+                          return OutlinedButton(
+                            onPressed: () {
+                              var data = {...selectedTypes.value};
+                              selected ? data.remove(type) : data.add(type);
+                              selectedTypes.value = data;
+                            },
+                            style: OutlinedButton.styleFrom(
+                              backgroundColor: selected ? Colors.grey : null,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                            child: Text(key),
+                          );
                         },
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor: selected ? Colors.grey : null,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                        ),
-                        child: Text(key),
-                      );
-                    },
-                  ),
-              ],
-            ),
-          ),
+                      ),
+                  ],
+                ),
+              ),
+            );
+          },
         );
       },
     );
@@ -184,29 +205,45 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return AnimatedBuilder(
       animation: Listenable.merge([keyword, widget.box.storage, selectedTypes]),
       builder: (context, _) {
-        final data = widget.box.storage.data.values.where(
-          (e) => _filter(
-            value: e,
-            keyword: keyword.value,
-            types: selectedTypes.value,
-          ),
-        );
+        return FutureBuilder(
+          future: widget.box.storage.data,
+          builder: (context, snapshot) {
+            final data = snapshot.data;
+            final error = snapshot.error;
 
-        final reversed = [...data].reversed;
+            if (snapshot.connectionState != ConnectionState.done) {
+              return Center(child: CircularProgressIndicator());
+            }
 
-        if (reversed.isEmpty) {
-          return Center(child: Text('No Data'));
-        }
+            if (error != null) {
+              return Center(child: Text(error.toString()));
+            }
 
-        return ListView.separated(
-          itemCount: reversed.length,
-          itemBuilder: (context, index) {
-            final entry = reversed.elementAtOrNull(index);
-            if (entry == null) return null;
-            return _item(context: context, value: entry);
-          },
-          separatorBuilder: (context, index) {
-            return const Divider(height: 1);
+            final filtered = data?.values.where(
+              (e) => _filter(
+                value: e,
+                keyword: keyword.value,
+                types: selectedTypes.value,
+              ),
+            );
+
+            if (filtered == null || filtered.isEmpty) {
+              return Center(child: Text('No Data'));
+            }
+
+            final reversed = [...filtered].reversed;
+
+            return ListView.separated(
+              itemCount: reversed.length,
+              itemBuilder: (context, index) {
+                final entry = reversed.elementAtOrNull(index);
+                if (entry == null) return null;
+                return _item(context: context, value: entry);
+              },
+              separatorBuilder: (context, index) {
+                return const Divider(height: 1);
+              },
+            );
           },
         );
       },

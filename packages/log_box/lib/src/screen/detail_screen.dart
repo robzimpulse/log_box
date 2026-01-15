@@ -72,14 +72,34 @@ class _DetailScreenState extends State<DetailScreen> {
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: Listenable.merge([widget.box.storage, isSearchMode, keyword]),
-      builder: (context, _) => _content(context),
+      builder: (context, _) => FutureBuilder(
+        future: widget.box.storage.data,
+        builder: (context, snapshot) {
+          final data = snapshot.data;
+          final error = snapshot.error;
+
+          if (snapshot.connectionState != ConnectionState.done) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          if (error != null) {
+            return Center(child: Text(error.toString()));
+          }
+
+          if (data == null || data.isEmpty) {
+            return Center(child: Text('No Data'));
+          }
+
+          return _content(context, data);
+        },
+      ),
     );
   }
 
-  Widget _content(BuildContext context) {
+  Widget _content(BuildContext context, Map<String, EntryModel> entry) {
     final theme = Theme.of(context);
 
-    final data = widget.box.storage.data[widget.id];
+    final data = entry[widget.id];
 
     if (data == null) {
       return const Scaffold(body: Center(child: Text('No Data')));
