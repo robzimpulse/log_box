@@ -1,7 +1,7 @@
 name: log_box_workspace
 
 environment:
-  sdk: ">=3.7.2 <4.0.0"
+  sdk: ">=3.8.0 <4.0.0"
   flutter: ">=3.29.3"
 
 dev_dependencies:
