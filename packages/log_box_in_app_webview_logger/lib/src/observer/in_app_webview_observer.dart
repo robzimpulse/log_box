@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 
 import '../enum/enum.dart';
 import '../model/webview_entry_model.dart';
+import '../model/webview_entry_model_log.dart';
 
 class InAppWebviewObserver {
   final Storage _storage;

@@ -8,3 +8,4 @@ export 'src/extension/json_helper_extension.dart';
 export 'src/extension/map_json_extension.dart';
 export 'src/extension/navigation_extension.dart';
 export 'src/model/log_entry_model.dart';
+export 'src/model/trace_log_entry_model.dart';

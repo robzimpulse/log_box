@@ -1,6 +1,7 @@
 import 'package:log_box_in_app_webview_logger/src/enum/enum.dart';
 import 'package:log_box_in_app_webview_logger/src/model/webview_entry_model.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:log_box_in_app_webview_logger/src/model/webview_entry_model_log.dart';
 
 void main() {
   final entry1 = WebviewEntryModel(
