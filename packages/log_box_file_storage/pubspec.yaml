@@ -1,5 +1,5 @@
-name: log_box_in_app_webview_logger
-description: "Log Box extension for in-app webview library"
+name: log_box_file_storage
+description: "Log Box extension for file storage"
 version: 0.0.1
 publish_to: none
 
@@ -11,9 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  uuid: ^4.5.1
-  flutter_inappwebview: ^6.1.0
-  json_annotation: ^4.9.0
+  file: ^7.0.1
 
   log_box:
     git:
@@ -25,5 +23,3 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
-  build_runner: ^2.3.3
-  json_serializable: ^6.6.1

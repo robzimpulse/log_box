@@ -10,7 +10,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
   json_annotation: ^4.9.0
+
   log_box:
     git:
       url: https://github.com/robzimpulse/log_box.git

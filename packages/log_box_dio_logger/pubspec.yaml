@@ -10,16 +10,18 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  log_box:
-    git:
-      url: https://github.com/robzimpulse/log_box.git
-      ref: master
-      path: packages/log_box
+
   dio: ^5.7.0
   equatable: ^2.0.5
   universal_io: ^2.2.2
   json_annotation: ^4.9.0
   rxdart: ^0.27.7
+
+  log_box:
+    git:
+      url: https://github.com/robzimpulse/log_box.git
+      ref: master
+      path: packages/log_box
 
 dev_dependencies:
   flutter_test:
