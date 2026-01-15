@@ -45,7 +45,7 @@ dependencies:
   log_box_navigation_logger:
     path: ../packages/log_box_navigation_logger
   log_box_in_app_webview_logger:
-    path: ../packages/log_box_navigation_logger
+    path: ../packages/log_box_in_app_webview_logger
 
 dev_dependencies:
   flutter_test:
