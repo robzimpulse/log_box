@@ -35,24 +35,6 @@ class FileStorage with ChangeNotifier implements Storage {
        _coder = coder,
        _root = root;
 
-  // void _init() async {
-  //   final files = await _root.list().toList();
-  //   for (final file in files.whereType<File>()) {
-  //     try {
-  //       final type = file.path.split('/').lastOrNull?.split('-').firstOrNull;
-  //       final coder = _coder?[type];
-  //       if (coder == null || type == null) continue;
-  //       final data = await file.readAsString();
-  //       final log = coder.call(jsonDecode(data));
-  //       if (log == null) continue;
-  //       _logs[log.id] = log;
-  //     } catch (e) {
-  //       dev.log(e.toString(), name: 'Log Box File Storage');
-  //     }
-  //   }
-  //   notifyListeners();
-  // }
-
   @override
   void add({required EntryModel log}) async {
     final file = _root.childFile('${log.runtimeType}-${log.id}.json');
