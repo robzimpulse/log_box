@@ -35,14 +35,14 @@ class MemoryStorage with ChangeNotifier implements Storage {
       }
     }
 
-    Future.microtask(() => notifyListeners());
+    notifyListeners();
   }
 
   @override
   void clear() {
     _logs.values.forEach(_controller.add);
     _logs.clear();
-    Future.microtask(() => notifyListeners());
+    notifyListeners();
   }
 
   @override
@@ -54,5 +54,10 @@ class MemoryStorage with ChangeNotifier implements Storage {
   void dispose() {
     _controller.close();
     super.dispose();
+  }
+
+  @override
+  void notifyListeners() {
+    Future.microtask(() => super.notifyListeners());
   }
 }
