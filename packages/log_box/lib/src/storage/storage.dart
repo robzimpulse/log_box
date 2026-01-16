@@ -1,17 +1,39 @@
-import 'package:flutter/foundation.dart';
+import 'dart:async';
 
 import '../model/entry_model.dart';
+import 'base/live_data_storage.dart';
+import 'base/persistent_data_storage.dart';
 
-abstract class Storage with ChangeNotifier {
-  /// Get all data stored
-  Future<Map<String, EntryModel>> get data;
+class Storage {
+  final LiveDataStorage _liveDataStorage;
+  final PersistentDataStorage? _persistentDataStorage;
+  final StreamSubscription _subscription;
 
-  /// get all data types
-  Future<Map<String, Type>> get types;
+  Storage({
+    required LiveDataStorage liveDataStorage,
+    PersistentDataStorage? persistentDataStorage,
+  }) : _liveDataStorage = liveDataStorage,
+       _persistentDataStorage = persistentDataStorage,
+       _subscription = liveDataStorage.onDeleteEntry.listen(
+         (e) => persistentDataStorage?.add(log: e),
+       );
+
+  LiveDataStorage get liveStorage => _liveDataStorage;
+
+  PersistentDataStorage? get persistentStorage => _persistentDataStorage;
 
   /// Adding entry
-  void add({required EntryModel log});
+  void add({required EntryModel log}) => _liveDataStorage.add(log: log);
 
   /// Clear all entry
-  void clear();
+  void clear() {
+    _persistentDataStorage?.clear();
+    _liveDataStorage.clear();
+  }
+
+  /// dispose the storage
+  void dispose() {
+    _subscription.cancel();
+    _liveDataStorage.dispose();
+  }
 }

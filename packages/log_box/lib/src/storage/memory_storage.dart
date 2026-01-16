@@ -4,17 +4,12 @@ import 'dart:collection';
 import 'package:flutter/foundation.dart';
 
 import '../model/entry_model.dart';
-import 'storage.dart';
+import 'base/live_data_storage.dart';
 
-class MemoryStorage with ChangeNotifier implements Storage {
-  /// Handle mapping between data and id
+class MemoryStorage with ChangeNotifier implements LiveDataStorage {
   final LinkedHashMap<String, EntryModel> _logs;
-
   final int _capacity;
-
   final StreamController<EntryModel> _controller;
-
-  Stream<EntryModel> get onDeleteEntry => _controller.stream;
 
   MemoryStorage({int capacity = 1000})
     : _logs = LinkedHashMap(),
@@ -43,14 +38,15 @@ class MemoryStorage with ChangeNotifier implements Storage {
   }
 
   @override
-  Future<Map<String, EntryModel>> get data => Future.value({..._logs});
+  List<EntryModel> get data => [..._logs.values];
 
   @override
-  Future<Map<String, Type>> get types {
-    return Future.value(
-      _logs.map((k, v) => MapEntry(v.display(), v.runtimeType)),
-    );
+  Map<String, Type> get types {
+    return _logs.map((k, v) => MapEntry(v.display(), v.runtimeType));
   }
+
+  @override
+  Stream<EntryModel> get onDeleteEntry => _controller.stream;
 
   @override
   void dispose() {

@@ -37,8 +37,7 @@ dependencies:
   flutter_inappwebview: ^6.1.0
   cached_network_image: ^3.4.1
   flutter_cache_manager: ^3.3.1
-  path_provider: ^2.1.5
-  file: ^7.0.1
+  universal_io: ^2.2.2
 
   log_box:
     path: ../packages/log_box
@@ -48,8 +47,6 @@ dependencies:
     path: ../packages/log_box_navigation_logger
   log_box_in_app_webview_logger:
     path: ../packages/log_box_in_app_webview_logger
-  log_box_file_storage:
-    path: ../packages/log_box_file_storage
 
 dev_dependencies:
   flutter_test:

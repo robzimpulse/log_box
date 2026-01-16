@@ -1,5 +1,7 @@
 export 'src/log_box.dart';
 export 'src/model/entry_model.dart';
+export 'src/storage/base/live_data_storage.dart';
+export 'src/storage/base/persistent_data_storage.dart';
 export 'src/storage/storage.dart';
 export 'src/storage/memory_storage.dart';
 export 'src/widget/human_readable_widget.dart';
