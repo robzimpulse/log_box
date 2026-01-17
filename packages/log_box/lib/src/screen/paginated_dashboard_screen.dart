@@ -3,18 +3,23 @@ import 'package:flutter/material.dart';
 import '../log_box.dart';
 import '../model/entry_model.dart';
 
-class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key, required this.box, this.onTap});
+class PaginatedDashboardScreen extends StatefulWidget {
+  const PaginatedDashboardScreen({
+    super.key,
+    required this.box,
+    this.onTapEntry,
+  });
 
   final LogBox box;
 
-  final void Function(EntryModel value, String keyword)? onTap;
+  final void Function(EntryModel value, String keyword)? onTapEntry;
 
   @override
-  State<DashboardScreen> createState() => _DashboardScreenState();
+  State<PaginatedDashboardScreen> createState() =>
+      _PaginatedDashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class _PaginatedDashboardScreenState extends State<PaginatedDashboardScreen> {
   final TextEditingController searchController = TextEditingController();
   final FocusNode focusNode = FocusNode();
 
@@ -46,22 +51,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
     isSearchMode.value = !isSearch;
   }
 
-  bool _filter({
-    required EntryModel value,
-    required String keyword,
-    Set<Type> types = const {},
-  }) {
-    return [
-      value.contains(keyword),
-      if (types.isNotEmpty) types.contains(value.runtimeType),
-    ].every((e) => e);
-  }
-
   Widget _item({required BuildContext context, required EntryModel value}) {
     final hasDetail = value.tabLength(context) > 0;
 
     return ListTile(
-      onTap: hasDetail ? () => widget.onTap?.call(value, keyword.value) : null,
+      onTap: hasDetail
+          ? () => widget.onTapEntry?.call(value, keyword.value)
+          : null,
       visualDensity: VisualDensity.compact,
       title: value.title(context),
       subtitle: value.subtitle(context),
@@ -124,7 +120,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
         body: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [_types(), Expanded(child: _content())],
+            children: [
+              _types(),
+              Expanded(child: Container()),
+            ],
           ),
         ),
       ),
@@ -132,16 +131,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _types() {
-    return AnimatedBuilder(
-      animation: Listenable.merge([
-        widget.box.storage.liveStorage,
-        selectedTypes,
-      ]),
-      builder: (context, _) {
-        final mappedTypes = {...widget.box.storage.liveStorage.types};
-        final keys = [...mappedTypes.keys]..sort((a, b) => a.compareTo(b));
+    final stream = widget.box.storage.persistentStorage?.types;
+    if (stream == null) return SizedBox.shrink();
 
-        if (keys.isEmpty) return const SizedBox.shrink();
+    return StreamBuilder(
+      stream: stream,
+      builder: (context, snapshot) {
+        final data = snapshot.data;
+        final error = snapshot.error;
+
+        if (snapshot.connectionState != ConnectionState.active) {
+          return SizedBox(
+            height: 50,
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (error != null) {
+          return SizedBox(
+            height: 50,
+            child: Center(child: Text(error.toString())),
+          );
+        }
+
+        if (data == null || data.isEmpty) {
+          return SizedBox(height: 50, child: Center(child: Text('No Data')));
+        }
+
+        final keys = [...data.keys]..sort((a, b) => a.compareTo(b));
 
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -156,7 +173,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 for (final key in keys)
                   Builder(
                     builder: (context) {
-                      final type = mappedTypes[key];
+                      final type = data[key];
                       if (type == null) return SizedBox.shrink();
                       final selected = selectedTypes.value.contains(type);
                       return OutlinedButton(
@@ -178,43 +195,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ],
             ),
           ),
-        );
-      },
-    );
-  }
-
-  Widget _content() {
-    return AnimatedBuilder(
-      animation: Listenable.merge([
-        keyword,
-        widget.box.storage.liveStorage,
-        selectedTypes,
-      ]),
-      builder: (context, _) {
-        final data = widget.box.storage.liveStorage.data;
-
-        final filtered = data.reversed.where(
-          (e) => _filter(
-            value: e,
-            keyword: keyword.value,
-            types: selectedTypes.value,
-          ),
-        );
-
-        if (filtered.isEmpty) {
-          return Center(child: Text('No Data'));
-        }
-
-        return ListView.separated(
-          itemCount: filtered.length,
-          itemBuilder: (context, index) {
-            final entry = filtered.elementAtOrNull(index);
-            if (entry == null) return null;
-            return _item(context: context, value: entry);
-          },
-          separatorBuilder: (context, index) {
-            return const Divider(height: 1);
-          },
         );
       },
     );

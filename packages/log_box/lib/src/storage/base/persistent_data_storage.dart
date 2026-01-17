@@ -22,8 +22,8 @@ abstract class PersistentDataStorage {
   /// Listen to entry with [id]
   Stream<EntryModel> stream(String id);
 
-  /// get all data types
-  Future<Map<String, Type>> get types;
+  /// get all data types of entry
+  Stream<Map<String, Type>> get types;
 
   /// Clear all entry
   Future<void> clear();
