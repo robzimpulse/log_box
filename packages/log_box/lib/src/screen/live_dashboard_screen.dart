@@ -155,8 +155,8 @@ class _LiveDashboardScreenState extends State<LiveDashboardScreen> {
         selectedTypes,
       ]),
       builder: (context, _) {
-        final mappedTypes = {...widget.box.storage.liveStorage.types};
-        final keys = [...mappedTypes.keys]..sort((a, b) => a.compareTo(b));
+        final data = widget.box.storage.liveStorage.types;
+        final keys = [...data.keys]..sort((a, b) => a.compareTo(b));
 
         if (keys.isEmpty) return const SizedBox.shrink();
 
@@ -173,7 +173,7 @@ class _LiveDashboardScreenState extends State<LiveDashboardScreen> {
                 for (final key in keys)
                   Builder(
                     builder: (context) {
-                      final type = mappedTypes[key];
+                      final type = data[key];
                       if (type == null) return SizedBox.shrink();
                       final selected = selectedTypes.value.contains(type);
                       return OutlinedButton(
