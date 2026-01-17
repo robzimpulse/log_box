@@ -97,10 +97,11 @@ class _LiveDashboardScreenState extends State<LiveDashboardScreen> {
                 );
               },
             ),
-            IconButton(
-              onPressed: widget.onTapPaginated,
-              icon: const Icon(Icons.storage),
-            ),
+            if (widget.box.storage.persistentStorage != null)
+              IconButton(
+                onPressed: widget.onTapPaginated,
+                icon: const Icon(Icons.storage),
+              ),
             IconButton(
               onPressed: () => widget.box.storage.clear(),
               icon: const Icon(Icons.delete),
