@@ -11,6 +11,16 @@ dependencies:
   flutter:
     sdk: flutter
 
+  file: ^7.0.1
+  drift: ^2.30.1
+  drift_flutter: ^0.2.8
+  path_provider: ^2.1.5
+  sqlite3: ^2.9.4
+  sqlite3_flutter_libs: ^0.5.41
+  collection: ^1.19.1
+  equatable: ^2.0.5
+  json_annotation: ^4.9.0
+
   log_box:
     git:
       url: https://github.com/robzimpulse/log_box.git
@@ -21,3 +31,6 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  build_runner: ^2.3.3
+  json_serializable: ^6.6.1
+  drift_dev: ^2.19.1

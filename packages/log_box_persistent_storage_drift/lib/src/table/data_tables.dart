@@ -1,0 +1,13 @@
+import 'package:drift/drift.dart';
+
+import '../mixin/auto_id_mixin.dart';
+import '../mixin/auto_timestamp_mixin.dart';
+
+@DataClassName('DataDrift')
+class DataTables extends Table with AutoTimestampTable, AutoIntegerIdTable {
+
+  TextColumn get uid => text().named('uid').nullable()();
+
+  BlobColumn get data => blob().named('data').nullable()();
+
+}

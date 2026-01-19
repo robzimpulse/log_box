@@ -47,6 +47,8 @@ dependencies:
     path: ../packages/log_box_navigation_logger
   log_box_in_app_webview_logger:
     path: ../packages/log_box_in_app_webview_logger
+  log_box_persistent_storage_drift:
+    path: ../packages/log_box_persistent_storage_drift
 
 dev_dependencies:
   flutter_test:
