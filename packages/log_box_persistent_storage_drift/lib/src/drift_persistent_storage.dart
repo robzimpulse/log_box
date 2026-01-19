@@ -19,21 +19,25 @@ class DriftPersistentStorage extends PersistentDataStorage {
        _decoder = decoder;
 
   @override
-  Future<void> add({required EntryModel log}) => _dao.add(log: log);
+  Future<void> add({required EntryModel log}) =>
+      _dao.add(log: log).catchError((e, st) => print(e));
 
   @override
   Future<void> clear() => _dao.clear();
 
   @override
-  Future<List<EntryModel>> fetch({required Cursor cursor, int limit = 20}) {
-    return _dao
-        .fetch(
-          refId: cursor.id,
-          types: cursor.types.toSet(),
-          fetchBefore: cursor.direction == PageDirection.before,
-          limit: limit,
-        )
-        .then((e) => e.map(_transform).nonNulls.toList());
+  Future<List<EntryModel>> fetch({
+    required Cursor cursor,
+    int limit = 20,
+  }) async {
+    final result = await _dao.fetch(
+      refId: cursor.id,
+      types: cursor.types.toSet(),
+      fetchBefore: cursor.direction == PageDirection.before,
+      limit: limit,
+    );
+
+    return result.map(_transform).nonNulls.toList();
   }
 
   @override
