@@ -64,13 +64,13 @@ class $DataTablesTable extends DataTables
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _dataMeta = const VerificationMeta('data');
+  static const VerificationMeta _jsonMeta = const VerificationMeta('json');
   @override
-  late final GeneratedColumn<Uint8List> data = GeneratedColumn<Uint8List>(
-    'data',
+  late final GeneratedColumn<String> json = GeneratedColumn<String>(
+    'json',
     aliasedName,
     true,
-    type: DriftSqlType.blob,
+    type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
   @override
@@ -80,7 +80,7 @@ class $DataTablesTable extends DataTables
     id,
     uid,
     type,
-    data,
+    json,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -121,10 +121,10 @@ class $DataTablesTable extends DataTables
         type.isAcceptableOrUnknown(data['type']!, _typeMeta),
       );
     }
-    if (data.containsKey('data')) {
+    if (data.containsKey('json')) {
       context.handle(
-        _dataMeta,
-        this.data.isAcceptableOrUnknown(data['data']!, _dataMeta),
+        _jsonMeta,
+        json.isAcceptableOrUnknown(data['json']!, _jsonMeta),
       );
     }
     return context;
@@ -156,9 +156,9 @@ class $DataTablesTable extends DataTables
         DriftSqlType.string,
         data['${effectivePrefix}type'],
       ),
-      data: attachedDatabase.typeMapping.read(
-        DriftSqlType.blob,
-        data['${effectivePrefix}data'],
+      json: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}json'],
       ),
     );
   }
@@ -175,14 +175,14 @@ class DataDrift extends DataClass implements Insertable<DataDrift> {
   final int id;
   final String? uid;
   final String? type;
-  final Uint8List? data;
+  final String? json;
   const DataDrift({
     required this.createdAt,
     required this.updatedAt,
     required this.id,
     this.uid,
     this.type,
-    this.data,
+    this.json,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -196,8 +196,8 @@ class DataDrift extends DataClass implements Insertable<DataDrift> {
     if (!nullToAbsent || type != null) {
       map['type'] = Variable<String>(type);
     }
-    if (!nullToAbsent || data != null) {
-      map['data'] = Variable<Uint8List>(data);
+    if (!nullToAbsent || json != null) {
+      map['json'] = Variable<String>(json);
     }
     return map;
   }
@@ -209,7 +209,7 @@ class DataDrift extends DataClass implements Insertable<DataDrift> {
       id: Value(id),
       uid: uid == null && nullToAbsent ? const Value.absent() : Value(uid),
       type: type == null && nullToAbsent ? const Value.absent() : Value(type),
-      data: data == null && nullToAbsent ? const Value.absent() : Value(data),
+      json: json == null && nullToAbsent ? const Value.absent() : Value(json),
     );
   }
 
@@ -224,7 +224,7 @@ class DataDrift extends DataClass implements Insertable<DataDrift> {
       id: serializer.fromJson<int>(json['id']),
       uid: serializer.fromJson<String?>(json['uid']),
       type: serializer.fromJson<String?>(json['type']),
-      data: serializer.fromJson<Uint8List?>(json['data']),
+      json: serializer.fromJson<String?>(json['json']),
     );
   }
   @override
@@ -236,7 +236,7 @@ class DataDrift extends DataClass implements Insertable<DataDrift> {
       'id': serializer.toJson<int>(id),
       'uid': serializer.toJson<String?>(uid),
       'type': serializer.toJson<String?>(type),
-      'data': serializer.toJson<Uint8List?>(data),
+      'json': serializer.toJson<String?>(json),
     };
   }
 
@@ -246,14 +246,14 @@ class DataDrift extends DataClass implements Insertable<DataDrift> {
     int? id,
     Value<String?> uid = const Value.absent(),
     Value<String?> type = const Value.absent(),
-    Value<Uint8List?> data = const Value.absent(),
+    Value<String?> json = const Value.absent(),
   }) => DataDrift(
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
     id: id ?? this.id,
     uid: uid.present ? uid.value : this.uid,
     type: type.present ? type.value : this.type,
-    data: data.present ? data.value : this.data,
+    json: json.present ? json.value : this.json,
   );
   DataDrift copyWithCompanion(DataTablesCompanion data) {
     return DataDrift(
@@ -262,7 +262,7 @@ class DataDrift extends DataClass implements Insertable<DataDrift> {
       id: data.id.present ? data.id.value : this.id,
       uid: data.uid.present ? data.uid.value : this.uid,
       type: data.type.present ? data.type.value : this.type,
-      data: data.data.present ? data.data.value : this.data,
+      json: data.json.present ? data.json.value : this.json,
     );
   }
 
@@ -274,20 +274,13 @@ class DataDrift extends DataClass implements Insertable<DataDrift> {
           ..write('id: $id, ')
           ..write('uid: $uid, ')
           ..write('type: $type, ')
-          ..write('data: $data')
+          ..write('json: $json')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(
-    createdAt,
-    updatedAt,
-    id,
-    uid,
-    type,
-    $driftBlobEquality.hash(data),
-  );
+  int get hashCode => Object.hash(createdAt, updatedAt, id, uid, type, json);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -297,7 +290,7 @@ class DataDrift extends DataClass implements Insertable<DataDrift> {
           other.id == this.id &&
           other.uid == this.uid &&
           other.type == this.type &&
-          $driftBlobEquality.equals(other.data, this.data));
+          other.json == this.json);
 }
 
 class DataTablesCompanion extends UpdateCompanion<DataDrift> {
@@ -306,14 +299,14 @@ class DataTablesCompanion extends UpdateCompanion<DataDrift> {
   final Value<int> id;
   final Value<String?> uid;
   final Value<String?> type;
-  final Value<Uint8List?> data;
+  final Value<String?> json;
   const DataTablesCompanion({
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.id = const Value.absent(),
     this.uid = const Value.absent(),
     this.type = const Value.absent(),
-    this.data = const Value.absent(),
+    this.json = const Value.absent(),
   });
   DataTablesCompanion.insert({
     this.createdAt = const Value.absent(),
@@ -321,7 +314,7 @@ class DataTablesCompanion extends UpdateCompanion<DataDrift> {
     this.id = const Value.absent(),
     this.uid = const Value.absent(),
     this.type = const Value.absent(),
-    this.data = const Value.absent(),
+    this.json = const Value.absent(),
   });
   static Insertable<DataDrift> custom({
     Expression<DateTime>? createdAt,
@@ -329,7 +322,7 @@ class DataTablesCompanion extends UpdateCompanion<DataDrift> {
     Expression<int>? id,
     Expression<String>? uid,
     Expression<String>? type,
-    Expression<Uint8List>? data,
+    Expression<String>? json,
   }) {
     return RawValuesInsertable({
       if (createdAt != null) 'created_at': createdAt,
@@ -337,7 +330,7 @@ class DataTablesCompanion extends UpdateCompanion<DataDrift> {
       if (id != null) 'id': id,
       if (uid != null) 'uid': uid,
       if (type != null) 'type': type,
-      if (data != null) 'data': data,
+      if (json != null) 'json': json,
     });
   }
 
@@ -347,7 +340,7 @@ class DataTablesCompanion extends UpdateCompanion<DataDrift> {
     Value<int>? id,
     Value<String?>? uid,
     Value<String?>? type,
-    Value<Uint8List?>? data,
+    Value<String?>? json,
   }) {
     return DataTablesCompanion(
       createdAt: createdAt ?? this.createdAt,
@@ -355,7 +348,7 @@ class DataTablesCompanion extends UpdateCompanion<DataDrift> {
       id: id ?? this.id,
       uid: uid ?? this.uid,
       type: type ?? this.type,
-      data: data ?? this.data,
+      json: json ?? this.json,
     );
   }
 
@@ -377,8 +370,8 @@ class DataTablesCompanion extends UpdateCompanion<DataDrift> {
     if (type.present) {
       map['type'] = Variable<String>(type.value);
     }
-    if (data.present) {
-      map['data'] = Variable<Uint8List>(data.value);
+    if (json.present) {
+      map['json'] = Variable<String>(json.value);
     }
     return map;
   }
@@ -391,7 +384,7 @@ class DataTablesCompanion extends UpdateCompanion<DataDrift> {
           ..write('id: $id, ')
           ..write('uid: $uid, ')
           ..write('type: $type, ')
-          ..write('data: $data')
+          ..write('json: $json')
           ..write(')'))
         .toString();
   }
@@ -416,7 +409,7 @@ typedef $$DataTablesTableCreateCompanionBuilder =
       Value<int> id,
       Value<String?> uid,
       Value<String?> type,
-      Value<Uint8List?> data,
+      Value<String?> json,
     });
 typedef $$DataTablesTableUpdateCompanionBuilder =
     DataTablesCompanion Function({
@@ -425,7 +418,7 @@ typedef $$DataTablesTableUpdateCompanionBuilder =
       Value<int> id,
       Value<String?> uid,
       Value<String?> type,
-      Value<Uint8List?> data,
+      Value<String?> json,
     });
 
 class $$DataTablesTableFilterComposer
@@ -462,8 +455,8 @@ class $$DataTablesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<Uint8List> get data => $composableBuilder(
-    column: $table.data,
+  ColumnFilters<String> get json => $composableBuilder(
+    column: $table.json,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -502,8 +495,8 @@ class $$DataTablesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<Uint8List> get data => $composableBuilder(
-    column: $table.data,
+  ColumnOrderings<String> get json => $composableBuilder(
+    column: $table.json,
     builder: (column) => ColumnOrderings(column),
   );
 }
@@ -532,8 +525,8 @@ class $$DataTablesTableAnnotationComposer
   GeneratedColumn<String> get type =>
       $composableBuilder(column: $table.type, builder: (column) => column);
 
-  GeneratedColumn<Uint8List> get data =>
-      $composableBuilder(column: $table.data, builder: (column) => column);
+  GeneratedColumn<String> get json =>
+      $composableBuilder(column: $table.json, builder: (column) => column);
 }
 
 class $$DataTablesTableTableManager
@@ -572,14 +565,14 @@ class $$DataTablesTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<String?> uid = const Value.absent(),
                 Value<String?> type = const Value.absent(),
-                Value<Uint8List?> data = const Value.absent(),
+                Value<String?> json = const Value.absent(),
               }) => DataTablesCompanion(
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 id: id,
                 uid: uid,
                 type: type,
-                data: data,
+                json: json,
               ),
           createCompanionCallback:
               ({
@@ -588,14 +581,14 @@ class $$DataTablesTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<String?> uid = const Value.absent(),
                 Value<String?> type = const Value.absent(),
-                Value<Uint8List?> data = const Value.absent(),
+                Value<String?> json = const Value.absent(),
               }) => DataTablesCompanion.insert(
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 id: id,
                 uid: uid,
                 type: type,
-                data: data,
+                json: json,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

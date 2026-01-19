@@ -14,14 +14,10 @@ class DataDao extends DatabaseAccessor<AppDatabase> with _$DataDaoMixin {
 
   Future<void> add({required EntryModel log}) {
     return transaction(() async {
-      final json = log.toJson();
-      final jsonString = jsonEncode(json);
-      final bytes = utf8.encode(jsonString);
-
       final companion = DataTablesCompanion.insert(
         uid: Value(log.id),
         type: Value(log.runtimeType.toString()),
-        data: Value(bytes),
+        json: Value(jsonEncode(log.toJson())),
       );
 
       await into(dataTables).insert(companion);
