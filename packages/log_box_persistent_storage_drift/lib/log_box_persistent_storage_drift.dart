@@ -27,24 +27,38 @@ class DriftPersistentStorage extends PersistentDataStorage {
 
   @override
   Future<List<EntryModel>> fetch({required Cursor cursor, int limit = 20}) {
-    // TODO: implement fetch
-    throw UnimplementedError();
+    return _dao
+        .fetch(
+          refId: cursor.id,
+          types: cursor.types.toSet(),
+          fetchBefore: cursor.direction == PageDirection.before,
+          limit: limit,
+        )
+        .then((e) => e.map(_transform).nonNulls.toList());
   }
 
   @override
   Stream<EntryModel> stream(String id) {
-    final transformer = StreamTransformer<DataDrift, EntryModel>.fromHandlers(
-      handleData: (data, sink) {
-        final decoder = _decoder?[data.type];
-        final json = data.json;
-        if (json == null || decoder == null) return;
-        sink.add(decoder.call(jsonDecode(json)));
-      }
-    );
-
-    return _dao.single(id).transform(transformer);
+    return _dao.single(id).transform(_transformer);
   }
 
   @override
   Stream<Set<String>> get types => _dao.types.map((e) => e.toSet());
+
+  StreamTransformer<DataDrift, EntryModel> get _transformer {
+    return StreamTransformer.fromHandlers(
+      handleData: (data, sink) {
+        final log = _transform(data);
+        if (log == null) return;
+        sink.add(log);
+      },
+    );
+  }
+
+  EntryModel? _transform(DataDrift data) {
+    final decoder = _decoder?[data.type];
+    final json = data.json;
+    if (json == null || decoder == null) return null;
+    return decoder.call(jsonDecode(json));
+  }
 }
