@@ -1,3 +1,7 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:math';
+
 import 'package:log_box/log_box.dart';
 
 import 'src/dao/data_dao.dart';
@@ -29,8 +33,16 @@ class DriftPersistentStorage extends PersistentDataStorage {
 
   @override
   Stream<EntryModel> stream(String id) {
-    // TODO: implement stream
-    throw UnimplementedError();
+    final transformer = StreamTransformer<DataDrift, EntryModel>.fromHandlers(
+      handleData: (data, sink) {
+        final decoder = _decoder?[data.type];
+        final json = data.json;
+        if (json == null || decoder == null) return;
+        sink.add(decoder.call(jsonDecode(json)));
+      }
+    );
+
+    return _dao.single(id).transform(transformer);
   }
 
   @override
