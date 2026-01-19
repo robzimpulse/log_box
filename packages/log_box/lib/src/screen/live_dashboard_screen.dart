@@ -103,7 +103,7 @@ class _LiveDashboardScreenState extends State<LiveDashboardScreen> {
                 icon: const Icon(Icons.storage),
               ),
             IconButton(
-              onPressed: () => widget.box.storage.clear(),
+              onPressed: () => widget.box.storage.liveStorage.clear(),
               icon: const Icon(Icons.delete),
             ),
           ],

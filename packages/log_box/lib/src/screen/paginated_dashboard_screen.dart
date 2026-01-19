@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:super_paging/super_paging.dart';
 
 import '../log_box.dart';
 import '../model/entry_model.dart';
+import '../storage/base/persistent_data_storage.dart';
 
 class PaginatedDashboardScreen extends StatefulWidget {
   const PaginatedDashboardScreen({
@@ -20,12 +22,28 @@ class PaginatedDashboardScreen extends StatefulWidget {
 }
 
 class _PaginatedDashboardScreenState extends State<PaginatedDashboardScreen> {
-  final TextEditingController searchController = TextEditingController();
-  final FocusNode focusNode = FocusNode();
+  final searchController = TextEditingController();
+  final focusNode = FocusNode();
 
-  final ValueNotifier<String> keyword = ValueNotifier('');
-  final ValueNotifier<bool> isSearchMode = ValueNotifier(false);
-  final ValueNotifier<Set<Type>> selectedTypes = ValueNotifier({});
+  final keyword = ValueNotifier<String>('');
+  final isSearchMode = ValueNotifier<bool>(false);
+  final selectedTypes = ValueNotifier<Set<Type>>({});
+
+  Pager<Cursor, EntryModel>? pager;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final source = widget.box.storage.persistentStorage;
+    if (source != null) {
+      pager = Pager(
+        initialKey: Cursor(),
+        config: const PagingConfig(pageSize: 10, initialLoadSize: 30),
+        pagingSourceFactory: () => source,
+      );
+    }
+  }
 
   @override
   void dispose() {
@@ -34,6 +52,7 @@ class _PaginatedDashboardScreenState extends State<PaginatedDashboardScreen> {
     keyword.dispose();
     isSearchMode.dispose();
     selectedTypes.dispose();
+    pager?.dispose();
     super.dispose();
   }
 
@@ -85,7 +104,7 @@ class _PaginatedDashboardScreenState extends State<PaginatedDashboardScreen> {
               },
             ),
             IconButton(
-              onPressed: () => widget.box.storage.clear(),
+              onPressed: () => widget.box.storage.persistentStorage?.clear(),
               icon: const Icon(Icons.delete),
             ),
           ],
@@ -98,6 +117,16 @@ class _PaginatedDashboardScreenState extends State<PaginatedDashboardScreen> {
                 child: TextField(
                   autofocus: true,
                   onChanged: (text) => keyword.value = text,
+                  onSubmitted: (text) {
+                    pager?.refresh(
+                      refreshKey: Cursor(
+                        keyword: text,
+                        types: [
+                          ...selectedTypes.value.map((e) => e.toString()),
+                        ],
+                      ),
+                    );
+                  },
                   focusNode: focusNode,
                   controller: searchController,
                   decoration: InputDecoration(
@@ -122,7 +151,7 @@ class _PaginatedDashboardScreenState extends State<PaginatedDashboardScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _types(),
-              Expanded(child: Container()),
+              Expanded(child: _content()),
             ],
           ),
         ),
@@ -196,6 +225,28 @@ class _PaginatedDashboardScreenState extends State<PaginatedDashboardScreen> {
             ),
           ),
         );
+      },
+    );
+  }
+
+  Widget _content() {
+    final pager = this.pager;
+    if (pager == null) return Center(child: Text('No Data'));
+
+    return PagingListView(
+      pager: pager,
+      itemBuilder: (context, index) {
+        final item = pager.items.elementAt(index);
+        return _item(context: context, value: item);
+      },
+      emptyBuilder: (context) {
+        return const Center(child: Text('No characters found'));
+      },
+      errorBuilder: (context, error) {
+        return Center(child: Text('$error'));
+      },
+      loadingBuilder: (context) {
+        return const Center(child: CircularProgressIndicator.adaptive());
       },
     );
   }
