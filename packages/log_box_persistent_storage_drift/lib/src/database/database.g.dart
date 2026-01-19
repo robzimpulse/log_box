@@ -55,6 +55,15 @@ class $DataTablesTable extends DataTables
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _typeMeta = const VerificationMeta('type');
+  @override
+  late final GeneratedColumn<String> type = GeneratedColumn<String>(
+    'type',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _dataMeta = const VerificationMeta('data');
   @override
   late final GeneratedColumn<Uint8List> data = GeneratedColumn<Uint8List>(
@@ -65,7 +74,14 @@ class $DataTablesTable extends DataTables
     requiredDuringInsert: false,
   );
   @override
-  List<GeneratedColumn> get $columns => [createdAt, updatedAt, id, uid, data];
+  List<GeneratedColumn> get $columns => [
+    createdAt,
+    updatedAt,
+    id,
+    uid,
+    type,
+    data,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -99,6 +115,12 @@ class $DataTablesTable extends DataTables
         uid.isAcceptableOrUnknown(data['uid']!, _uidMeta),
       );
     }
+    if (data.containsKey('type')) {
+      context.handle(
+        _typeMeta,
+        type.isAcceptableOrUnknown(data['type']!, _typeMeta),
+      );
+    }
     if (data.containsKey('data')) {
       context.handle(
         _dataMeta,
@@ -130,6 +152,10 @@ class $DataTablesTable extends DataTables
         DriftSqlType.string,
         data['${effectivePrefix}uid'],
       ),
+      type: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}type'],
+      ),
       data: attachedDatabase.typeMapping.read(
         DriftSqlType.blob,
         data['${effectivePrefix}data'],
@@ -148,12 +174,14 @@ class DataDrift extends DataClass implements Insertable<DataDrift> {
   final DateTime updatedAt;
   final int id;
   final String? uid;
+  final String? type;
   final Uint8List? data;
   const DataDrift({
     required this.createdAt,
     required this.updatedAt,
     required this.id,
     this.uid,
+    this.type,
     this.data,
   });
   @override
@@ -164,6 +192,9 @@ class DataDrift extends DataClass implements Insertable<DataDrift> {
     map['id'] = Variable<int>(id);
     if (!nullToAbsent || uid != null) {
       map['uid'] = Variable<String>(uid);
+    }
+    if (!nullToAbsent || type != null) {
+      map['type'] = Variable<String>(type);
     }
     if (!nullToAbsent || data != null) {
       map['data'] = Variable<Uint8List>(data);
@@ -177,6 +208,7 @@ class DataDrift extends DataClass implements Insertable<DataDrift> {
       updatedAt: Value(updatedAt),
       id: Value(id),
       uid: uid == null && nullToAbsent ? const Value.absent() : Value(uid),
+      type: type == null && nullToAbsent ? const Value.absent() : Value(type),
       data: data == null && nullToAbsent ? const Value.absent() : Value(data),
     );
   }
@@ -191,6 +223,7 @@ class DataDrift extends DataClass implements Insertable<DataDrift> {
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       id: serializer.fromJson<int>(json['id']),
       uid: serializer.fromJson<String?>(json['uid']),
+      type: serializer.fromJson<String?>(json['type']),
       data: serializer.fromJson<Uint8List?>(json['data']),
     );
   }
@@ -202,6 +235,7 @@ class DataDrift extends DataClass implements Insertable<DataDrift> {
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'id': serializer.toJson<int>(id),
       'uid': serializer.toJson<String?>(uid),
+      'type': serializer.toJson<String?>(type),
       'data': serializer.toJson<Uint8List?>(data),
     };
   }
@@ -211,12 +245,14 @@ class DataDrift extends DataClass implements Insertable<DataDrift> {
     DateTime? updatedAt,
     int? id,
     Value<String?> uid = const Value.absent(),
+    Value<String?> type = const Value.absent(),
     Value<Uint8List?> data = const Value.absent(),
   }) => DataDrift(
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
     id: id ?? this.id,
     uid: uid.present ? uid.value : this.uid,
+    type: type.present ? type.value : this.type,
     data: data.present ? data.value : this.data,
   );
   DataDrift copyWithCompanion(DataTablesCompanion data) {
@@ -225,6 +261,7 @@ class DataDrift extends DataClass implements Insertable<DataDrift> {
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       id: data.id.present ? data.id.value : this.id,
       uid: data.uid.present ? data.uid.value : this.uid,
+      type: data.type.present ? data.type.value : this.type,
       data: data.data.present ? data.data.value : this.data,
     );
   }
@@ -236,14 +273,21 @@ class DataDrift extends DataClass implements Insertable<DataDrift> {
           ..write('updatedAt: $updatedAt, ')
           ..write('id: $id, ')
           ..write('uid: $uid, ')
+          ..write('type: $type, ')
           ..write('data: $data')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(createdAt, updatedAt, id, uid, $driftBlobEquality.hash(data));
+  int get hashCode => Object.hash(
+    createdAt,
+    updatedAt,
+    id,
+    uid,
+    type,
+    $driftBlobEquality.hash(data),
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -252,6 +296,7 @@ class DataDrift extends DataClass implements Insertable<DataDrift> {
           other.updatedAt == this.updatedAt &&
           other.id == this.id &&
           other.uid == this.uid &&
+          other.type == this.type &&
           $driftBlobEquality.equals(other.data, this.data));
 }
 
@@ -260,12 +305,14 @@ class DataTablesCompanion extends UpdateCompanion<DataDrift> {
   final Value<DateTime> updatedAt;
   final Value<int> id;
   final Value<String?> uid;
+  final Value<String?> type;
   final Value<Uint8List?> data;
   const DataTablesCompanion({
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.id = const Value.absent(),
     this.uid = const Value.absent(),
+    this.type = const Value.absent(),
     this.data = const Value.absent(),
   });
   DataTablesCompanion.insert({
@@ -273,6 +320,7 @@ class DataTablesCompanion extends UpdateCompanion<DataDrift> {
     this.updatedAt = const Value.absent(),
     this.id = const Value.absent(),
     this.uid = const Value.absent(),
+    this.type = const Value.absent(),
     this.data = const Value.absent(),
   });
   static Insertable<DataDrift> custom({
@@ -280,6 +328,7 @@ class DataTablesCompanion extends UpdateCompanion<DataDrift> {
     Expression<DateTime>? updatedAt,
     Expression<int>? id,
     Expression<String>? uid,
+    Expression<String>? type,
     Expression<Uint8List>? data,
   }) {
     return RawValuesInsertable({
@@ -287,6 +336,7 @@ class DataTablesCompanion extends UpdateCompanion<DataDrift> {
       if (updatedAt != null) 'updated_at': updatedAt,
       if (id != null) 'id': id,
       if (uid != null) 'uid': uid,
+      if (type != null) 'type': type,
       if (data != null) 'data': data,
     });
   }
@@ -296,6 +346,7 @@ class DataTablesCompanion extends UpdateCompanion<DataDrift> {
     Value<DateTime>? updatedAt,
     Value<int>? id,
     Value<String?>? uid,
+    Value<String?>? type,
     Value<Uint8List?>? data,
   }) {
     return DataTablesCompanion(
@@ -303,6 +354,7 @@ class DataTablesCompanion extends UpdateCompanion<DataDrift> {
       updatedAt: updatedAt ?? this.updatedAt,
       id: id ?? this.id,
       uid: uid ?? this.uid,
+      type: type ?? this.type,
       data: data ?? this.data,
     );
   }
@@ -322,6 +374,9 @@ class DataTablesCompanion extends UpdateCompanion<DataDrift> {
     if (uid.present) {
       map['uid'] = Variable<String>(uid.value);
     }
+    if (type.present) {
+      map['type'] = Variable<String>(type.value);
+    }
     if (data.present) {
       map['data'] = Variable<Uint8List>(data.value);
     }
@@ -335,6 +390,7 @@ class DataTablesCompanion extends UpdateCompanion<DataDrift> {
           ..write('updatedAt: $updatedAt, ')
           ..write('id: $id, ')
           ..write('uid: $uid, ')
+          ..write('type: $type, ')
           ..write('data: $data')
           ..write(')'))
         .toString();
@@ -359,6 +415,7 @@ typedef $$DataTablesTableCreateCompanionBuilder =
       Value<DateTime> updatedAt,
       Value<int> id,
       Value<String?> uid,
+      Value<String?> type,
       Value<Uint8List?> data,
     });
 typedef $$DataTablesTableUpdateCompanionBuilder =
@@ -367,6 +424,7 @@ typedef $$DataTablesTableUpdateCompanionBuilder =
       Value<DateTime> updatedAt,
       Value<int> id,
       Value<String?> uid,
+      Value<String?> type,
       Value<Uint8List?> data,
     });
 
@@ -396,6 +454,11 @@ class $$DataTablesTableFilterComposer
 
   ColumnFilters<String> get uid => $composableBuilder(
     column: $table.uid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get type => $composableBuilder(
+    column: $table.type,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -434,6 +497,11 @@ class $$DataTablesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<Uint8List> get data => $composableBuilder(
     column: $table.data,
     builder: (column) => ColumnOrderings(column),
@@ -460,6 +528,9 @@ class $$DataTablesTableAnnotationComposer
 
   GeneratedColumn<String> get uid =>
       $composableBuilder(column: $table.uid, builder: (column) => column);
+
+  GeneratedColumn<String> get type =>
+      $composableBuilder(column: $table.type, builder: (column) => column);
 
   GeneratedColumn<Uint8List> get data =>
       $composableBuilder(column: $table.data, builder: (column) => column);
@@ -500,12 +571,14 @@ class $$DataTablesTableTableManager
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> id = const Value.absent(),
                 Value<String?> uid = const Value.absent(),
+                Value<String?> type = const Value.absent(),
                 Value<Uint8List?> data = const Value.absent(),
               }) => DataTablesCompanion(
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 id: id,
                 uid: uid,
+                type: type,
                 data: data,
               ),
           createCompanionCallback:
@@ -514,12 +587,14 @@ class $$DataTablesTableTableManager
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> id = const Value.absent(),
                 Value<String?> uid = const Value.absent(),
+                Value<String?> type = const Value.absent(),
                 Value<Uint8List?> data = const Value.absent(),
               }) => DataTablesCompanion.insert(
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 id: id,
                 uid: uid,
+                type: type,
                 data: data,
               ),
           withReferenceMapper: (p0) => p0

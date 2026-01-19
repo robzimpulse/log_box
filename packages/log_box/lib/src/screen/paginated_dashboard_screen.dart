@@ -27,7 +27,7 @@ class _PaginatedDashboardScreenState extends State<PaginatedDashboardScreen> {
 
   final keyword = ValueNotifier<String>('');
   final isSearchMode = ValueNotifier<bool>(false);
-  final selectedTypes = ValueNotifier<Set<Type>>({});
+  final selectedTypes = ValueNotifier<Set<String>>({});
 
   Pager<Cursor, EntryModel>? pager;
 
@@ -187,8 +187,6 @@ class _PaginatedDashboardScreenState extends State<PaginatedDashboardScreen> {
           return SizedBox(height: 50, child: Center(child: Text('No Data')));
         }
 
-        final keys = [...data.keys]..sort((a, b) => a.compareTo(b));
-
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: SingleChildScrollView(
@@ -199,16 +197,14 @@ class _PaginatedDashboardScreenState extends State<PaginatedDashboardScreen> {
               runSpacing: 8,
               direction: Axis.horizontal,
               children: [
-                for (final key in keys)
+                for (final key in data)
                   Builder(
                     builder: (context) {
-                      final type = data[key];
-                      if (type == null) return SizedBox.shrink();
-                      final selected = selectedTypes.value.contains(type);
+                      final selected = selectedTypes.value.contains(key);
                       return OutlinedButton(
                         onPressed: () {
                           var data = {...selectedTypes.value};
-                          selected ? data.remove(type) : data.add(type);
+                          selected ? data.remove(key) : data.add(key);
                           selectedTypes.value = data;
                         },
                         style: OutlinedButton.styleFrom(

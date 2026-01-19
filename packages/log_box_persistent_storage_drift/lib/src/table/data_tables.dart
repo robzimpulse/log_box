@@ -8,6 +8,8 @@ class DataTables extends Table with AutoTimestampTable, AutoIntegerIdTable {
 
   TextColumn get uid => text().named('uid').nullable()();
 
+  TextColumn get type => text().named('type').nullable()();
+
   BlobColumn get data => blob().named('data').nullable()();
 
 }

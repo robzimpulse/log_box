@@ -2,9 +2,6 @@ import 'package:super_paging/super_paging.dart';
 
 import '../../model/entry_model.dart';
 
-// typedef ObjectDecoder = EntryModel? Function(Map<String, dynamic> json);
-// typedef MapObjectDecoder = Map<String, ObjectDecoder>;
-
 enum PageDirection { before, after }
 
 class Cursor {
@@ -46,7 +43,7 @@ abstract class PersistentDataStorage extends PagingSource<Cursor, EntryModel> {
   Stream<EntryModel> stream(String id);
 
   /// get all data types of entry
-  Stream<Map<String, Type>> get types;
+  Stream<Set<String>> get types;
 
   /// Clear all entry
   Future<void> clear();
