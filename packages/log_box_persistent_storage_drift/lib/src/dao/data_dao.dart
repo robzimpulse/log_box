@@ -32,56 +32,7 @@ class DataDao extends DatabaseAccessor<AppDatabase> with _$DataDaoMixin {
     bool fetchBefore = false,
     int limit = 20,
   }) async {
-    return _cursor(refId: refId).then(
-      (cursor) => _fetch(
-        cursorId: cursor?.id,
-        cursorDate: cursor?.createdAt,
-        types: types,
-        fetchBefore: fetchBefore,
-        limit: limit,
-      ),
-    );
-  }
-
-  Future<DataDrift?> _cursor({String? refId}) {
-    final selector = select(dataTables);
-
-    if (refId != null) {
-      selector.where((t) => t.uid.equals(refId));
-    }
-
-    selector.limit(1);
-
-    return selector.getSingleOrNull();
-  }
-
-  Future<List<DataDrift>> _fetch({
-    int? cursorId,
-    DateTime? cursorDate,
-    Set<String>? types,
-    bool fetchBefore = false,
-    int limit = 20,
-  }) {
     final selector = select(dataTables)
-      ..where((t) {
-        // 1. If no cursor (first page), return all rows (no filter needed)
-        if (cursorId == null || cursorDate == null) return const Constant(true);
-
-        // 2. Cursor Logic
-        if (fetchBefore) {
-          // "Previous": We want rows NEWER than cursor
-          // Logic: (date > cursorDate) OR (date == cursorDate AND id > cursorId)
-          return t.createdAt.isBiggerThanValue(cursorDate) |
-              (t.createdAt.equals(cursorDate) &
-                  t.id.isBiggerThanValue(cursorId));
-        } else {
-          // "Next": We want rows OLDER than cursor
-          // Logic: (date < cursorDate) OR (date == cursorDate AND id < cursorId)
-          return t.createdAt.isSmallerThanValue(cursorDate) |
-              (t.createdAt.equals(cursorDate) &
-                  t.id.isSmallerThanValue(cursorId));
-        }
-      })
       ..orderBy([
         (t) {
           // 3. Sorting Direction
@@ -106,6 +57,35 @@ class DataDao extends DatabaseAccessor<AppDatabase> with _$DataDaoMixin {
 
     if (types != null && types.isNotEmpty) {
       selector.where((t) => t.type.isIn(types));
+    }
+
+    if (refId != null) {
+      final subquery = Subquery(
+        selectOnly(dataTables)
+          ..addColumns([dataTables.id, dataTables.createdAt])
+          ..where(dataTables.uid.equals(refId))
+          ..limit(1),
+        's',
+      );
+
+      selector.where((t) {
+        // 2. Cursor Logic
+        if (fetchBefore) {
+          // "Previous": We want rows NEWER than cursor
+          // Logic: (date > cursorDate) OR (date == cursorDate AND id > cursorId)
+          return t.createdAt.isBiggerThan(subquery.ref(dataTables.createdAt)) |
+              (t.createdAt.equalsExp(subquery.ref(dataTables.createdAt)) &
+                  t.id.isBiggerThan(subquery.ref(dataTables.id)));
+        } else {
+          // "Next": We want rows OLDER than cursor
+          // Logic: (date < cursorDate) OR (date == cursorDate AND id < cursorId)
+          return t.createdAt.isSmallerThan(subquery.ref(dataTables.createdAt)) |
+              (t.createdAt.equalsExp(subquery.ref(dataTables.createdAt)) &
+                  t.id.isSmallerThan(subquery.ref(dataTables.id)));
+        }
+      });
+    } else {
+      selector.where((t) => const Constant(true));
     }
 
     return selector.get().then((e) {
