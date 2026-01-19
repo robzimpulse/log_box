@@ -40,7 +40,7 @@ abstract class PersistentDataStorage extends PagingSource<Cursor, EntryModel> {
   Future<void> add({required EntryModel log});
 
   /// fetch entry with [param] and limit [limit]
-  Future<List<EntryModel>> fetch({Cursor cursor, int limit = 20});
+  Future<List<EntryModel>> fetch({required Cursor cursor, int limit = 20});
 
   /// Listen to entry with [id]
   Stream<EntryModel> stream(String id);
