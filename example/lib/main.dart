@@ -33,6 +33,13 @@ void main() async {
       await Future.delayed(Duration(microseconds: 500));
       box.log('Testing message with index $log');
     }
+
+    Future.delayed(Duration(seconds: 5), () async {
+      for (final log in List.generate(50, (e) => e)) {
+        await Future.delayed(Duration(microseconds: 500));
+        box.log('Testing message with index $log');
+      }
+    });
   });
 
   runApp(AppScreen(box: box, dio: dio, cache: cache));

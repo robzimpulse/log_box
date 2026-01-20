@@ -60,32 +60,32 @@ class DataDao extends DatabaseAccessor<AppDatabase> with _$DataDaoMixin {
     }
 
     if (refId != null) {
-      final subquery = Subquery(
-        selectOnly(dataTables)
-          ..addColumns([dataTables.id, dataTables.createdAt])
-          ..where(dataTables.uid.equals(refId))
-          ..limit(1),
-        's',
-      );
+      final cursorSelector = selectOnly(dataTables)
+        ..addColumns([dataTables.id, dataTables.createdAt])
+        ..where(dataTables.uid.equals(refId))
+        ..limit(1);
+
+      final cursor = await cursorSelector.getSingleOrNull();
+      final cursorId = cursor?.read(dataTables.id);
+      final cursorCreatedAt = cursor?.read(dataTables.createdAt);
+
+      if (cursorId == null || cursorCreatedAt == null) {
+        return [];
+      }
 
       selector.where((t) {
-        // 2. Cursor Logic
         if (fetchBefore) {
-          // "Previous": We want rows NEWER than cursor
-          // Logic: (date > cursorDate) OR (date == cursorDate AND id > cursorId)
-          return t.createdAt.isBiggerThan(subquery.ref(dataTables.createdAt)) |
-              (t.createdAt.equalsExp(subquery.ref(dataTables.createdAt)) &
-                  t.id.isBiggerThan(subquery.ref(dataTables.id)));
+          // "Previous" logic
+          return t.createdAt.isBiggerThanValue(cursorCreatedAt) |
+              (t.createdAt.equals(cursorCreatedAt) &
+                  t.id.isBiggerThanValue(cursorId));
         } else {
-          // "Next": We want rows OLDER than cursor
-          // Logic: (date < cursorDate) OR (date == cursorDate AND id < cursorId)
-          return t.createdAt.isSmallerThan(subquery.ref(dataTables.createdAt)) |
-              (t.createdAt.equalsExp(subquery.ref(dataTables.createdAt)) &
-                  t.id.isSmallerThan(subquery.ref(dataTables.id)));
+          // "Next" logic
+          return t.createdAt.isSmallerThanValue(cursorCreatedAt) |
+              (t.createdAt.equals(cursorCreatedAt) &
+                  t.id.isSmallerThanValue(cursorId));
         }
       });
-    } else {
-      selector.where((t) => const Constant(true));
     }
 
     return selector.get().then((e) {
