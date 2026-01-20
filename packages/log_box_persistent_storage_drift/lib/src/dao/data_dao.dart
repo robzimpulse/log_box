@@ -38,6 +38,7 @@ class DataDao extends DatabaseAccessor<AppDatabase> with _$DataDaoMixin {
 
   Future<List<DataDrift>> fetch({
     String? refId,
+    String? keyword,
     Set<String>? types,
     bool fetchBefore = false,
     int limit = 20,
@@ -68,8 +69,12 @@ class DataDao extends DatabaseAccessor<AppDatabase> with _$DataDaoMixin {
     if (types != null && types.isNotEmpty) {
       selector.where((t) => t.type.isIn(types));
     }
+    
+    if (keyword != null && keyword.isNotEmpty) {
+      selector.where((t) => t.json.like('%$keyword%'));
+    }
 
-    if (refId != null) {
+    if (refId != null && refId.isNotEmpty) {
       final cursorSelector = selectOnly(dataTables)
         ..addColumns([dataTables.id, dataTables.createdAt])
         ..where(dataTables.uid.equals(refId))

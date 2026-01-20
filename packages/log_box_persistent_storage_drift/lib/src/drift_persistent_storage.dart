@@ -32,6 +32,7 @@ class DriftPersistentStorage extends PersistentDataStorage {
     final result = await _dao.fetch(
       refId: cursor.id,
       types: cursor.types.toSet(),
+      keyword: cursor.keyword,
       fetchBefore: cursor.direction == PageDirection.before,
       limit: limit,
     );
