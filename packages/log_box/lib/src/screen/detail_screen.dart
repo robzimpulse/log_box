@@ -80,17 +80,56 @@ class _DetailScreenState extends State<DetailScreen> {
         final data = widget.box.storage.liveStorage.data.where(
           (e) => e.id == widget.id,
         );
-        return _content(context, data: data.firstOrNull);
+
+        final value = data.firstOrNull;
+
+        if (value != null) return _content(context, value);
+
+        final storage = widget.box.storage.persistentStorage;
+
+        if (storage != null) {
+          return StreamBuilder(
+            stream: storage.stream(widget.id),
+            builder: (context, snapshot) {
+              final data = snapshot.data;
+              final error = snapshot.error;
+
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Scaffold(
+                  appBar: AppBar(title: Text('Loading')),
+                  body: Center(child: CircularProgressIndicator()),
+                );
+              }
+
+              if (error != null) {
+                return Scaffold(
+                  appBar: AppBar(title: Text('Error')),
+                  body: Center(child: Text(error.toString())),
+                );
+              }
+
+              if (data == null) {
+                return Scaffold(
+                  appBar: AppBar(title: Text('No Data')),
+                  body: Center(child: Text('No Data')),
+                );
+              }
+
+              return _content(context, data);
+            },
+          );
+        }
+
+        return Scaffold(
+          appBar: AppBar(title: Text('No Data')),
+          body: Center(child: Text('No Data')),
+        );
       },
     );
   }
 
-  Widget _content(BuildContext context, {EntryModel? data}) {
+  Widget _content(BuildContext context, EntryModel data) {
     final theme = Theme.of(context);
-
-    if (data == null) {
-      return const Scaffold(body: Center(child: Text('No Data')));
-    }
 
     final tabs = data.tabs(
       context,
