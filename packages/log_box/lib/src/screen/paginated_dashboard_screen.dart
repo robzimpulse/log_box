@@ -50,6 +50,7 @@ class _PaginatedDashboardScreenState extends State<PaginatedDashboardScreen> {
   void _refresh() {
     pager?.refresh(
       refreshKey: Cursor(
+        keyword: keyword.value,
         types: selectedTypes.value.map((e) => e.toString()).toList(),
       ),
     );
@@ -127,16 +128,7 @@ class _PaginatedDashboardScreenState extends State<PaginatedDashboardScreen> {
                 child: TextField(
                   autofocus: true,
                   onChanged: (text) => keyword.value = text,
-                  onSubmitted: (text) {
-                    pager?.refresh(
-                      refreshKey: Cursor(
-                        keyword: text,
-                        types: [
-                          ...selectedTypes.value.map((e) => e.toString()),
-                        ],
-                      ),
-                    );
-                  },
+                  onSubmitted: (_) => _refresh(),
                   focusNode: focusNode,
                   controller: searchController,
                   decoration: InputDecoration(
