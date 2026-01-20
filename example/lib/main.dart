@@ -35,7 +35,7 @@ void main() async {
     }
 
     Future.delayed(Duration(seconds: 5), () async {
-      for (final log in List.generate(50, (e) => e)) {
+      for (final log in List.generate(1000, (e) => e)) {
         await Future.delayed(Duration(microseconds: 500));
         box.log('Testing message with index $log');
       }

@@ -236,7 +236,18 @@ class _PaginatedDashboardScreenState extends State<PaginatedDashboardScreen> {
         return _item(context: context, value: item);
       },
       emptyBuilder: (context) {
-        return const Center(child: Text('No characters found'));
+        return Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('No Data Found'),
+              TextButton(
+                onPressed: () => pager.refresh(),
+                child: const Text('Refresh'),
+              ),
+            ],
+          ),
+        );
       },
       errorBuilder: (context, error) {
         return Center(child: Text('$error'));
