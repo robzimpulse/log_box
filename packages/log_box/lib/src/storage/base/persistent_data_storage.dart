@@ -52,7 +52,7 @@ abstract class PersistentDataStorage extends PagingSource<Cursor, EntryModel> {
   Future<LoadResult<Cursor, EntryModel>> load(LoadParams<Cursor> params) async {
     try {
       final cursor = params.key ?? Cursor();
-      final result = await fetch(cursor: cursor, limit: params.loadSize + 1);
+      final result = await fetch(cursor: cursor, limit: params.loadSize);
       return LoadResult.page(
         items: result,
         nextKey: cursor.copyWith(
