@@ -19,8 +19,7 @@ class DriftPersistentStorage extends PersistentDataStorage {
        _decoder = decoder;
 
   @override
-  Future<void> add({required EntryModel log}) =>
-      _dao.add(log: log).catchError((e, st) => print(e));
+  Future<void> add({required EntryModel log}) => _dao.add(log: log);
 
   @override
   Future<void> clear() => _dao.clear();
@@ -46,7 +45,19 @@ class DriftPersistentStorage extends PersistentDataStorage {
   }
 
   @override
-  Stream<Set<String>> get types => _dao.types.map((e) => e.toSet());
+  Stream<Map<String, Type>> get types {
+    return _dao.latestDistinctByType.map((result) {
+      final data = <String, Type>{};
+
+      for (final element in result) {
+        final log = _transform(element);
+        if (log == null) continue;
+        data[log.display()] = log.runtimeType;
+      }
+
+      return data;
+    });
+  }
 
   StreamTransformer<DataDrift, EntryModel> get _transformer {
     return StreamTransformer.fromHandlers(

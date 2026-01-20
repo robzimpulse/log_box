@@ -8,7 +8,17 @@ import '../table/data_tables.dart';
 
 part 'data_dao.g.dart';
 
-@DriftAccessor(tables: [DataTables])
+@DriftAccessor(
+  tables: [DataTables],
+  queries: {
+    'latestDistinctRowByType': '''
+    SELECT * FROM (
+      SELECT *, ROW_NUMBER() OVER (PARTITION BY type ORDER BY created_at DESC) as rn
+      FROM data_tables
+    ) WHERE rn = 1
+    ''',
+  },
+)
 class DataDao extends DatabaseAccessor<AppDatabase> with _$DataDaoMixin {
   DataDao(super.db);
 
@@ -104,12 +114,18 @@ class DataDao extends DatabaseAccessor<AppDatabase> with _$DataDaoMixin {
     return selector.watchSingle();
   }
 
-  Stream<List<String>> get types {
-    final selector = selectOnly(dataTables, distinct: true)
-      ..addColumns([dataTables.type]);
+  Stream<List<DataDrift>> get latestDistinctByType {
+    return latestDistinctRowByType().watch().map((e) => [...e.map(_transform)]);
+  }
 
-    return selector.watch().map(
-      (e) => e.map((e) => e.read(dataTables.type)).nonNulls.toList(),
+  DataDrift _transform(LatestDistinctRowByTypeResult result) {
+    return DataDrift(
+      createdAt: result.createdAt,
+      updatedAt: result.updatedAt,
+      id: result.id,
+      uid: result.uid,
+      type: result.type,
+      json: result.json,
     );
   }
 }

@@ -27,7 +27,7 @@ class _PaginatedDashboardScreenState extends State<PaginatedDashboardScreen> {
 
   final keyword = ValueNotifier<String>('');
   final isSearchMode = ValueNotifier<bool>(false);
-  final selectedTypes = ValueNotifier<Set<String>>({});
+  final selectedTypes = ValueNotifier<Set<Type>>({});
 
   Pager<Cursor, EntryModel>? pager;
 
@@ -43,6 +43,16 @@ class _PaginatedDashboardScreenState extends State<PaginatedDashboardScreen> {
         pagingSourceFactory: () => source,
       );
     }
+
+    selectedTypes.addListener(_refresh);
+  }
+
+  void _refresh() {
+    pager?.refresh(
+      refreshKey: Cursor(
+        types: selectedTypes.value.map((e) => e.toString()).toList(),
+      ),
+    );
   }
 
   @override
@@ -169,7 +179,7 @@ class _PaginatedDashboardScreenState extends State<PaginatedDashboardScreen> {
         final data = snapshot.data;
         final error = snapshot.error;
 
-        if (snapshot.connectionState != ConnectionState.active) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return SizedBox(
             height: 50,
             child: Center(child: CircularProgressIndicator()),
@@ -187,39 +197,48 @@ class _PaginatedDashboardScreenState extends State<PaginatedDashboardScreen> {
           return SizedBox(height: 50, child: Center(child: Text('No Data')));
         }
 
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            scrollDirection: Axis.horizontal,
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              direction: Axis.horizontal,
-              children: [
-                for (final key in data)
-                  Builder(
-                    builder: (context) {
-                      final selected = selectedTypes.value.contains(key);
-                      return OutlinedButton(
-                        onPressed: () {
-                          var data = {...selectedTypes.value};
-                          selected ? data.remove(key) : data.add(key);
-                          selectedTypes.value = data;
+        final keys = [...data.keys]..sort((a, b) => a.compareTo(b));
+
+        return ListenableBuilder(
+          listenable: selectedTypes,
+          builder: (context, _) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                scrollDirection: Axis.horizontal,
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  direction: Axis.horizontal,
+                  children: [
+                    for (final key in keys)
+                      Builder(
+                        builder: (context) {
+                          final type = data[key];
+                          if (type == null) return SizedBox.shrink();
+                          final selected = selectedTypes.value.contains(type);
+                          return OutlinedButton(
+                            onPressed: () {
+                              var data = {...selectedTypes.value};
+                              selected ? data.remove(type) : data.add(type);
+                              selectedTypes.value = data;
+                            },
+                            style: OutlinedButton.styleFrom(
+                              backgroundColor: selected ? Colors.grey : null,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                            child: Text(key),
+                          );
                         },
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor: selected ? Colors.grey : null,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                        ),
-                        child: Text(key),
-                      );
-                    },
-                  ),
-              ],
-            ),
-          ),
+                      ),
+                  ],
+                ),
+              ),
+            );
+          },
         );
       },
     );
@@ -229,7 +248,7 @@ class _PaginatedDashboardScreenState extends State<PaginatedDashboardScreen> {
     final pager = this.pager;
     if (pager == null) return Center(child: Text('No Data'));
 
-    return PagingListView(
+    return BidirectionalPagingListView(
       pager: pager,
       itemBuilder: (context, index) {
         final item = pager.items.elementAt(index);

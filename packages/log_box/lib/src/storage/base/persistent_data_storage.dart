@@ -43,7 +43,7 @@ abstract class PersistentDataStorage extends PagingSource<Cursor, EntryModel> {
   Stream<EntryModel> stream(String id);
 
   /// get all data types of entry
-  Stream<Set<String>> get types;
+  Stream<Map<String, Type>> get types;
 
   /// Clear all entry
   Future<void> clear();
