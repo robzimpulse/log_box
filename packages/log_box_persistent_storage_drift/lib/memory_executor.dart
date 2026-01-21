@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 
-import 'base.dart';
+import 'src/database/executor/base.dart';
 
 class MemoryExecutor extends Executor {
   final QueryExecutor _executor;
