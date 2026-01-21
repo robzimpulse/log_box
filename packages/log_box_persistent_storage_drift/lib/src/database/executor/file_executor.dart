@@ -10,7 +10,10 @@ import '../../adapter/filesystem_adapter/filesystem_adapter.dart'
     as fs;
 
 class FileExecutor extends Executor {
+  /// name of the database
   final String name;
+
+  /// this value will be ignored on web platform
   final String path;
 
   FileExecutor({this.name = 'log_box_persistence_drift', required this.path});
@@ -21,6 +24,10 @@ class FileExecutor extends Executor {
       () => driftDatabase(
         name: name,
         native: DriftNativeOptions(databaseDirectory: () => directory),
+        web: DriftWebOptions(
+          sqlite3Wasm: Uri.parse('sqlite3.wasm'),
+          driftWorker: Uri.parse('drift_worker.js'),
+        ),
       ),
     );
   }
