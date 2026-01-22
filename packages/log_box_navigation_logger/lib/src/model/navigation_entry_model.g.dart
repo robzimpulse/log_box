@@ -10,10 +10,9 @@ NavigationEntryModel _$NavigationEntryModelFromJson(
   Map<String, dynamic> json,
 ) => NavigationEntryModel(
   id: json['id'] as String?,
-  timestamp:
-      json['timestamp'] == null
-          ? null
-          : DateTime.parse(json['timestamp'] as String),
+  timestamp: json['timestamp'] == null
+      ? null
+      : DateTime.parse(json['timestamp'] as String),
   action: $enumDecode(_$NavigationActionEnumMap, json['action']),
   route: json['route'] as String?,
   previousRoute: json['previous_route'] as String?,

@@ -9,10 +9,9 @@ part of 'trace_log_entry_model.dart';
 TraceLogEntryModel _$TraceLogEntryModelFromJson(Map<String, dynamic> json) =>
     TraceLogEntryModel(
       id: json['id'] as String?,
-      timestamp:
-          json['timestamp'] == null
-              ? null
-              : DateTime.parse(json['timestamp'] as String),
+      timestamp: json['timestamp'] == null
+          ? null
+          : DateTime.parse(json['timestamp'] as String),
       name: json['name'] as String,
       logs:
           (json['logs'] as List<dynamic>?)

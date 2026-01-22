@@ -6,27 +6,24 @@ part of 'http_request_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-HttpRequestModel _$HttpRequestModelFromJson(
-  Map<String, dynamic> json,
-) => HttpRequestModel(
-  size: (json['size'] as num).toInt(),
-  time: DateTime.parse(json['time'] as String),
-  headers: json['headers'] as Map<String, dynamic>?,
-  body: json['body'] as String?,
-  contentType: json['content_type'] as String?,
-  cookies: (json['cookies'] as Map<String, dynamic>?)?.map(
-    (k, e) => MapEntry(k, e as String),
-  ),
-  queryParameters: json['query_parameters'] as Map<String, dynamic>,
-  formDataFiles:
-      (json['form_data_files'] as List<dynamic>?)
+HttpRequestModel _$HttpRequestModelFromJson(Map<String, dynamic> json) =>
+    HttpRequestModel(
+      size: (json['size'] as num).toInt(),
+      time: DateTime.parse(json['time'] as String),
+      headers: json['headers'] as Map<String, dynamic>?,
+      body: json['body'] as String?,
+      contentType: json['content_type'] as String?,
+      cookies: (json['cookies'] as Map<String, dynamic>?)?.map(
+        (k, e) => MapEntry(k, e as String),
+      ),
+      queryParameters: json['query_parameters'] as Map<String, dynamic>,
+      formDataFiles: (json['form_data_files'] as List<dynamic>?)
           ?.map((e) => FormDataFileModel.fromJson(e as Map<String, dynamic>))
           .toList(),
-  formDataFields:
-      (json['form_data_fields'] as List<dynamic>?)
+      formDataFields: (json['form_data_fields'] as List<dynamic>?)
           ?.map((e) => FormDataFieldModel.fromJson(e as Map<String, dynamic>))
           .toList(),
-);
+    );
 
 Map<String, dynamic> _$HttpRequestModelToJson(
   HttpRequestModel instance,
