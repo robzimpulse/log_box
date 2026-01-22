@@ -32,8 +32,9 @@ class Storage {
   }
 
   /// dispose the storage
-  void dispose() {
-    _subscription.cancel();
+  Future<void> dispose() async {
+    await _subscription.cancel();
     _liveDataStorage.dispose();
+    await _persistentDataStorage?.dispose();
   }
 }

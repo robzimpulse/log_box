@@ -48,6 +48,9 @@ abstract class PersistentDataStorage extends PagingSource<Cursor, EntryModel> {
   /// Clear all entry
   Future<void> clear();
 
+  /// dispose this storage
+  Future<void> dispose();
+
   @override
   Future<LoadResult<Cursor, EntryModel>> load(LoadParams<Cursor> params) async {
     try {

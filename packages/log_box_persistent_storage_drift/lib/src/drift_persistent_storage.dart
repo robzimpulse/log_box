@@ -76,4 +76,9 @@ class DriftPersistentStorage extends PersistentDataStorage {
     if (json == null || decoder == null) return null;
     return decoder.call(jsonDecode(json));
   }
+
+  @override
+  Future<void> dispose() async {
+    await _dao.close();
+  }
 }

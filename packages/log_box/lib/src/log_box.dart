@@ -12,4 +12,8 @@ class LogBox {
 
   LogBox({Storage? storage})
     : storage = storage ?? Storage(liveDataStorage: MemoryStorage());
+
+  void dispose() {
+    storage.dispose();
+  }
 }
