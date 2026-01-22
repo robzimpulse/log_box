@@ -12,4 +12,6 @@ class DataTables extends Table with AutoTimestampTable, AutoIntegerIdTable {
 
   TextColumn get json => text().named('json').nullable()();
 
+  @override
+  List<Set<Column>>? get uniqueKeys => [{uid}];
 }

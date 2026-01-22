@@ -30,7 +30,7 @@ class DataDao extends DatabaseAccessor<LogBoxPersistentDatabase> with _$DataDaoM
         json: Value(jsonEncode(log.toJson())),
       );
 
-      await into(dataTables).insert(companion);
+      await into(dataTables).insert(companion, mode: InsertMode.insertOrReplace);
     });
   }
 
