@@ -70,78 +70,57 @@ class _DetailScreenState extends State<DetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: Listenable.merge([
-        widget.box.storage.liveStorage,
-        isSearchMode,
-        keyword,
-      ]),
-      builder: (context, _) {
-        final data = widget.box.storage.liveStorage.data.where(
-          (e) => e.id == widget.id,
-        );
+    return StreamBuilder(
+      stream: widget.box.storage.stream(widget.id),
+      builder: (context, snapshot) {
+        final data = snapshot.data;
+        final error = snapshot.error;
 
-        final value = data.firstOrNull;
-
-        if (value != null) return _content(context, value);
-
-        final storage = widget.box.storage.persistentStorage;
-
-        if (storage != null) {
-          return StreamBuilder(
-            stream: storage.stream(widget.id),
-            builder: (context, snapshot) {
-              final data = snapshot.data;
-              final error = snapshot.error;
-
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Scaffold(
-                  appBar: AppBar(title: Text('Loading')),
-                  body: Center(child: CircularProgressIndicator()),
-                );
-              }
-
-              if (error != null) {
-                return Scaffold(
-                  appBar: AppBar(title: Text('Error')),
-                  body: Center(child: Text(error.toString())),
-                );
-              }
-
-              if (data == null) {
-                return Scaffold(
-                  appBar: AppBar(title: Text('No Data')),
-                  body: Center(child: Text('No Data')),
-                );
-              }
-
-              return _content(context, data);
-            },
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Scaffold(
+            appBar: AppBar(title: Text('Loading')),
+            body: Center(child: CircularProgressIndicator()),
           );
         }
 
-        return Scaffold(
-          appBar: AppBar(title: Text('No Data')),
-          body: Center(child: Text('No Data')),
-        );
+        if (error != null) {
+          return Scaffold(
+            appBar: AppBar(title: Text('Error')),
+            body: Center(child: Text(error.toString())),
+          );
+        }
+
+        if (data == null) {
+          return Scaffold(
+            appBar: AppBar(title: Text('No Data')),
+            body: Center(child: Text('No Data')),
+          );
+        }
+
+        return _content(context, data);
       },
     );
   }
 
   Widget _content(BuildContext context, EntryModel data) {
-    final theme = Theme.of(context);
+    return AnimatedBuilder(
+      animation: Listenable.merge([keyword, isSearchMode]),
+      builder: (context, _) {
+        final theme = Theme.of(context);
 
-    final tabs = data.tabs(
-      context,
-      searchTerm: keyword.value.isEmpty ? null : keyword.value,
-    );
+        final tabs = data.tabs(
+          context,
+          searchTerm: keyword.value.isEmpty ? null : keyword.value,
+        );
 
-    return DefaultTabController(
-      length: data.tabLength(context),
-      child: Scaffold(
-        appBar: _appBar(context, theme, data, tabs),
-        body: SafeArea(child: TabBarView(children: tabs.values.toList())),
-      ),
+        return DefaultTabController(
+          length: data.tabLength(context),
+          child: Scaffold(
+            appBar: _appBar(context, theme, data, tabs),
+            body: SafeArea(child: TabBarView(children: tabs.values.toList())),
+          ),
+        );
+      },
     );
   }
 
