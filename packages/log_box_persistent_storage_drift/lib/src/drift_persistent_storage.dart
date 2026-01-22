@@ -19,7 +19,14 @@ class DriftPersistentStorage extends PersistentDataStorage {
        _decoder = decoder;
 
   @override
-  Future<void> add({required EntryModel log}) => _dao.add(log: log);
+  Future<void> add({required EntryModel log}) async {
+    final result = await _dao.fetch(refId: log.id, limit: 1);
+    final existing = result.firstOrNull;
+    if (existing == null) return _dao.add(log: log);
+    final data = _transform(existing);
+    if (data == null) return _dao.add(log: log);
+    return _dao.add(log: data.merge(log));
+  }
 
   @override
   Future<void> clear() => _dao.clear();
