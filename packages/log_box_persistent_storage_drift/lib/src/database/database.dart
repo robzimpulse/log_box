@@ -7,9 +7,9 @@ import 'executor/base.dart';
 part 'database.g.dart';
 
 @DriftDatabase(tables: [DataTables], daos: [DataDao])
-class AppDatabase extends _$AppDatabase {
+class LogBoxPersistentDatabase extends _$LogBoxPersistentDatabase {
 
-  AppDatabase({required Executor executor}) : super(executor.executor);
+  LogBoxPersistentDatabase({required Executor executor}) : super(executor.executor);
 
   @override
   int get schemaVersion => 1;

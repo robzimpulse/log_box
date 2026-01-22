@@ -390,11 +390,12 @@ class DataTablesCompanion extends UpdateCompanion<DataDrift> {
   }
 }
 
-abstract class _$AppDatabase extends GeneratedDatabase {
-  _$AppDatabase(QueryExecutor e) : super(e);
-  $AppDatabaseManager get managers => $AppDatabaseManager(this);
+abstract class _$LogBoxPersistentDatabase extends GeneratedDatabase {
+  _$LogBoxPersistentDatabase(QueryExecutor e) : super(e);
+  $LogBoxPersistentDatabaseManager get managers =>
+      $LogBoxPersistentDatabaseManager(this);
   late final $DataTablesTable dataTables = $DataTablesTable(this);
-  late final DataDao dataDao = DataDao(this as AppDatabase);
+  late final DataDao dataDao = DataDao(this as LogBoxPersistentDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -422,7 +423,7 @@ typedef $$DataTablesTableUpdateCompanionBuilder =
     });
 
 class $$DataTablesTableFilterComposer
-    extends Composer<_$AppDatabase, $DataTablesTable> {
+    extends Composer<_$LogBoxPersistentDatabase, $DataTablesTable> {
   $$DataTablesTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -462,7 +463,7 @@ class $$DataTablesTableFilterComposer
 }
 
 class $$DataTablesTableOrderingComposer
-    extends Composer<_$AppDatabase, $DataTablesTable> {
+    extends Composer<_$LogBoxPersistentDatabase, $DataTablesTable> {
   $$DataTablesTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -502,7 +503,7 @@ class $$DataTablesTableOrderingComposer
 }
 
 class $$DataTablesTableAnnotationComposer
-    extends Composer<_$AppDatabase, $DataTablesTable> {
+    extends Composer<_$LogBoxPersistentDatabase, $DataTablesTable> {
   $$DataTablesTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -532,7 +533,7 @@ class $$DataTablesTableAnnotationComposer
 class $$DataTablesTableTableManager
     extends
         RootTableManager<
-          _$AppDatabase,
+          _$LogBoxPersistentDatabase,
           $DataTablesTable,
           DataDrift,
           $$DataTablesTableFilterComposer,
@@ -542,13 +543,19 @@ class $$DataTablesTableTableManager
           $$DataTablesTableUpdateCompanionBuilder,
           (
             DataDrift,
-            BaseReferences<_$AppDatabase, $DataTablesTable, DataDrift>,
+            BaseReferences<
+              _$LogBoxPersistentDatabase,
+              $DataTablesTable,
+              DataDrift
+            >,
           ),
           DataDrift,
           PrefetchHooks Function()
         > {
-  $$DataTablesTableTableManager(_$AppDatabase db, $DataTablesTable table)
-    : super(
+  $$DataTablesTableTableManager(
+    _$LogBoxPersistentDatabase db,
+    $DataTablesTable table,
+  ) : super(
         TableManagerState(
           db: db,
           table: table,
@@ -600,7 +607,7 @@ class $$DataTablesTableTableManager
 
 typedef $$DataTablesTableProcessedTableManager =
     ProcessedTableManager<
-      _$AppDatabase,
+      _$LogBoxPersistentDatabase,
       $DataTablesTable,
       DataDrift,
       $$DataTablesTableFilterComposer,
@@ -608,14 +615,17 @@ typedef $$DataTablesTableProcessedTableManager =
       $$DataTablesTableAnnotationComposer,
       $$DataTablesTableCreateCompanionBuilder,
       $$DataTablesTableUpdateCompanionBuilder,
-      (DataDrift, BaseReferences<_$AppDatabase, $DataTablesTable, DataDrift>),
+      (
+        DataDrift,
+        BaseReferences<_$LogBoxPersistentDatabase, $DataTablesTable, DataDrift>,
+      ),
       DataDrift,
       PrefetchHooks Function()
     >;
 
-class $AppDatabaseManager {
-  final _$AppDatabase _db;
-  $AppDatabaseManager(this._db);
+class $LogBoxPersistentDatabaseManager {
+  final _$LogBoxPersistentDatabase _db;
+  $LogBoxPersistentDatabaseManager(this._db);
   $$DataTablesTableTableManager get dataTables =>
       $$DataTablesTableTableManager(_db, _db.dataTables);
 }

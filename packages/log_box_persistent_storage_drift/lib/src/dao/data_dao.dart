@@ -19,7 +19,7 @@ part 'data_dao.g.dart';
     ''',
   },
 )
-class DataDao extends DatabaseAccessor<AppDatabase> with _$DataDaoMixin {
+class DataDao extends DatabaseAccessor<LogBoxPersistentDatabase> with _$DataDaoMixin {
   DataDao(super.db);
 
   Future<void> add({required EntryModel log}) {

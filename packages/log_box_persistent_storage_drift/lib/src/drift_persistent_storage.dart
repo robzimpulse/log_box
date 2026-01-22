@@ -15,7 +15,7 @@ class DriftPersistentStorage extends PersistentDataStorage {
   DriftPersistentStorage({
     required Executor executor,
     MapObjectDecoder? decoder,
-  }) : _dao = DataDao(AppDatabase(executor: executor)),
+  }) : _dao = DataDao(LogBoxPersistentDatabase(executor: executor)),
        _decoder = decoder;
 
   @override

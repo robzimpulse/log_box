@@ -3,7 +3,7 @@
 part of 'data_dao.dart';
 
 // ignore_for_file: type=lint
-mixin _$DataDaoMixin on DatabaseAccessor<AppDatabase> {
+mixin _$DataDaoMixin on DatabaseAccessor<LogBoxPersistentDatabase> {
   $DataTablesTable get dataTables => attachedDatabase.dataTables;
   Selectable<LatestDistinctRowByTypeResult> latestDistinctRowByType() {
     return customSelect(
