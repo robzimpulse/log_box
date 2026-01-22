@@ -54,19 +54,23 @@ abstract class PersistentDataStorage extends PagingSource<Cursor, EntryModel> {
   @override
   Future<LoadResult<Cursor, EntryModel>> load(LoadParams<Cursor> params) async {
     try {
-      final cursor = params.key ?? Cursor();
-      final result = await fetch(cursor: cursor, limit: params.loadSize);
-      return LoadResult.page(
-        items: result,
-        nextKey: cursor.copyWith(
-          id: result.lastOrNull?.id,
-          direction: PageDirection.after,
-        ),
-        prevKey: cursor.copyWith(
-          id: result.firstOrNull?.id,
-          direction: PageDirection.before,
-        ),
-      );
+      final curr = params.key ?? Cursor();
+      Cursor? next;
+      Cursor? prev;
+
+      final result = await fetch(cursor: curr, limit: params.loadSize);
+      final nextId = result.lastOrNull?.id;
+      final prevId = result.firstOrNull?.id;
+
+      if (nextId != null) {
+        next = curr.copyWith(id: nextId, direction: PageDirection.after);
+      }
+
+      if (prevId != null) {
+        prev = curr.copyWith(id: prevId, direction: PageDirection.before);
+      }
+
+      return LoadResult.page(items: result, nextKey: next, prevKey: prev);
     } catch (e) {
       return LoadResult.error(e);
     }
