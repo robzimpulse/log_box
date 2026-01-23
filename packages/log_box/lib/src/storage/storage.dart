@@ -23,7 +23,24 @@ class Storage {
   PersistentDataStorage? get persistentStorage => _persistentDataStorage;
 
   /// Adding entry
-  void add({required EntryModel log}) => _liveDataStorage.add(log: log);
+  void add({required EntryModel log}) async {
+    final persistence = persistentStorage;
+    if (persistence == null) {
+      _liveDataStorage.add(log: log);
+      return;
+    }
+
+    final existing = await persistence
+        .fetch(cursor: Cursor(id: log.id), limit: 1)
+        .then((e) => e.firstOrNull);
+
+    if (existing == null) {
+      _liveDataStorage.add(log: log);
+      return;
+    }
+
+    await persistence.add(log: log);
+  }
 
   /// Clear all entry
   void clear() {
