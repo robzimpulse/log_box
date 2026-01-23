@@ -36,11 +36,22 @@ abstract class PersistentDataStorage extends PagingSource<Cursor, EntryModel> {
   /// Adding entry
   Future<void> add({required EntryModel log});
 
-  /// fetch entry with [param] and limit [limit]
+  /// fetch entry with [param] and limit [limit], this will return previous or
+  /// next data based on [cursor.direction] with limit [limit].
   Future<List<EntryModel>> fetch({required Cursor cursor, int limit = 20});
 
+  /// watch entry with [param] and limit [limit], this will return previous or
+  /// next data based on [cursor.direction] with limit [limit].
+  Stream<List<EntryModel>> fetchStream({
+    required Cursor cursor,
+    int limit = 20,
+  });
+
   /// Listen to entry with [id]
-  Stream<EntryModel> stream(String id);
+  Stream<EntryModel> getStream(String id);
+
+  /// get to entry with [id]
+  Future<EntryModel?> get(String id);
 
   /// get all data types of entry
   Stream<Map<String, Type>> get types;
@@ -55,12 +66,30 @@ abstract class PersistentDataStorage extends PagingSource<Cursor, EntryModel> {
   Future<LoadResult<Cursor, EntryModel>> load(LoadParams<Cursor> params) async {
     try {
       final curr = params.key ?? Cursor();
+      List<EntryModel> result;
+      String? nextId;
       Cursor? next;
+      String? prevId;
       Cursor? prev;
 
-      final result = await fetch(cursor: curr, limit: params.loadSize);
-      final nextId = result.lastOrNull?.id;
-      final prevId = result.firstOrNull?.id;
+      result = await fetch(cursor: curr, limit: params.loadSize);
+      nextId = result.lastOrNull?.id;
+      prevId = result.firstOrNull?.id;
+
+      if (result.isEmpty && curr.direction == PageDirection.before) {
+        final stream = fetchStream(cursor: curr, limit: params.loadSize);
+        result = await stream.firstWhere((e) => e.isNotEmpty);
+        nextId = result.lastOrNull?.id;
+        prevId = result.firstOrNull?.id;
+      }
+
+      // print('''
+      // Load:
+      //   Current: ${curr.json()}
+      //   Next: ${next?.json()}
+      //   Prev: ${prev?.json()}
+      //   Results: ${result.map((e) => e.id)}
+      // ''');
 
       if (nextId != null) {
         next = curr.copyWith(id: nextId, direction: PageDirection.after);

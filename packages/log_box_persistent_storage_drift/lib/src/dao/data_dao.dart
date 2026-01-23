@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
@@ -39,7 +40,7 @@ class DataDao extends DatabaseAccessor<LogBoxPersistentDatabase>
 
   Future<void> clear() => transaction(() => delete(dataTables).go());
 
-  Future<List<DataDrift>> fetch({
+  Future<SimpleSelectStatement<$DataTablesTable, DataDrift>> selector({
     String? refId,
     String? keyword,
     Set<String>? types,
@@ -78,14 +79,9 @@ class DataDao extends DatabaseAccessor<LogBoxPersistentDatabase>
     }
 
     if (refId != null && refId.isNotEmpty) {
-      final cursorSelector = selectOnly(dataTables)
-        ..addColumns([dataTables.id, dataTables.createdAt])
-        ..where(dataTables.uid.equals(refId))
-        ..limit(1);
-
-      final cursor = await cursorSelector.getSingleOrNull();
-      final cursorId = cursor?.read(dataTables.id);
-      final cursorCreatedAt = cursor?.read(dataTables.createdAt);
+      final cursor = await get(refId);
+      final cursorId = cursor?.id;
+      final cursorCreatedAt = cursor?.createdAt;
 
       if (cursorId != null && cursorCreatedAt != null) {
         selector.where((t) {
@@ -103,13 +99,62 @@ class DataDao extends DatabaseAccessor<LogBoxPersistentDatabase>
         });
       }
     }
+    return selector;
+  }
 
-    return selector.get().then((e) {
+  Stream<List<DataDrift>> watchFetch({
+    String? refId,
+    String? keyword,
+    Set<String>? types,
+    bool fetchBefore = false,
+    int limit = 20,
+  }) {
+    final controller = StreamController<List<DataDrift>>();
+
+    final query = selector(
+      refId: refId,
+      keyword: keyword,
+      types: types,
+      fetchBefore: fetchBefore,
+      limit: limit,
+    );
+
+    query
+        .then((e) => e.watch().map((e) => fetchBefore ? [...e.reversed] : e))
+        .then((e) => controller.addStream(e));
+
+    return controller.stream;
+  }
+
+  Future<List<DataDrift>> fetch({
+    String? refId,
+    String? keyword,
+    Set<String>? types,
+    bool fetchBefore = false,
+    int limit = 20,
+  }) async {
+    final query = await selector(
+      refId: refId,
+      keyword: keyword,
+      types: types,
+      fetchBefore: fetchBefore,
+      limit: limit,
+    );
+
+    return query.get().then((e) {
       // 4. Post-Processing
       // If we fetched "Before", the DB gave us [Oldest -> Newest].
       // We must reverse it to maintain the UI order [Newest -> Oldest].
       return fetchBefore ? [...e.reversed] : e;
     });
+  }
+
+  Future<DataDrift?> get(String id) {
+    final selector = select(dataTables)
+      ..where((t) => t.uid.equals(id))
+      ..limit(1);
+
+    return selector.getSingleOrNull();
   }
 
   Stream<DataDrift> single(String uid) {

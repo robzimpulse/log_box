@@ -30,9 +30,7 @@ class Storage {
       return;
     }
 
-    final existing = await persistence
-        .fetch(cursor: Cursor(id: log.id), limit: 1)
-        .then((e) => e.firstOrNull);
+    final existing = await persistence.get(log.id);
 
     if (existing == null) {
       _liveDataStorage.add(log: log);
@@ -67,7 +65,7 @@ class Storage {
       final storage = persistentStorage;
       if (storage != null) {
         controller
-            .addStream(storage.stream(id))
+            .addStream(storage.getStream(id))
             .then((_) => controller.close());
         return;
       }

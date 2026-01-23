@@ -20,8 +20,7 @@ class DriftPersistentStorage extends PersistentDataStorage {
 
   @override
   Future<void> add({required EntryModel log}) async {
-    final result = await _dao.fetch(refId: log.id, limit: 1);
-    final existing = result.firstOrNull;
+    final existing = await _dao.get(log.id);
     if (existing == null) return _dao.add(log: log);
     final data = _transform(existing);
     if (data == null) return _dao.add(log: log);
@@ -48,8 +47,26 @@ class DriftPersistentStorage extends PersistentDataStorage {
   }
 
   @override
-  Stream<EntryModel> stream(String id) {
+  Stream<List<EntryModel>> fetchStream({required Cursor cursor, int limit = 20}) {
+    final stream = _dao.watchFetch(
+      refId: cursor.id,
+      types: cursor.types.toSet(),
+      keyword: cursor.keyword,
+      fetchBefore: cursor.direction == PageDirection.before,
+      limit: limit,
+    );
+
+    return stream.map((e) => e.map(_transform).nonNulls.toList());
+  }
+
+  @override
+  Stream<EntryModel> getStream(String id) {
     return _dao.single(id).transform(_transformer);
+  }
+
+  @override
+  Future<EntryModel?> get(String id) {
+    return _dao.get(id).then((e) => e == null ? null : _transform(e));
   }
 
   @override
