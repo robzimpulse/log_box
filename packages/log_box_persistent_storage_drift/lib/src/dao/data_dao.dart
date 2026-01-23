@@ -19,7 +19,8 @@ part 'data_dao.g.dart';
     ''',
   },
 )
-class DataDao extends DatabaseAccessor<LogBoxPersistentDatabase> with _$DataDaoMixin {
+class DataDao extends DatabaseAccessor<LogBoxPersistentDatabase>
+    with _$DataDaoMixin {
   DataDao(super.db);
 
   Future<void> add({required EntryModel log}) {
@@ -30,7 +31,9 @@ class DataDao extends DatabaseAccessor<LogBoxPersistentDatabase> with _$DataDaoM
         json: Value(jsonEncode(log.toJson())),
       );
 
-      await into(dataTables).insert(companion, mode: InsertMode.insertOrReplace);
+      await into(
+        dataTables,
+      ).insert(companion, mode: InsertMode.insertOrReplace);
     });
   }
 
@@ -69,7 +72,7 @@ class DataDao extends DatabaseAccessor<LogBoxPersistentDatabase> with _$DataDaoM
     if (types != null && types.isNotEmpty) {
       selector.where((t) => t.type.isIn(types));
     }
-    
+
     if (keyword != null && keyword.isNotEmpty) {
       selector.where((t) => t.json.like('%$keyword%'));
     }
@@ -84,23 +87,21 @@ class DataDao extends DatabaseAccessor<LogBoxPersistentDatabase> with _$DataDaoM
       final cursorId = cursor?.read(dataTables.id);
       final cursorCreatedAt = cursor?.read(dataTables.createdAt);
 
-      if (cursorId == null || cursorCreatedAt == null) {
-        return [];
+      if (cursorId != null && cursorCreatedAt != null) {
+        selector.where((t) {
+          if (fetchBefore) {
+            // "Previous" logic
+            return t.createdAt.isBiggerThanValue(cursorCreatedAt) |
+                (t.createdAt.equals(cursorCreatedAt) &
+                    t.id.isBiggerThanValue(cursorId));
+          } else {
+            // "Next" logic
+            return t.createdAt.isSmallerThanValue(cursorCreatedAt) |
+                (t.createdAt.equals(cursorCreatedAt) &
+                    t.id.isSmallerThanValue(cursorId));
+          }
+        });
       }
-
-      selector.where((t) {
-        if (fetchBefore) {
-          // "Previous" logic
-          return t.createdAt.isBiggerThanValue(cursorCreatedAt) |
-              (t.createdAt.equals(cursorCreatedAt) &
-                  t.id.isBiggerThanValue(cursorId));
-        } else {
-          // "Next" logic
-          return t.createdAt.isSmallerThanValue(cursorCreatedAt) |
-              (t.createdAt.equals(cursorCreatedAt) &
-                  t.id.isSmallerThanValue(cursorId));
-        }
-      });
     }
 
     return selector.get().then((e) {
