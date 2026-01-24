@@ -10,7 +10,9 @@ part 'navigation_entry_model.g.dart';
 class NavigationEntryModel extends EntryModel {
   final NavigationAction action;
   final String? route;
+  final String? argument;
   final String? previousRoute;
+  final String? previousArgument;
 
   NavigationEntryModel({
     super.id,
@@ -18,6 +20,8 @@ class NavigationEntryModel extends EntryModel {
     required this.action,
     this.route,
     this.previousRoute,
+    this.argument,
+    this.previousArgument,
   });
 
   @override
@@ -28,11 +32,107 @@ class NavigationEntryModel extends EntryModel {
   }
 
   @override
-  int tabLength(BuildContext context) => 0;
+  int tabLength(BuildContext context) => 2;
 
   @override
   Map<Tab, Widget> tabs(BuildContext context, {String? searchTerm}) {
-    return {};
+    return Map.fromEntries([
+      _overview(context, searchTerm: searchTerm),
+      _details(context, searchTerm: searchTerm),
+    ]);
+  }
+
+  MapEntry<Tab, Widget> _overview(BuildContext context, {String? searchTerm}) {
+    return MapEntry(
+      const Tab(
+        text: 'Overview',
+        icon: Icon(Icons.info, color: Colors.white),
+      ),
+      CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(child: SizedBox(height: 8)),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverToBoxAdapter(
+              child: HumanReadableWidget(
+                name: 'Action',
+                value: action.name,
+                searchTerm: searchTerm,
+              ),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverToBoxAdapter(
+              child: HumanReadableWidget(
+                name: 'Timestamp',
+                value: timestamp.toIso8601String(),
+                searchTerm: searchTerm,
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(child: SizedBox(height: 8)),
+        ],
+      ),
+    );
+  }
+
+  MapEntry<Tab, Widget> _details(BuildContext context, {String? searchTerm}) {
+    return MapEntry(
+      const Tab(
+        text: 'Detail',
+        icon: Icon(Icons.list, color: Colors.white),
+      ),
+      CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(child: SizedBox(height: 8)),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverToBoxAdapter(
+              child: HumanReadableWidget(
+                name: 'From Route Name',
+                value: previousRoute,
+                searchTerm: searchTerm,
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(child: SizedBox(height: 8)),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverToBoxAdapter(
+              child: HumanReadableWidget(
+                name: 'From Route Arguments',
+                value: previousArgument,
+                searchTerm: searchTerm,
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(child: SizedBox(height: 8)),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverToBoxAdapter(
+              child: HumanReadableWidget(
+                name: 'To Route Name',
+                value: route,
+                searchTerm: searchTerm,
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(child: SizedBox(height: 8)),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverToBoxAdapter(
+              child: HumanReadableWidget(
+                name: 'To Route Arguments',
+                value: argument,
+                searchTerm: searchTerm,
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(child: SizedBox(height: 8)),
+        ],
+      ),
+    );
   }
 
   @override
@@ -81,7 +181,9 @@ class NavigationEntryModel extends EntryModel {
   bool contains(String keyword) {
     return [
       route?.toLowerCase().contains(keyword.toLowerCase()),
+      argument?.toLowerCase().contains(keyword.toLowerCase()),
       previousRoute?.toLowerCase().contains(keyword.toLowerCase()),
+      previousArgument?.toLowerCase().contains(keyword.toLowerCase()),
     ].nonNulls.contains(true);
   }
 
@@ -93,16 +195,25 @@ class NavigationEntryModel extends EntryModel {
     if (other is! NavigationEntryModel) return this;
     return copyWith(
       previousRoute: other.previousRoute ?? previousRoute,
+      previousArgument: other.previousArgument ?? previousArgument,
       route: other.route ?? route,
+      argument: other.argument ?? argument,
     );
   }
 
-  NavigationEntryModel copyWith({String? route, String? previousRoute}) {
+  NavigationEntryModel copyWith({
+    String? route,
+    String? argument,
+    String? previousRoute,
+    String? previousArgument,
+  }) {
     return NavigationEntryModel(
       id: id,
       timestamp: timestamp,
       action: action,
       route: route ?? this.route,
+      argument: argument ?? this.argument,
+      previousArgument: previousArgument ?? this.previousArgument,
       previousRoute: previousRoute ?? this.previousRoute,
     );
   }
