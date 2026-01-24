@@ -22,7 +22,7 @@ class InAppWebviewObserver {
         id: _id,
         uri: uri,
         html: html,
-        error: error,
+        error: error.toString(),
         loading: loading,
       ),
     );

@@ -15,7 +15,7 @@ class WebviewEntryModel extends EntryModel {
   final List<String> scripts;
   final List<WebviewEntryModelLog> events;
   final String? html;
-  final Object? error;
+  final String? error;
   final bool? loading;
 
   WebviewEntryModel({

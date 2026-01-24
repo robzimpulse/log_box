@@ -24,7 +24,7 @@ WebviewEntryModel _$WebviewEntryModelFromJson(
           .toList() ??
       const [],
   html: json['html'] as String?,
-  error: json['error'],
+  error: json['error'] as String?,
 );
 
 Map<String, dynamic> _$WebviewEntryModelToJson(WebviewEntryModel instance) =>
