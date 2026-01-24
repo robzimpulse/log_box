@@ -16,13 +16,20 @@ class InAppWebviewObserver {
     : _storage = storage,
       _id = const Uuid().v4();
 
-  void set({Uri? uri, String? html, Object? error, bool? loading}) {
+  void set({
+    Uri? uri,
+    String? html,
+    Object? error,
+    StackTrace? stackTrace,
+    bool? loading,
+  }) {
     _storage.add(
       log: WebviewEntryModel(
         id: _id,
         uri: uri,
         html: html,
         error: error.toString(),
+        stackTrace: stackTrace.toString(),
         loading: loading,
       ),
     );
