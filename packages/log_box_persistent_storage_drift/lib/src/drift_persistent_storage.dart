@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:log_box/log_box.dart';
+import 'package:log_box_persistent_storage_drift/src/model/drift_query_entry_model.dart';
 
 import 'dao/data_dao.dart';
 import 'database/database.dart';
@@ -10,13 +11,16 @@ import 'util/typedef.dart';
 
 class DriftPersistentStorage extends PersistentDataStorage {
   final DataDao _dao;
-  final MapObjectDecoder? _decoder;
+  final MapObjectDecoder _decoder;
 
   DriftPersistentStorage({
     required Executor executor,
     MapObjectDecoder? decoder,
   }) : _dao = DataDao(LogBoxPersistentDatabase(executor: executor)),
-       _decoder = decoder;
+       _decoder = {
+         (DriftQueryEntryModel).toString(): DriftQueryEntryModel.fromJson,
+         ...?decoder,
+       };
 
   @override
   Future<void> add({required EntryModel log}) async {
@@ -47,7 +51,10 @@ class DriftPersistentStorage extends PersistentDataStorage {
   }
 
   @override
-  Stream<List<EntryModel>> fetchStream({required Cursor cursor, int limit = 20}) {
+  Stream<List<EntryModel>> fetchStream({
+    required Cursor cursor,
+    int limit = 20,
+  }) {
     final stream = _dao.watchFetch(
       refId: cursor.id,
       types: cursor.types.toSet(),
@@ -95,7 +102,7 @@ class DriftPersistentStorage extends PersistentDataStorage {
   }
 
   EntryModel? _transform(DataDrift data) {
-    final decoder = _decoder?[data.type];
+    final decoder = _decoder[data.type];
     final json = data.json;
     if (json == null || decoder == null) return null;
     return decoder.call(jsonDecode(json));

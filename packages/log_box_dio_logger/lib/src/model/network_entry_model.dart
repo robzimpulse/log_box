@@ -118,7 +118,7 @@ class NetworkEntryModel extends EntryModel {
       }
     }
 
-    Widget status0(BuildContext context) {
+    Widget status(BuildContext context) {
       if (loading == true) {
         return const SizedBox(
           width: 16,
@@ -151,7 +151,7 @@ class NetworkEntryModel extends EntryModel {
           children: [
             Icon(Icons.public, size: 16, color: color()),
             const SizedBox(width: 8),
-            status0(context),
+            status(context),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
