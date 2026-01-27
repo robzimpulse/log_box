@@ -170,8 +170,8 @@ class _DetailScreenState extends State<DetailScreen> {
         ...data.menus(context, widget.box),
       ],
       bottom: TabBar(
-        labelColor: Colors.white,
-        unselectedLabelColor: Colors.white,
+        labelColor: theme.appBarTheme.foregroundColor,
+        unselectedLabelColor: theme.appBarTheme.foregroundColor,
         indicatorSize: TabBarIndicatorSize.tab,
         tabs: tabs.keys.toList(),
       ),

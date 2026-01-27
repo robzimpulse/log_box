@@ -15,7 +15,8 @@ class WebviewEntryModel extends EntryModel {
   final List<String> scripts;
   final List<WebviewEntryModelLog> events;
   final String? html;
-  final Object? error;
+  final String? error;
+  final String? stackTrace;
   final bool? loading;
 
   WebviewEntryModel({
@@ -27,6 +28,7 @@ class WebviewEntryModel extends EntryModel {
     this.events = const [],
     this.html,
     this.error,
+    this.stackTrace,
   });
 
   @override
@@ -61,6 +63,7 @@ class WebviewEntryModel extends EntryModel {
       events: [...other.events, ...events],
       html: other.html ?? html,
       error: other.error ?? error,
+      stackTrace: other.stackTrace ?? stackTrace,
     );
   }
 
@@ -124,7 +127,10 @@ class WebviewEntryModel extends EntryModel {
 
   MapEntry<Tab, Widget> _overview(BuildContext context, {String? searchTerm}) {
     return MapEntry(
-      const Tab(text: 'Overview', icon: Icon(Icons.info, color: Colors.white)),
+      const Tab(
+        text: 'Overview',
+        icon: Icon(Icons.info, color: Colors.white),
+      ),
       CustomScrollView(
         slivers: [
           SliverToBoxAdapter(child: SizedBox(height: 8)),
@@ -247,7 +253,10 @@ class WebviewEntryModel extends EntryModel {
     }
 
     return MapEntry(
-      const Tab(text: 'Events', icon: Icon(Icons.event, color: Colors.white)),
+      const Tab(
+        text: 'Events',
+        icon: Icon(Icons.event, color: Colors.white),
+      ),
       CustomScrollView(
         slivers: [
           SliverToBoxAdapter(child: SizedBox(height: 8)),
@@ -260,7 +269,10 @@ class WebviewEntryModel extends EntryModel {
 
   MapEntry<Tab, Widget> _html(BuildContext context, {String? searchTerm}) {
     return MapEntry(
-      const Tab(text: 'Html', icon: Icon(Icons.html, color: Colors.white)),
+      const Tab(
+        text: 'Html',
+        icon: Icon(Icons.html, color: Colors.white),
+      ),
       CustomScrollView(
         slivers: [
           SliverToBoxAdapter(child: SizedBox(height: 8)),
@@ -282,7 +294,10 @@ class WebviewEntryModel extends EntryModel {
 
   MapEntry<Tab, Widget> _error(BuildContext context, {String? searchTerm}) {
     return MapEntry(
-      const Tab(text: 'Error', icon: Icon(Icons.warning, color: Colors.white)),
+      const Tab(
+        text: 'Error',
+        icon: Icon(Icons.warning, color: Colors.white),
+      ),
       CustomScrollView(
         slivers: [
           SliverToBoxAdapter(child: SizedBox(height: 8)),
@@ -291,7 +306,17 @@ class WebviewEntryModel extends EntryModel {
             sliver: SliverToBoxAdapter(
               child: HumanReadableWidget(
                 name: 'Error',
-                value: error.toString(),
+                value: error,
+                searchTerm: searchTerm,
+              ),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            sliver: SliverToBoxAdapter(
+              child: HumanReadableWidget(
+                name: 'Stack Trace',
+                value: stackTrace,
                 searchTerm: searchTerm,
               ),
             ),

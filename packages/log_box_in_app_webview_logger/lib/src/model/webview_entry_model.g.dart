@@ -24,7 +24,8 @@ WebviewEntryModel _$WebviewEntryModelFromJson(
           .toList() ??
       const [],
   html: json['html'] as String?,
-  error: json['error'],
+  error: json['error'] as String?,
+  stackTrace: json['stack_trace'] as String?,
 );
 
 Map<String, dynamic> _$WebviewEntryModelToJson(WebviewEntryModel instance) =>
@@ -36,5 +37,6 @@ Map<String, dynamic> _$WebviewEntryModelToJson(WebviewEntryModel instance) =>
       'events': instance.events.map((e) => e.toJson()).toList(),
       'html': instance.html,
       'error': instance.error,
+      'stack_trace': instance.stackTrace,
       'loading': instance.loading,
     };
