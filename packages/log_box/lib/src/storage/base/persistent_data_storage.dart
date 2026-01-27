@@ -83,14 +83,6 @@ abstract class PersistentDataStorage extends PagingSource<Cursor, EntryModel> {
         prevId = result.firstOrNull?.id;
       }
 
-      // print('''
-      // Load:
-      //   Current: ${curr.json()}
-      //   Next: ${next?.json()}
-      //   Prev: ${prev?.json()}
-      //   Results: ${result.map((e) => e.id)}
-      // ''');
-
       if (nextId != null) {
         next = curr.copyWith(id: nextId, direction: PageDirection.after);
       }
