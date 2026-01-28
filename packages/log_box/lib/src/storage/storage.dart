@@ -61,7 +61,7 @@ class Storage {
 
     return CombineLatestStream.combine2(
       value,
-      persistentStorage.getStream(id),
+      persistentStorage.getStream(id).whereNotNull(),
       (a, b) => a ?? b,
     );
   }

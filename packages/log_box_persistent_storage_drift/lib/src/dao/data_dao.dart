@@ -157,12 +157,12 @@ class DataDao extends DatabaseAccessor<LogBoxPersistentDatabase>
     return selector.getSingleOrNull();
   }
 
-  Stream<DataDrift> single(String uid) {
+  Stream<DataDrift?> single(String uid) {
     final selector = select(dataTables)
       ..where((t) => t.uid.equals(uid))
       ..limit(1);
 
-    return selector.watchSingle();
+    return selector.watchSingleOrNull();
   }
 
   Stream<List<DataDrift>> get latestDistinctByType {

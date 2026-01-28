@@ -48,7 +48,7 @@ abstract class PersistentDataStorage extends PagingSource<Cursor, EntryModel> {
   });
 
   /// Listen to entry with [id]
-  Stream<EntryModel> getStream(String id);
+  Stream<EntryModel?> getStream(String id);
 
   /// get to entry with [id]
   Future<EntryModel?> get(String id);

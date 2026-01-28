@@ -67,7 +67,7 @@ class DriftPersistentStorage extends PersistentDataStorage {
   }
 
   @override
-  Stream<EntryModel> getStream(String id) {
+  Stream<EntryModel?> getStream(String id) {
     return _dao.single(id).transform(_transformer);
   }
 
