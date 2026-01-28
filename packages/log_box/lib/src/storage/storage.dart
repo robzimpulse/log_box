@@ -1,5 +1,8 @@
 import 'dart:async';
 
+import 'package:log_box/src/extension/change_notifier_selector_stream.dart';
+import 'package:rxdart/rxdart.dart';
+
 import '../model/entry_model.dart';
 import 'base/live_data_storage.dart';
 import 'base/persistent_data_storage.dart';
@@ -47,46 +50,20 @@ class Storage {
   }
 
   Stream<EntryModel> stream(String id) {
-    late StreamController<EntryModel> controller;
-
-    // Define the listener function
-    void listener() {
-      final value = liveStorage.data.where((e) => e.id == id).firstOrNull;
-
-      // feed forward data from [liveStorage] to controller if exists
-      if (value != null) {
-        controller.add(value);
-        return;
-      }
-
-      liveStorage.removeListener(listener);
-
-      // passing the value from [persistentStorage] if exists
-      final storage = persistentStorage;
-      if (storage != null) {
-        controller
-            .addStream(storage.getStream(id))
-            .then((_) => controller.close());
-        return;
-      }
-
-      // close the controller if no [persistentStorage]
-      controller.close();
-    }
-
-    controller = StreamController(
-      onListen: () {
-        // Immediately emit the current value when someone listens
-        listener();
-        liveStorage.addListener(listener);
-      },
-      onCancel: () {
-        // Clean up the listener when the subscription ends
-        liveStorage.removeListener(listener);
-      },
+    final value = liveStorage.stream(
+      () => liveStorage.data.where((e) => e.id == id).firstOrNull,
     );
 
-    return controller.stream;
+    final persistentStorage = this.persistentStorage;
+    if (persistentStorage == null) {
+      return value.whereNotNull();
+    }
+
+    return CombineLatestStream.combine2(
+      value,
+      persistentStorage.getStream(id),
+      (a, b) => a ?? b,
+    );
   }
 
   /// dispose the storage
