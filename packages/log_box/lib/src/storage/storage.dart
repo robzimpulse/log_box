@@ -50,20 +50,14 @@ class Storage {
   }
 
   Stream<EntryModel> stream(String id) {
-    final value = liveStorage.stream(
-      () => liveStorage.data.where((e) => e.id == id).firstOrNull,
-    );
-
-    final persistentStorage = this.persistentStorage;
-    if (persistentStorage == null) {
-      return value.whereNotNull();
-    }
-
-    return CombineLatestStream.combine2(
-      value,
-      persistentStorage.getStream(id).whereNotNull(),
-      (a, b) => a ?? b,
-    );
+    return MergeStream([
+      ...[
+        liveStorage
+            .stream(() => liveStorage.data.where((e) => e.id == id).firstOrNull)
+            .whereNotNull(),
+        persistentStorage?.getStream(id).whereNotNull(),
+      ].nonNulls,
+    ]);
   }
 
   /// dispose the storage

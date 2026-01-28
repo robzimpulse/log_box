@@ -68,12 +68,12 @@ class DriftPersistentStorage extends PersistentDataStorage {
 
   @override
   Stream<EntryModel?> getStream(String id) {
-    return _dao.single(id).transform(_transformer);
+    return _dao.stream(id).transform(_transformer);
   }
 
   @override
   Future<EntryModel?> get(String id) {
-    return _dao.get(id).then((e) => e == null ? null : _transform(e));
+    return _dao.get(id).then(_transform);
   }
 
   @override
@@ -91,7 +91,7 @@ class DriftPersistentStorage extends PersistentDataStorage {
     });
   }
 
-  StreamTransformer<DataDrift, EntryModel> get _transformer {
+  StreamTransformer<DataDrift?, EntryModel> get _transformer {
     return StreamTransformer.fromHandlers(
       handleData: (data, sink) {
         final log = _transform(data);
@@ -101,9 +101,9 @@ class DriftPersistentStorage extends PersistentDataStorage {
     );
   }
 
-  EntryModel? _transform(DataDrift data) {
-    final decoder = _decoder[data.type];
-    final json = data.json;
+  EntryModel? _transform(DataDrift? data) {
+    final decoder = _decoder[data?.type];
+    final json = data?.json;
     if (json == null || decoder == null) return null;
     return decoder.call(jsonDecode(json));
   }
