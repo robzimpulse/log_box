@@ -1,14 +1,23 @@
 import 'dart:async';
 
-import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:log_box/log_box.dart';
-import 'package:log_box_persistent_storage_drift/src/model/drift_query_entry_model.dart';
+
+import '../model/drift_query_entry_model.dart';
+import '../model/drift_query_operation_model.dart';
+import '../extension/string_format_extension.dart';
 
 class DriftQueryInterceptor extends QueryInterceptor {
   final Storage _storage;
+  DriftQueryEntryModel? _current;
 
   DriftQueryInterceptor({required Storage storage}) : _storage = storage;
+
+  void _add(DriftQueryOperationModel model) {
+    _current = (_current ?? DriftQueryEntryModel()).copyWith(
+      operations: [model],
+    );
+  }
 
   Future<T> _run<T>({
     required String description,
@@ -17,12 +26,9 @@ class DriftQueryInterceptor extends QueryInterceptor {
     required FutureOr<T> Function() operation,
   }) async {
     final stopwatch = Stopwatch()..start();
-    var model = DriftQueryEntryModel(
+    var model = DriftQueryOperationModel.create(
       operation: description,
-      statement: statement,
-      arguments: Map.fromEntries([
-        ...?args?.mapIndexed((i, e) => MapEntry('$i', e.toString())),
-      ]),
+      statement: statement?.interpolate([...?args?.nonNulls]),
     );
     try {
       return await operation();
@@ -30,14 +36,17 @@ class DriftQueryInterceptor extends QueryInterceptor {
       model = model.copyWith(error: e.toString(), stackTrace: st.toString());
       rethrow;
     } finally {
-      _storage.add(log: model.copyWith(duration: stopwatch.elapsed));
+      _add(model.copyWith(duration: stopwatch.elapsed));
       stopwatch.stop();
     }
   }
 
   @override
   TransactionExecutor beginTransaction(QueryExecutor parent) {
-    _storage.add(log: DriftQueryEntryModel(operation: 'Begin'));
+    final data = _current;
+    if (data != null) _storage.add(log: data);
+    _current = null;
+    _add(DriftQueryOperationModel.create(operation: 'Begin'));
     return super.beginTransaction(parent);
   }
 

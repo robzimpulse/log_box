@@ -1,34 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:log_box/log_box.dart';
+import 'package:log_box_persistent_storage_drift/src/model/drift_query_operation_model.dart';
 
 part 'drift_query_entry_model.g.dart';
 
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class DriftQueryEntryModel extends EntryModel {
-  final String? operation;
-  final String? statement;
-  final Duration? duration;
-  final Map<String, dynamic>? arguments;
-  final String? error;
-  final String? stackTrace;
+  final List<DriftQueryOperationModel>? operations;
+  final bool? loading;
+
+  List<String> get operation {
+    return [...?operations?.map((e) => e.operation).nonNulls];
+  }
+
+  List<Duration> get duration {
+    return [...?operations?.map((e) => e.duration).nonNulls];
+  }
 
   DriftQueryEntryModel({
     super.id,
     super.timestamp,
-    this.operation,
-    this.statement,
-    this.duration,
-    this.arguments,
-    this.error,
-    this.stackTrace,
+    this.operations,
+    this.loading,
   });
 
   @override
   bool contains(String keyword) {
     return [
-      statement?.toLowerCase().contains(keyword.toLowerCase()) ?? false,
-      operation?.toLowerCase().contains(keyword.toLowerCase()) ?? false,
+      ...?operations?.map((e) => e.contains(keyword)).nonNulls,
     ].contains(true);
   }
 
@@ -38,45 +38,29 @@ class DriftQueryEntryModel extends EntryModel {
   @override
   DriftQueryEntryModel merge(other) {
     if (other is! DriftQueryEntryModel) return this;
-    return copyWith(
-      operation: other.operation,
-      statement: other.statement,
-      duration: other.duration,
-      arguments: other.arguments,
-      error: other.error,
-      stackTrace: other.stackTrace,
-    );
+    return copyWith(operations: other.operations, loading: other.loading);
   }
 
   DriftQueryEntryModel copyWith({
-    String? operation,
-    String? statement,
-    Duration? duration,
-    Map<String, dynamic>? arguments,
-    String? error,
-    String? stackTrace,
+    List<DriftQueryOperationModel>? operations,
+    bool? loading,
   }) {
     return DriftQueryEntryModel(
       id: id,
       timestamp: timestamp,
-      operation: operation ?? this.operation,
-      statement: statement ?? this.statement,
-      duration: duration ?? this.duration,
-      arguments: {...?arguments, ...?this.arguments},
-      error: error ?? this.error,
-      stackTrace: stackTrace ?? this.stackTrace,
+      operations: [...?operations, ...?this.operations],
+      loading: loading ?? this.loading,
     );
   }
 
   @override
-  int tabLength(BuildContext context) => 3;
+  int tabLength(BuildContext context) => 2;
 
   @override
   Map<Tab, Widget> tabs(BuildContext context, {String? searchTerm}) {
     return Map.fromEntries([
       _overview(context, searchTerm: searchTerm),
-      _details(context, searchTerm: searchTerm),
-      _errors(context, searchTerm: searchTerm),
+      _events(context, searchTerm: searchTerm),
     ]);
   }
 
@@ -94,7 +78,7 @@ class DriftQueryEntryModel extends EntryModel {
             sliver: SliverToBoxAdapter(
               child: HumanReadableWidget(
                 name: 'Operation',
-                value: operation,
+                value: operation.join(' > '),
                 searchTerm: searchTerm,
               ),
             ),
@@ -104,7 +88,7 @@ class DriftQueryEntryModel extends EntryModel {
             sliver: SliverToBoxAdapter(
               child: HumanReadableWidget(
                 name: 'Duration',
-                value: duration.toString(),
+                value: '${duration.fold(Duration.zero, (a, b) => a + b)}',
                 searchTerm: searchTerm,
               ),
             ),
@@ -125,7 +109,8 @@ class DriftQueryEntryModel extends EntryModel {
     );
   }
 
-  MapEntry<Tab, Widget> _details(BuildContext context, {String? searchTerm}) {
+  MapEntry<Tab, Widget> _events(BuildContext context, {String? searchTerm}) {
+    final items = operations?.reversed;
     return MapEntry(
       const Tab(
         text: 'Detail',
@@ -134,60 +119,11 @@ class DriftQueryEntryModel extends EntryModel {
       CustomScrollView(
         slivers: [
           SliverToBoxAdapter(child: SizedBox(height: 8)),
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            sliver: SliverToBoxAdapter(
-              child: HumanReadableWidget(
-                name: 'Statement',
-                value: statement,
-                searchTerm: searchTerm,
-              ),
-            ),
-          ),
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            sliver: SliverToBoxAdapter(
-              child: HumanReadableWidget(
-                name: 'Extra',
-                value: arguments?.json,
-                searchTerm: searchTerm,
-              ),
-            ),
-          ),
-          SliverToBoxAdapter(child: SizedBox(height: 8)),
-        ],
-      ),
-    );
-  }
-
-  MapEntry<Tab, Widget> _errors(BuildContext context, {String? searchTerm}) {
-    return MapEntry(
-      const Tab(
-        text: 'Error',
-        icon: Icon(Icons.warning, color: Colors.white),
-      ),
-      CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(child: SizedBox(height: 8)),
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            sliver: SliverToBoxAdapter(
-              child: HumanReadableWidget(
-                name: 'Error',
-                value: error,
-                searchTerm: searchTerm,
-              ),
-            ),
-          ),
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            sliver: SliverToBoxAdapter(
-              child: HumanReadableWidget(
-                name: 'Stack Trace',
-                value: stackTrace,
-                searchTerm: searchTerm,
-              ),
-            ),
+          SliverList.builder(
+            itemBuilder: (context, index) {
+              final item = items?.elementAtOrNull(index);
+              return item?.display(context, searchTerm: searchTerm);
+            },
           ),
           SliverToBoxAdapter(child: SizedBox(height: 8)),
         ],
@@ -197,16 +133,35 @@ class DriftQueryEntryModel extends EntryModel {
 
   @override
   Widget title(BuildContext context) {
-    final statement = this.statement;
     return Column(
       children: [
         Row(
           children: [
             Icon(Icons.storage, size: 16),
             const SizedBox(width: 8),
+            if (loading == true) ...[
+              const SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(),
+              ),
+              const SizedBox(width: 8),
+            ],
             Expanded(
               child: Text(
-                operation ?? 'Unknown Operation',
+                'Database Queries',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
+            ),
+          ],
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                operation.join('>'),
                 maxLines: 1,
                 style: Theme.of(context).textTheme.labelLarge,
                 overflow: TextOverflow.ellipsis,
@@ -214,19 +169,6 @@ class DriftQueryEntryModel extends EntryModel {
             ),
           ],
         ),
-        if (statement != null)
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  statement,
-                  maxLines: 2,
-                  style: Theme.of(context).textTheme.labelMedium,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
       ],
     );
   }

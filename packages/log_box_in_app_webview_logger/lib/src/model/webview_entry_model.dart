@@ -171,87 +171,7 @@ class WebviewEntryModel extends EntryModel {
   }
 
   MapEntry<Tab, Widget> _events(BuildContext context, {String? searchTerm}) {
-    final theme = Theme.of(context);
-
-    final slivers = [];
-    for (final event in events.reversed) {
-      final json = event.extra?.json;
-      if (json == null) {
-        slivers.add(
-          SliverToBoxAdapter(
-            child: ListTile(
-              visualDensity: VisualDensity.compact,
-              title: Text(
-                event.event.name,
-                maxLines: 1,
-                style: theme.textTheme.labelLarge,
-                overflow: TextOverflow.ellipsis,
-              ),
-              subtitle: Text(
-                event.timestamp.toIso8601String(),
-                style: theme.textTheme.labelSmall?.copyWith(color: Colors.grey),
-              ),
-            ),
-          ),
-        );
-      } else {
-        slivers.add(
-          SliverToBoxAdapter(
-            child: ExpansionTile(
-              visualDensity: VisualDensity.compact,
-              title: Row(
-                children: [
-                  Stack(
-                    alignment: Alignment.centerLeft,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(right: 12),
-                        child: Text(
-                          event.event.name,
-                          maxLines: 1,
-                          style: theme.textTheme.labelLarge,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      if (searchTerm != null && json.contains(searchTerm))
-                        Positioned(
-                          width: 6,
-                          height: 6,
-                          right: 0,
-                          top: 0,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.red,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                  Spacer(),
-                ],
-              ),
-              subtitle: Text(
-                event.timestamp.toIso8601String(),
-                style: theme.textTheme.labelSmall?.copyWith(color: Colors.grey),
-              ),
-              showTrailingIcon: event.extra?.json != null,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: HumanReadableWidget(
-                    name: 'Extra',
-                    value: json,
-                    searchTerm: searchTerm,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      }
-    }
-
+    final items = events.reversed;
     return MapEntry(
       const Tab(
         text: 'Events',
@@ -260,7 +180,12 @@ class WebviewEntryModel extends EntryModel {
       CustomScrollView(
         slivers: [
           SliverToBoxAdapter(child: SizedBox(height: 8)),
-          ...slivers,
+          SliverList.builder(
+            itemBuilder: (context, index) {
+              final item = items.elementAtOrNull(index);
+              return item?.display(context, searchTerm: searchTerm);
+            },
+          ),
           SliverToBoxAdapter(child: SizedBox(height: 8)),
         ],
       ),
