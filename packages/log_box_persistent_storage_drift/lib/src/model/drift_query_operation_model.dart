@@ -110,14 +110,14 @@ class DriftQueryOperationModel {
       ),
       subtitle: Row(
         children: [
-          Flexible(
+          Expanded(
             child: Text(
               timestamp.toIso8601String(),
               textAlign: TextAlign.start,
               style: theme.textTheme.labelSmall?.copyWith(color: Colors.grey),
             ),
           ),
-          Flexible(
+          Expanded(
             child: Text(
               duration.toString(),
               textAlign: TextAlign.end,
