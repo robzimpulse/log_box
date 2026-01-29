@@ -110,19 +110,18 @@ class DriftQueryOperationModel {
       ),
       subtitle: Row(
         children: [
-          Expanded(
-            child: Text(
-              timestamp.toIso8601String(),
-              textAlign: TextAlign.start,
-              style: theme.textTheme.labelSmall?.copyWith(color: Colors.grey),
-            ),
+          Text(
+            timestamp.toIso8601String(),
+            textAlign: TextAlign.start,
+            maxLines: 1,
+            style: theme.textTheme.labelSmall?.copyWith(color: Colors.grey),
           ),
-          Expanded(
-            child: Text(
-              duration.toString(),
-              textAlign: TextAlign.end,
-              style: theme.textTheme.labelSmall?.copyWith(color: Colors.grey),
-            ),
+          Spacer(),
+          Text(
+            duration.toString(),
+            textAlign: TextAlign.end,
+            maxLines: 1,
+            style: theme.textTheme.labelSmall?.copyWith(color: Colors.grey),
           ),
         ],
       ),

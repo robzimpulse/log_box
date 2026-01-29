@@ -171,7 +171,6 @@ class WebviewEntryModel extends EntryModel {
   }
 
   MapEntry<Tab, Widget> _events(BuildContext context, {String? searchTerm}) {
-    final items = events.reversed;
     return MapEntry(
       const Tab(
         text: 'Events',
@@ -182,7 +181,7 @@ class WebviewEntryModel extends EntryModel {
           SliverToBoxAdapter(child: SizedBox(height: 8)),
           SliverList.builder(
             itemBuilder: (context, index) {
-              final item = items.elementAtOrNull(index);
+              final item = events.elementAtOrNull(index);
               return item?.display(context, searchTerm: searchTerm);
             },
           ),

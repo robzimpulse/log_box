@@ -161,7 +161,7 @@ class DriftQueryEntryModel extends EntryModel {
           children: [
             Expanded(
               child: Text(
-                operation.join('>'),
+                operation.reversed.join(' > '),
                 maxLines: 1,
                 style: Theme.of(context).textTheme.labelLarge,
                 overflow: TextOverflow.ellipsis,
