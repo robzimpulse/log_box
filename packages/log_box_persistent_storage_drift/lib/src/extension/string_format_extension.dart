@@ -1,6 +1,6 @@
 extension StringFormatExtension on String {
-  String interpolate(List<Object> params) {
-    if (params.isEmpty) return this;
+  String interpolate(List<Object?>? params) {
+    if (params == null || params.isEmpty) return this;
     String result = this;
     for (final param in params) {
       result = result.replaceFirst(

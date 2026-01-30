@@ -11,7 +11,11 @@ DriftQueryOperationModel _$DriftQueryOperationModelFromJson(
 ) => DriftQueryOperationModel(
   timestamp: DateTime.parse(json['timestamp'] as String),
   operation: json['operation'] as String?,
-  statement: json['statement'] as String?,
+  statements:
+      (json['statements'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const [],
   duration: json['duration'] == null
       ? null
       : Duration(microseconds: (json['duration'] as num).toInt()),
@@ -23,7 +27,7 @@ Map<String, dynamic> _$DriftQueryOperationModelToJson(
   DriftQueryOperationModel instance,
 ) => <String, dynamic>{
   'operation': instance.operation,
-  'statement': instance.statement,
+  'statements': instance.statements,
   'duration': instance.duration?.inMicroseconds,
   'error': instance.error,
   'stack_trace': instance.stackTrace,

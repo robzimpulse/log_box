@@ -7,7 +7,7 @@ part 'drift_query_operation_model.g.dart';
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class DriftQueryOperationModel {
   final String? operation;
-  final String? statement;
+  final List<String> statements;
   final Duration? duration;
   final String? error;
   final String? stackTrace;
@@ -15,7 +15,7 @@ class DriftQueryOperationModel {
 
   factory DriftQueryOperationModel.create({
     String? operation,
-    String? statement,
+    List<String> statements = const [],
     Duration? duration,
     String? error,
     String? stackTrace,
@@ -23,7 +23,7 @@ class DriftQueryOperationModel {
     return DriftQueryOperationModel(
       timestamp: DateTime.timestamp(),
       operation: operation,
-      statement: statement,
+      statements: statements,
       duration: duration,
       error: error,
       stackTrace: stackTrace,
@@ -32,7 +32,7 @@ class DriftQueryOperationModel {
 
   DriftQueryOperationModel copyWith({
     String? operation,
-    String? statement,
+    List<String>? statements,
     Duration? duration,
     String? error,
     String? stackTrace,
@@ -40,7 +40,7 @@ class DriftQueryOperationModel {
     return DriftQueryOperationModel(
       timestamp: timestamp,
       operation: operation ?? this.operation,
-      statement: statement ?? this.statement,
+      statements: [...?statements, ...this.statements],
       duration: duration ?? this.duration,
       error: error ?? this.error,
       stackTrace: stackTrace ?? this.stackTrace,
@@ -50,7 +50,7 @@ class DriftQueryOperationModel {
   const DriftQueryOperationModel({
     required this.timestamp,
     this.operation,
-    this.statement,
+    this.statements = const [],
     this.duration,
     this.error,
     this.stackTrace,
@@ -59,7 +59,8 @@ class DriftQueryOperationModel {
   bool contains(String keyword) {
     return [
       operation?.toLowerCase().contains(keyword.toLowerCase()) == true,
-      statement?.toLowerCase().contains(keyword.toLowerCase()) == true,
+      for (final statement in statements)
+        statement.toLowerCase().contains(keyword.toLowerCase()) == true,
       error?.toLowerCase().contains(keyword.toLowerCase()) == true,
       stackTrace?.toLowerCase().contains(keyword.toLowerCase()) == true,
     ].contains(true);
@@ -129,8 +130,8 @@ class DriftQueryOperationModel {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: HumanReadableWidget(
-            name: 'Statement',
-            value: statement,
+            name: 'Statements',
+            value: statements.join('\n\n'),
             searchTerm: searchTerm,
           ),
         ),
