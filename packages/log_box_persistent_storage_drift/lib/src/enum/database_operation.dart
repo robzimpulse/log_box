@@ -7,9 +7,17 @@ enum DatabaseOperation {
   runDelete('Delete'),
   runInsert('Insert'),
   runSelect('Select'),
-  runUpdate('Update');
+  runUpdate('Update'),
+  unknown('Unknown');
 
   final String rawValue;
 
   const DatabaseOperation(this.rawValue);
+
+  factory DatabaseOperation.fromRawValue(String value) {
+    return DatabaseOperation.values.firstWhere(
+      (element) => element.rawValue == value,
+      orElse: () => DatabaseOperation.unknown,
+    );
+  }
 }
