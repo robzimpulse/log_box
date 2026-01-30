@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
+import 'package:flutter/foundation.dart';
 import 'package:log_box/log_box.dart';
 
-import '../model/drift_query_entry_model.dart';
 import '../model/drift_query_operation_model.dart';
 import '../extension/string_format_extension.dart';
 
@@ -33,49 +33,17 @@ class DriftQueryInterceptor extends QueryInterceptor {
     required DatabaseOperation operation,
     required DriftQueryOperationModel model,
   }) {
-    print('Operation: ${operation.rawValue}: ${model.statements.length}');
+    if (kDebugMode) {
+      final message = [
+        'Database Operation: ${operation.rawValue}',
+        'Statement:',
+        model.statements.map((e) => '- $e'),
+      ].join('\n');
 
-    // TODO: implement this
-    // final value = model.copyWith(operation: operation.rawValue);
-    // _current = (_current ?? DriftQueryEntryModel()).copyWith(
-    //   operations: [model.copyWith(operation: operation.rawValue)],
-    // );
-    // switch (operation) {
-    //   case DatabaseOperation.beginTransaction:
-    //     if (_stack.isEmpty) {
-    //       _stack.add(value);
-    //     } else {
-    //       _storage.add(log: DriftQueryEntryModel(operations: _stack));
-    //       _stack.clear();
-    //       _stack.add(value);
-    //     }
-    //
-    //   case DatabaseOperation.commitTransaction:
-    //     if (_stack.isEmpty) {
-    //     } else {}
-    //
-    //   case DatabaseOperation.rollbackTransaction:
-    //     // TODO: Handle this case.
-    //     throw UnimplementedError();
-    //   case DatabaseOperation.runBatched:
-    //     // TODO: Handle this case.
-    //     throw UnimplementedError();
-    //   case DatabaseOperation.runCustom:
-    //     // TODO: Handle this case.
-    //     throw UnimplementedError();
-    //   case DatabaseOperation.runDelete:
-    //     // TODO: Handle this case.
-    //     throw UnimplementedError();
-    //   case DatabaseOperation.runInsert:
-    //     // TODO: Handle this case.
-    //     throw UnimplementedError();
-    //   case DatabaseOperation.runSelect:
-    //     // TODO: Handle this case.
-    //     throw UnimplementedError();
-    //   case DatabaseOperation.runUpdate:
-    //     // TODO: Handle this case.
-    //     throw UnimplementedError();
-    // }
+      debugPrint(message);
+    }
+
+    // TODO: implement grouping hierarchy + store in [_storage]
   }
 
   Future<T> _runFuture<T>({

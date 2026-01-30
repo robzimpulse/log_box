@@ -85,11 +85,17 @@ class WebviewEntryModel extends EntryModel {
     final theme = Theme.of(context);
     final path = uri?.path ?? '/';
 
+    Color? color() {
+      if (error == null && stackTrace == null) return Colors.green;
+      if (error == null || stackTrace == null) return Colors.orange;
+      return Colors.red;
+    }
+
     return Column(
       children: [
         Row(
           children: [
-            const Icon(Icons.web, size: 16),
+            Icon(Icons.web, size: 16, color: color()),
             const SizedBox(width: 8),
             if (loading == true) ...[
               const SizedBox(

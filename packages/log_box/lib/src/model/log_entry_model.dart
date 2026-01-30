@@ -71,11 +71,17 @@ class LogEntryModel extends EntryModel {
 
   @override
   Widget title(BuildContext context) {
+    Color? color() {
+      if (error == null && stackTrace == null) return Colors.green;
+      if (error == null || stackTrace == null) return Colors.orange;
+      return Colors.red;
+    }
+
     return Column(
       children: [
         Row(
           children: [
-            const Icon(Icons.bug_report, size: 16),
+            Icon(Icons.bug_report, size: 16, color: color()),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
@@ -177,7 +183,7 @@ class LogEntryModel extends EntryModel {
     return MapEntry(
       const Tab(
         text: 'Error',
-        icon: Icon(Icons.warning, color: Colors.white)
+        icon: Icon(Icons.warning, color: Colors.white),
       ),
       CustomScrollView(
         slivers: [
