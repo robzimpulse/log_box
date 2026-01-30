@@ -28,8 +28,8 @@ class InAppWebviewObserver {
         id: _id,
         uri: uri,
         html: html,
-        error: error.toString(),
-        stackTrace: stackTrace.toString(),
+        error: error?.toString(),
+        stackTrace: stackTrace?.toString(),
         loading: loading,
       ),
     );
