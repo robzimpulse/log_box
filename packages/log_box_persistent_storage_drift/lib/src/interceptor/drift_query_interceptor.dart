@@ -5,24 +5,9 @@ import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 import 'package:log_box/log_box.dart';
 
+import '../enum/database_operation.dart';
 import '../model/drift_query_operation_model.dart';
 import '../extension/string_format_extension.dart';
-
-enum DatabaseOperation {
-  beginTransaction('Begin Transaction'),
-  commitTransaction('Commit Transaction'),
-  rollbackTransaction('Rollback Transaction'),
-  runBatched('Batched'),
-  runCustom('Custom'),
-  runDelete('Delete'),
-  runInsert('Insert'),
-  runSelect('Select'),
-  runUpdate('Update');
-
-  final String rawValue;
-
-  const DatabaseOperation(this.rawValue);
-}
 
 class DriftQueryInterceptor extends QueryInterceptor {
   final Storage _storage;
