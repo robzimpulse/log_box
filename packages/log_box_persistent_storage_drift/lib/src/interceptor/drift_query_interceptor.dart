@@ -4,6 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 import 'package:log_box/log_box.dart';
+import 'package:log_box_persistent_storage_drift/src/util/drift_log_builder.dart';
 
 import '../enum/database_operation.dart';
 import '../model/drift_query_operation_model.dart';
@@ -11,6 +12,7 @@ import '../extension/string_format_extension.dart';
 
 class DriftQueryInterceptor extends QueryInterceptor {
   final Storage _storage;
+  final _builder = LogTreeBuilder();
 
   DriftQueryInterceptor({required Storage storage}) : _storage = storage;
 
@@ -28,7 +30,7 @@ class DriftQueryInterceptor extends QueryInterceptor {
       debugPrint(message);
     }
 
-    // TODO: implement grouping hierarchy + store in [_storage]
+    // TODO: test [LogTreeBuilder] + store in [_storage]
   }
 
   Future<T> _runFuture<T>({
