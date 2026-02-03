@@ -1,80 +1,108 @@
 import '../enum/database_operation.dart';
-import '../util/drift_log_builder.dart';
+import '../model/drift_query_entry_model.dart';
 
-extension TreeVisualizerExtension on List<LogNode> {
-  void debug() {
+extension TreeVisualizerExtension on List<DriftQueryEntryModel> {
+  String get visualize {
+    final buffer = StringBuffer();
+
     if (isEmpty) {
-      print('(No logs captured)');
-      return;
+      return '(No logs captured)';
     }
 
-    print('┌─ Database Operation Log Tree ──────────────────────────────────');
-    for (final (index, node) in indexed) {
-      node.debug('', index == length - 1);
+    buffer.writeln(
+      '┌─ Drift Query Log Tree ─────────────────────────────────────────',
+    );
+    for (final (index, child) in indexed) {
+      child.debug(buffer, '', index == length - 1);
     }
-    print('└──────────────────────────────────────────────────────────────');
+    buffer.write(
+      '└────────────────────────────────────────────────────────────────',
+    );
+
+    return buffer.toString();
   }
 }
 
-extension LeafVisualizerExtension on LogNode {
-  void debug(String prefix, bool isLast) {
+extension LeafVisualizerExtension on DriftQueryEntryModel {
+  void debug(StringBuffer buffer, String prefix, bool isLast) {
+    // 1. Setup
     final connector = isLast ? '└── ' : '├── ';
 
-    String icon;
-    // We calculate status for ALL node types now
+    // 2. Icon
+    final icon = switch (operation) {
+      DatabaseOperation.beginTransaction => '📂',
+      DatabaseOperation.commitTransaction => '✅',
+      DatabaseOperation.rollbackTransaction => '❌',
+      DatabaseOperation.runBatched => '📦',
+      DatabaseOperation.runCustom => '⚙️',
+      DatabaseOperation.runDelete => '🗑',
+      DatabaseOperation.runInsert => '📥',
+      DatabaseOperation.runSelect => '🔍',
+      DatabaseOperation.runUpdate => '📝',
+      DatabaseOperation.unknown => '🔹',
+    };
     String statusInfo = "";
 
-    // 1. Determine Status String
-    if (isCompleted == true) {
-      // It finished with a Commit or Rollback
-      statusInfo = completionType == DatabaseOperation.commitTransaction
-          ? " [Committed]"
-          : " [Rolled Back]";
+    // Calculate Status (Committed vs Active)
+    if (isComplete == true) {
+      if (completionType == DatabaseOperation.commitTransaction) {
+        statusInfo = " [Committed]";
+      } else if (completionType == DatabaseOperation.rollbackTransaction) {
+        statusInfo = " [Rolled Back]";
+      }
     } else if (operation == DatabaseOperation.beginTransaction) {
-      // Only "Begin" should show "Active" if not completed.
-      // Atomic ops (Delete/Insert) are instantaneous, so we don't say "Active".
+      // Only show "Active" for unclosed transactions
       statusInfo = " [ACTIVE/OPEN]";
     }
 
-    // 2. Determine Icon
-    switch (operation) {
-      case DatabaseOperation.beginTransaction:
-        icon = "📂";
-        break;
-      case DatabaseOperation.commitTransaction:
-        icon = "✅";
-        break;
-      case DatabaseOperation.rollbackTransaction:
-        icon = "❌";
-        break;
-      case DatabaseOperation.runInsert:
-        icon = "📥";
-        break;
-      case DatabaseOperation.runUpdate:
-        icon = "📝";
-        break;
-      case DatabaseOperation.runDelete:
-        icon = "🗑️ ";
-        break;
-      case DatabaseOperation.runSelect:
-        icon = "🔍";
-        break;
-      default:
-        icon = "🔹";
-        break;
+    // 3. Format Timings
+
+    // final t = data.timestamp;
+    final timeStr = [
+      timestamp.hour.toString().padLeft(2, '0'),
+      timestamp.minute.toString().padLeft(2, '0'),
+      timestamp.second.toString().padLeft(2, '0'),
+      timestamp.millisecond.toString().padLeft(3, '0'),
+    ].join(':');
+
+    // Only show duration if it exists (e.g. " (15ms)")
+    final duration = this.duration;
+    final durationStr = duration != null
+        ? " (${duration.inMilliseconds}ms)"
+        : "";
+
+    // 4. Write The Main Row
+    buffer.writeln(
+      '$prefix$connector$icon ${operation.rawValue} ($timeStr)$durationStr$statusInfo',
+    );
+
+    // 5. Write Details (Errors & SQL Statements)
+    // We add extra indentation to align these under the text, not the tree lines
+    final detailPrefix = "$prefix${isLast ? '    ' : '│   '}   ";
+
+    // Write Error if present
+    if (error != null) {
+      buffer.writeln('$detailPrefix⚠️  ERROR: $error');
+      if (stackTrace != null) {
+        // Optional: Print first line of stack trace to keep it clean
+        final stackLine = stackTrace.toString().split('\n').first;
+        buffer.writeln('$detailPrefix   Stack: $stackLine');
+      }
     }
 
-    final t = timestamp;
-    final timeStr = "${t.hour}:${t.minute}:${t.second}.${t.millisecond}";
+    // Write SQL Statements
+    if (statements.isNotEmpty) {
+      for (var stmt in statements) {
+        // clean up newlines for compact logging
+        final cleanStmt = stmt.replaceAll('\n', ' ').trim();
+        buffer.writeln('$detailPrefix$cleanStmt');
+      }
+    }
 
-    // 3. Print
-    print('$prefix$connector$icon ${operation.rawValue} ($timeStr)$statusInfo');
-
+    // 6. Recursion for Children
     final childPrefix = prefix + (isLast ? '    ' : '│   ');
-
-    // 6. Recurse
     for (final (index, child) in children.indexed) {
-      child.debug(childPrefix, index == children.length - 1);
+      child.debug(buffer, childPrefix, index == children.length - 1);
     }
   }
 }

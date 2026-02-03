@@ -3,35 +3,16 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
-import 'package:log_box/log_box.dart';
-import 'package:log_box_persistent_storage_drift/src/util/drift_log_builder.dart';
 
 import '../enum/database_operation.dart';
 import '../model/drift_query_operation_model.dart';
 import '../extension/string_format_extension.dart';
 
 class DriftQueryInterceptor extends QueryInterceptor {
-  final Storage _storage;
-  final _builder = LogTreeBuilder();
+  final ValueSetter<DriftQueryOperationModel>? _onEvent;
 
-  DriftQueryInterceptor({required Storage storage}) : _storage = storage;
-
-  void _add({
-    required DatabaseOperation operation,
-    required DriftQueryOperationModel model,
-  }) {
-    if (kDebugMode) {
-      final message = [
-        'Database Operation: ${operation.rawValue}',
-        'Statement:',
-        model.statements.map((e) => '- $e'),
-      ].join('\n');
-
-      debugPrint(message);
-    }
-
-    // TODO: test [LogTreeBuilder] + store in [_storage]
-  }
+  DriftQueryInterceptor({ValueSetter<DriftQueryOperationModel>? onEvent})
+    : _onEvent = onEvent;
 
   Future<T> _runFuture<T>({
     required DatabaseOperation type,
@@ -39,17 +20,17 @@ class DriftQueryInterceptor extends QueryInterceptor {
     required Future<T> Function() operation,
   }) async {
     final stopwatch = Stopwatch()..start();
-    var model = DriftQueryOperationModel.create(statements: statements);
+    var model = DriftQueryOperationModel.create(
+      operation: type,
+      statements: statements,
+    );
     try {
       return await operation();
     } catch (e, st) {
       model = model.copyWith(error: e.toString(), stackTrace: st.toString());
       rethrow;
     } finally {
-      _add(
-        operation: type,
-        model: model.copyWith(duration: stopwatch.elapsed),
-      );
+      _onEvent?.call(model.copyWith(duration: stopwatch.elapsed));
       stopwatch.stop();
     }
   }
@@ -59,17 +40,14 @@ class DriftQueryInterceptor extends QueryInterceptor {
     required T Function() operation,
   }) {
     final stopwatch = Stopwatch()..start();
-    var model = DriftQueryOperationModel.create();
+    var model = DriftQueryOperationModel.create(operation: type);
     try {
       return operation();
     } catch (e, st) {
       model = model.copyWith(error: e.toString(), stackTrace: st.toString());
       rethrow;
     } finally {
-      _add(
-        operation: type,
-        model: model.copyWith(duration: stopwatch.elapsed),
-      );
+      _onEvent?.call(model.copyWith(duration: stopwatch.elapsed));
       stopwatch.stop();
     }
   }
