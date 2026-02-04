@@ -1,5 +1,10 @@
+import 'package:json_annotation/json_annotation.dart';
+
 import '../enum/database_operation.dart';
 
+part 'drift_query_operation_model.g.dart';
+
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class DriftQueryOperationModel {
   final DatabaseOperation operation;
   final List<String> statements;
@@ -50,4 +55,20 @@ class DriftQueryOperationModel {
     this.error,
     this.stackTrace,
   });
+
+  bool contains(String keyword) {
+    return [
+      operation.rawValue.toLowerCase().contains(keyword.toLowerCase()),
+      for (final statement in statements)
+        statement.toLowerCase().contains(keyword.toLowerCase()),
+      error?.toLowerCase().contains(keyword.toLowerCase()) == true,
+      stackTrace?.toLowerCase().contains(keyword.toLowerCase()) == true,
+    ].contains(true);
+  }
+
+  Map<String, dynamic> toJson() => _$DriftQueryOperationModelToJson(this);
+
+  factory DriftQueryOperationModel.fromJson(Map<String, dynamic> json) {
+    return _$DriftQueryOperationModelFromJson(json);
+  }
 }
