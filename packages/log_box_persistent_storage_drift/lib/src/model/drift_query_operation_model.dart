@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:log_box/log_box.dart';
 
 import '../enum/database_operation.dart';
 
@@ -70,5 +72,54 @@ class DriftQueryOperationModel {
 
   factory DriftQueryOperationModel.fromJson(Map<String, dynamic> json) {
     return _$DriftQueryOperationModelFromJson(json);
+  }
+
+  Widget widget(BuildContext context, {String? searchTerm}) {
+    return ExpansionTile(
+      title: Text(operation.rawValue),
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: HumanReadableWidget(
+            name: 'Timestamp',
+            value: timestamp.toIso8601String(),
+            searchTerm: searchTerm,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: HumanReadableWidget(
+            name: 'Duration',
+            value: duration.toString(),
+            searchTerm: searchTerm,
+          ),
+        ),
+        for (final (index, statement) in statements.indexed)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: HumanReadableWidget(
+              name: 'Statement #${index + 1}',
+              value: statement,
+              searchTerm: searchTerm,
+            ),
+          ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: HumanReadableWidget(
+            name: 'Error',
+            value: error,
+            searchTerm: searchTerm,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: HumanReadableWidget(
+            name: 'Stacktrace',
+            value: stackTrace,
+            searchTerm: searchTerm,
+          ),
+        ),
+      ],
+    );
   }
 }

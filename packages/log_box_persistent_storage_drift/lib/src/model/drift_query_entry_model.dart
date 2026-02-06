@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:log_box/log_box.dart';
 
+import 'drift_log_node.dart';
 import 'drift_query_operation_model.dart';
+import '../extension/drift_query_operation_model_extension.dart';
 
 part 'drift_query_entry_model.g.dart';
 
@@ -16,6 +18,8 @@ class DriftQueryEntryModel extends EntryModel {
       (a, b) => a + (b.duration ?? Duration.zero),
     );
   }
+
+  List<LogNode> get tree => operations.tree;
 
   DriftQueryEntryModel({super.id, super.timestamp, required this.operations});
 
@@ -92,6 +96,10 @@ class DriftQueryEntryModel extends EntryModel {
   }
 
   MapEntry<Tab, Widget> _details(BuildContext context, {String? searchTerm}) {
+    final children = tree.expand(
+      (e) => e.widgets(context, searchTerm: searchTerm),
+    );
+
     return MapEntry(
       const Tab(
         text: 'Detail',
@@ -102,49 +110,7 @@ class DriftQueryEntryModel extends EntryModel {
           SliverToBoxAdapter(child: SizedBox(height: 8)),
           SliverList.separated(
             separatorBuilder: (context, index) => SizedBox(height: 8),
-            itemBuilder: (context, index) {
-              final value = operations.elementAtOrNull(index);
-              if (value == null) return null;
-              return ExpansionTile(
-                title: Text(value.operation.rawValue),
-                subtitle: Text(value.timestamp.toIso8601String()),
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: HumanReadableWidget(
-                      name: 'Duration',
-                      value: value.duration.toString(),
-                      searchTerm: searchTerm,
-                    ),
-                  ),
-                  for (final (index, statement) in value.statements.indexed)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: HumanReadableWidget(
-                        name: 'Statement #${index + 1}',
-                        value: statement,
-                        searchTerm: searchTerm,
-                      ),
-                    ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: HumanReadableWidget(
-                      name: 'Error',
-                      value: value.error,
-                      searchTerm: searchTerm,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: HumanReadableWidget(
-                      name: 'Stacktrace',
-                      value: value.stackTrace,
-                      searchTerm: searchTerm,
-                    ),
-                  ),
-                ],
-              );
-            },
+            itemBuilder: (context, index) => children.elementAtOrNull(index),
           ),
           SliverToBoxAdapter(child: SizedBox(height: 8)),
         ],

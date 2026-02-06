@@ -20,4 +20,8 @@ enum DatabaseOperation {
       orElse: () => DatabaseOperation.unknown,
     );
   }
+
+  bool get isAtomic {
+    return ![beginTransaction, commitTransaction].contains(this);
+  }
 }
