@@ -103,14 +103,14 @@ class _DetailScreenState extends State<DetailScreen> {
   }
 
   Widget _content(BuildContext context, EntryModel data) {
-    return AnimatedBuilder(
-      animation: Listenable.merge([keyword, isSearchMode]),
-      builder: (context, _) {
+    return ValueListenableBuilder(
+      valueListenable: keyword,
+      builder: (context, value, _) {
         final theme = Theme.of(context);
 
         final tabs = data.tabs(
           context,
-          searchTerm: keyword.value.isEmpty ? null : keyword.value,
+          searchTerm: value.isEmpty ? null : value,
         );
 
         return DefaultTabController(
@@ -130,32 +130,32 @@ class _DetailScreenState extends State<DetailScreen> {
     EntryModel data,
     Map<Tab, Widget> tabs,
   ) {
-    Widget view = const Text('Detail Log');
-
-    if (isSearchMode.value) {
-      view = Container(
-        alignment: Alignment.centerLeft,
-        child: TextField(
-          autofocus: true,
-          onChanged: (text) => keyword.value = text,
-          focusNode: focusNode,
-          controller: searchController,
-          decoration: InputDecoration(
-            hintText: 'Search...',
-            filled: false,
-            border: InputBorder.none,
-            hintStyle: theme.textTheme.titleLarge?.copyWith(
-              color: Colors.white,
-            ),
-          ),
-          cursorColor: Colors.white,
-          style: theme.textTheme.titleLarge?.copyWith(color: Colors.white),
-        ),
-      );
-    }
-
     return AppBar(
-      title: view,
+      title: ValueListenableBuilder(
+        valueListenable: isSearchMode,
+        builder: (context, value, _) {
+          if (!value) return const Text('Detail Log');
+          return Container(
+            alignment: Alignment.centerLeft,
+            child: TextField(
+              autofocus: true,
+              onChanged: (text) => keyword.value = text,
+              focusNode: focusNode,
+              controller: searchController,
+              decoration: InputDecoration(
+                hintText: 'Search...',
+                filled: false,
+                border: InputBorder.none,
+                hintStyle: theme.textTheme.titleLarge?.copyWith(
+                  color: Colors.white,
+                ),
+              ),
+              cursorColor: Colors.white,
+              style: theme.textTheme.titleLarge?.copyWith(color: Colors.white),
+            ),
+          );
+        },
+      ),
       elevation: 3,
       centerTitle: false,
       leading: IconButton(
@@ -163,9 +163,14 @@ class _DetailScreenState extends State<DetailScreen> {
         icon: const Icon(Icons.arrow_back),
       ),
       actions: [
-        IconButton(
-          onPressed: _toggleSearch,
-          icon: Icon(isSearchMode.value ? Icons.close : Icons.search),
+        ValueListenableBuilder(
+          valueListenable: isSearchMode,
+          builder: (context, value, _) {
+            return IconButton(
+              onPressed: _toggleSearch,
+              icon: Icon(isSearchMode.value ? Icons.close : Icons.search),
+            );
+          },
         ),
         ...data.menus(context, widget.box),
       ],
