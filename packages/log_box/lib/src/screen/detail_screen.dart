@@ -71,7 +71,7 @@ class _DetailScreenState extends State<DetailScreen> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: widget.box.storage.stream(widget.id),
+      stream: widget.box.storage.stream(widget.id).distinct(),
       builder: (context, snapshot) {
         final data = snapshot.data;
         final error = snapshot.error;
