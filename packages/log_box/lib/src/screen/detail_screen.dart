@@ -97,7 +97,13 @@ class _DetailScreenState extends State<DetailScreen> {
           );
         }
 
-        return _content(context, data);
+        return DefaultTabController(
+          length: data.tabLength(context),
+          child: Scaffold(
+            appBar: _appBar(context, Theme.of(context), data),
+            body: SafeArea(child: _content(context, data)),
+          ),
+        );
       },
     );
   }
@@ -106,30 +112,17 @@ class _DetailScreenState extends State<DetailScreen> {
     return ValueListenableBuilder(
       valueListenable: keyword,
       builder: (context, value, _) {
-        final theme = Theme.of(context);
-
         final tabs = data.tabs(
           context,
           searchTerm: value.isEmpty ? null : value,
         );
 
-        return DefaultTabController(
-          length: data.tabLength(context),
-          child: Scaffold(
-            appBar: _appBar(context, theme, data, tabs),
-            body: SafeArea(child: TabBarView(children: tabs.values.toList())),
-          ),
-        );
+        return TabBarView(children: tabs.values.toList());
       },
     );
   }
 
-  AppBar _appBar(
-    BuildContext context,
-    ThemeData theme,
-    EntryModel data,
-    Map<Tab, Widget> tabs,
-  ) {
+  AppBar _appBar(BuildContext context, ThemeData theme, EntryModel data) {
     return AppBar(
       title: ValueListenableBuilder(
         valueListenable: isSearchMode,
@@ -178,7 +171,7 @@ class _DetailScreenState extends State<DetailScreen> {
         labelColor: theme.appBarTheme.foregroundColor,
         unselectedLabelColor: theme.appBarTheme.foregroundColor,
         indicatorSize: TabBarIndicatorSize.tab,
-        tabs: tabs.keys.toList(),
+        tabs: data.tabs(context).keys.toList(),
       ),
     );
   }
