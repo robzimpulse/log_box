@@ -192,7 +192,7 @@ class _InAppWebviewScreenState extends State<InAppWebviewScreen> {
         _log('onLoadStop: $url');
         widget.observer.onLoadStop(uri: url?.uriValue);
       },
-      onProgressChanged: (controller, progress) {
+      onProgressChanged: (_, progress) {
         _log('onProgress: $progress');
         widget.observer.onProgressChanged(progress: progress);
       },
@@ -214,7 +214,7 @@ class _InAppWebviewScreenState extends State<InAppWebviewScreen> {
         _log('onLoadResource: ${resource.url}');
         widget.observer.onLoadResource(resource: resource.toMap());
       },
-      onConsoleMessage: (controller, message) {
+      onConsoleMessage: (_, message) {
         _log('onConsoleMessage: ${message.message}');
         widget.observer.onConsoleMessage(message: message.toMap());
       },
