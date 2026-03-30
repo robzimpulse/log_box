@@ -16,6 +16,7 @@ extension InAppWebviewLoggerExtension on LogBox {
   Future<void> webview({
     required BuildContext context,
     required Uri uri,
+    List<String> scripts = const [],
     String? html,
     ThemeData? theme,
     SnapshotCallback? onTapSnapshot,
@@ -35,6 +36,7 @@ extension InAppWebviewLoggerExtension on LogBox {
             child: InAppWebviewScreen(
               uri: uri,
               html: html,
+              scripts: scripts,
               onTapSnapshot: onTapSnapshot,
               initialUserScripts: initialUserScripts,
               javascriptHandlers: javascriptHandlers,

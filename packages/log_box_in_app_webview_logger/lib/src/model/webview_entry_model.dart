@@ -263,7 +263,9 @@ class WebviewEntryModel extends EntryModel {
     return [
       if (uri != null)
         IconButton(
-          onPressed: () => box.webview(context: context, uri: uri),
+          onPressed: () {
+            box.webview(context: context, uri: uri, scripts: scripts);
+          },
           icon: Icon(Icons.public),
         ),
     ];

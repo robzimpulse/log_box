@@ -11,6 +11,7 @@ class InAppWebviewScreen extends StatefulWidget {
     super.key,
     required this.uri,
     required this.observer,
+    this.scripts = const [],
     this.html,
     this.initialUserScripts,
     this.javascriptHandlers,
@@ -20,6 +21,7 @@ class InAppWebviewScreen extends StatefulWidget {
 
   final String? html;
   final Uri uri;
+  final List<String> scripts;
   final UnmodifiableListView<UserScript>? initialUserScripts;
   final Map<String, JavaScriptHandlerCallback>? javascriptHandlers;
   final Map<String, String>? headers;
@@ -40,6 +42,13 @@ class _InAppWebviewScreenState extends State<InAppWebviewScreen> {
     setState(() {
       messages.insert(0, message);
     });
+  }
+
+  void _runScripts(InAppWebViewController controller) async {
+    for (final script in widget.scripts) {
+      controller.evaluateJavascript(source: script);
+      await Future.delayed(Duration(seconds: 1));
+    }
   }
 
   @override
@@ -188,9 +197,10 @@ class _InAppWebviewScreenState extends State<InAppWebviewScreen> {
         _log('onLoadStart: $url');
         widget.observer.onLoadStart(uri: url?.uriValue);
       },
-      onLoadStop: (_, url) {
+      onLoadStop: (controller, url) {
         _log('onLoadStop: $url');
         widget.observer.onLoadStop(uri: url?.uriValue);
+        _runScripts(controller);
       },
       onProgressChanged: (_, progress) {
         _log('onProgress: $progress');
