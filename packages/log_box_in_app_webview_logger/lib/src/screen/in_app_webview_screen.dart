@@ -11,6 +11,7 @@ class InAppWebviewScreen extends StatefulWidget {
     super.key,
     required this.uri,
     required this.observer,
+    this.forceLoad = false,
     this.scripts = const [],
     this.html,
     this.initialUserScripts,
@@ -27,6 +28,7 @@ class InAppWebviewScreen extends StatefulWidget {
   final Map<String, String>? headers;
   final SnapshotCallback? onTapSnapshot;
   final InAppWebviewObserver observer;
+  final bool forceLoad;
 
   @override
   State<InAppWebviewScreen> createState() => _InAppWebviewScreenState();
@@ -49,6 +51,14 @@ class _InAppWebviewScreenState extends State<InAppWebviewScreen> {
       controller.evaluateJavascript(source: script);
       await Future.delayed(Duration(seconds: 1));
     }
+  }
+
+  void _forceLoad(InAppWebViewController controller, int? height) async {
+    if (height == null || height <= 0) return;
+    await controller.scrollTo(x: 0, y: height);
+    await Future.delayed(const Duration(seconds: 1));
+    final newHeight = await controller.getContentHeight();
+    if (newHeight != height) _forceLoad(controller, newHeight);
   }
 
   @override
@@ -197,10 +207,13 @@ class _InAppWebviewScreenState extends State<InAppWebviewScreen> {
         _log('onLoadStart: $url');
         widget.observer.onLoadStart(uri: url?.uriValue);
       },
-      onLoadStop: (controller, url) {
+      onLoadStop: (controller, url) async {
         _log('onLoadStop: $url');
         widget.observer.onLoadStop(uri: url?.uriValue);
         _runScripts(controller);
+        if (widget.forceLoad) {
+          _forceLoad(controller, await controller.getContentHeight());
+        }
       },
       onProgressChanged: (_, progress) {
         _log('onProgress: $progress');
