@@ -17,7 +17,6 @@ extension InAppWebviewLoggerExtension on LogBox {
     required BuildContext context,
     required Uri uri,
     List<String> scripts = const [],
-    bool forceLoad = false,
     String? html,
     ThemeData? theme,
     SnapshotCallback? onTapSnapshot,
@@ -37,7 +36,6 @@ extension InAppWebviewLoggerExtension on LogBox {
             child: InAppWebviewScreen(
               uri: uri,
               html: html,
-              forceLoad: forceLoad,
               scripts: scripts,
               onTapSnapshot: onTapSnapshot,
               initialUserScripts: initialUserScripts,
