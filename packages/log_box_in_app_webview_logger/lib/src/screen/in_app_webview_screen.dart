@@ -55,7 +55,7 @@ class _InAppWebviewScreenState extends State<InAppWebviewScreen> {
 
   void _forceLoad(InAppWebViewController controller, int? height) async {
     if (height == null || height <= 0) return;
-    await controller.scrollTo(x: 0, y: height);
+    await controller.scrollTo(x: 0, y: height, animated: true);
     await Future.delayed(const Duration(seconds: 1));
     final newHeight = await controller.getContentHeight();
     if (newHeight != height) _forceLoad(controller, newHeight);
