@@ -72,6 +72,7 @@ class _PaginatedDashboardScreenState extends State<PaginatedDashboardScreen> {
 
     if (isSearch) {
       keyword.value = '';
+      searchController.clear();
       focusNode.unfocus();
     } else {
       keyword.value = searchController.text;
