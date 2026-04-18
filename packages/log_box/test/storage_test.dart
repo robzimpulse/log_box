@@ -1,124 +1,212 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:log_box/src/model/entry_model.dart';
 import 'package:log_box/src/storage/base/persistent_data_storage.dart';
-import 'package:log_box/src/storage/memory_storage.dart';
+import 'package:log_box/src/storage/base/live_data_storage.dart';
 import 'package:log_box/src/storage/storage.dart';
-import 'package:log_box/src/model/log_entry_model.dart';
+import 'package:mocktail/mocktail.dart';
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 
-class MockPersistentStorage extends PersistentDataStorage {
-  final Map<String, EntryModel> _data = {};
-  bool cleared = false;
-  bool disposed = false;
+class MockPersistentStorage extends Mock implements PersistentDataStorage {}
+abstract class FakeLiveDataStorage extends LiveDataStorage with ChangeNotifier {}
+class MockLiveDataStorage extends Mock implements FakeLiveDataStorage {}
 
+class FakeEntryModel extends Fake implements EntryModel {
   @override
-  Future<void> add({required EntryModel log}) async {
-    _data[log.id] = log;
-  }
-
-  @override
-  Future<void> clear() async {
-    cleared = true;
-    _data.clear();
-  }
-
-  @override
-  Future<void> dispose() async {
-    disposed = true;
-  }
-
-  @override
-  Future<EntryModel?> get(String id) async {
-    return _data[id];
-  }
-
-  @override
-  Stream<EntryModel?> getStream(String id) {
-    return Stream.value(_data[id]);
-  }
-  
-  @override
-  Future<List<EntryModel>> fetch({required Cursor cursor, int limit = 20}) async {
-    return _data.values.toList();
-  }
-
-  @override
-  Stream<List<EntryModel>> fetchStream({required Cursor cursor, int limit = 20}) {
-    return Stream.value(_data.values.toList());
-  }
-
-  @override
-  Stream<Map<String, Type>> get types => Stream.value({});
+  final String id;
+  FakeEntryModel(this.id);
 }
 
 void main() {
+  setUpAll(() {
+    registerFallbackValue(FakeEntryModel('fallback'));
+  });
+
   group('Storage', () {
-    late MemoryStorage liveStorage;
+    late MockLiveDataStorage liveStorage;
     late MockPersistentStorage persistentStorage;
-    late Storage storage;
+    late StreamController<EntryModel> onDeleteController;
 
     setUp(() {
-      liveStorage = MemoryStorage(capacity: 5);
+      liveStorage = MockLiveDataStorage();
       persistentStorage = MockPersistentStorage();
-      storage = Storage(
+      onDeleteController = StreamController<EntryModel>.broadcast();
+      
+      when(() => liveStorage.onDeleteEntry).thenAnswer((_) => onDeleteController.stream);
+      when(() => liveStorage.dispose()).thenReturn(null);
+      
+      when(() => persistentStorage.add(log: any(named: 'log'))).thenAnswer((_) async {});
+      when(() => persistentStorage.dispose()).thenAnswer((_) async {});
+      when(() => persistentStorage.clear()).thenAnswer((_) async {});
+    });
+
+    tearDown(() {
+      onDeleteController.close();
+    });
+
+    test('onDeleteEntry listener adds to persistent storage', () async {
+      final storage = Storage(
         liveDataStorage: liveStorage,
         persistentDataStorage: persistentStorage,
       );
+      final log = FakeEntryModel('1');
+      onDeleteController.add(log);
+      
+      await Future.delayed(Duration(milliseconds: 10));
+      
+      verify(() => persistentStorage.add(log: log)).called(1);
+      await storage.dispose();
+    });
+
+    test('onDeleteEntry listener handles null persistent storage', () async {
+      final storage = Storage(liveDataStorage: liveStorage);
+      final log = FakeEntryModel('1');
+      onDeleteController.add(log);
+      
+      await Future.delayed(Duration(milliseconds: 10));
+      
+      // Should not throw
+      await storage.dispose();
+    });
+
+    test('add entry when persistent storage is null', () async {
+      final storageNoP = Storage(liveDataStorage: liveStorage);
+      final log = FakeEntryModel('1');
+      
+      when(() => liveStorage.add(log: any(named: 'log'))).thenReturn(null);
+
+      storageNoP.add(log: log);
+      
+      verify(() => liveStorage.add(log: log)).called(1);
     });
 
     test('add entry when not in persistent storage', () async {
-      final log = LogEntryModel(id: '1', message: 'msg');
+      final storage = Storage(
+        liveDataStorage: liveStorage,
+        persistentDataStorage: persistentStorage,
+      );
+      final log = FakeEntryModel('1');
+      when(() => persistentStorage.get('1')).thenAnswer((_) async => null);
+      when(() => liveStorage.add(log: any(named: 'log'))).thenReturn(null);
+
       storage.add(log: log);
       
-      // Since persistence.get is called, we might need to wait or use a more synchronous mock if possible
-      // But Storage.add is async internally (void async).
-      await Future.delayed(Duration(milliseconds: 100));
+      await Future.delayed(Duration(milliseconds: 10));
       
-      expect(liveStorage.data.length, 1);
+      verify(() => liveStorage.add(log: log)).called(1);
+      verifyNever(() => persistentStorage.add(log: any(named: 'log')));
     });
 
     test('add entry when already in persistent storage', () async {
-      final log = LogEntryModel(id: '1', message: 'msg');
-      await persistentStorage.add(log: log);
-      
+      final storage = Storage(
+        liveDataStorage: liveStorage,
+        persistentDataStorage: persistentStorage,
+      );
+      final log = FakeEntryModel('1');
+      when(() => persistentStorage.get('1')).thenAnswer((_) async => log);
+
       storage.add(log: log);
-      await Future.delayed(Duration(milliseconds: 100));
       
-      // Should add to persistent instead of live if it exists? 
-      // Actually the logic is:
-      // if (existing == null) { _liveDataStorage.add(log: log); return; }
-      // await persistence.add(log: log);
-      // So if it exists, it goes to persistence.
+      await Future.delayed(Duration(milliseconds: 10));
       
-      expect(liveStorage.data.length, 0);
-      expect(persistentStorage._data.containsKey('1'), isTrue);
+      verify(() => persistentStorage.add(log: log)).called(1);
+      verifyNever(() => liveStorage.add(log: any(named: 'log')));
     });
 
     test('clear clears both storages', () {
+      final storage = Storage(
+        liveDataStorage: liveStorage,
+        persistentDataStorage: persistentStorage,
+      );
+      when(() => liveStorage.clear()).thenReturn(null);
+
       storage.clear();
-      expect(persistentStorage.cleared, isTrue);
-      // MemoryStorage clear is tested elsewhere
+      
+      verify(() => persistentStorage.clear()).called(1);
+      verify(() => liveStorage.clear()).called(1);
+    });
+
+    test('clear handles null persistent storage', () {
+      final storage = Storage(liveDataStorage: liveStorage);
+      when(() => liveStorage.clear()).thenReturn(null);
+
+      storage.clear();
+      
+      verify(() => liveStorage.clear()).called(1);
     });
 
     test('dispose cancels subscription and disposes storages', () async {
+      final storage = Storage(
+        liveDataStorage: liveStorage,
+        persistentDataStorage: persistentStorage,
+      );
+
       await storage.dispose();
-      expect(persistentStorage.disposed, isTrue);
+      
+      verify(() => liveStorage.dispose()).called(1);
+      verify(() => persistentStorage.dispose()).called(1);
+    });
+
+    test('dispose handles null persistent storage', () async {
+      final storage = Storage(liveDataStorage: liveStorage);
+
+      await storage.dispose();
+      
+      verify(() => liveStorage.dispose()).called(1);
     });
 
     test('stream merges live and persistent', () async {
-      final log = LogEntryModel(id: '1', message: 'msg');
-      liveStorage.add(log: log);
+      final realLiveStorage = _SimpleLiveStorage();
+      final storage = Storage(
+        liveDataStorage: realLiveStorage,
+        persistentDataStorage: persistentStorage,
+      );
       
+      final log1 = FakeEntryModel('1');
+      final log2 = FakeEntryModel('1');
+      
+      realLiveStorage.data.add(log1);
+      when(() => persistentStorage.getStream('1')).thenAnswer((_) => Stream.value(log2));
+
+      final stream = storage.stream('1');
+      final results = await stream.take(2).toList();
+      
+      expect(results, containsAll([log1, log2]));
+    });
+
+    test('stream handles null persistent storage', () async {
+      final realLiveStorage = _SimpleLiveStorage();
+      final storage = Storage(liveDataStorage: realLiveStorage);
+      final log1 = FakeEntryModel('1');
+      
+      realLiveStorage.data.add(log1);
+
       final stream = storage.stream('1');
       final first = await stream.first;
-      expect(first.id, '1');
+      
+      expect(first, log1);
     });
-    
-    test('Storage without persistence', () {
-      final storageNoP = Storage(liveDataStorage: MemoryStorage());
-      final log = LogEntryModel(id: '1', message: 'msg');
-      storageNoP.add(log: log);
-      expect(storageNoP.liveStorage.data.length, 1);
+
+    test('getters return correct storages', () {
+      final storage = Storage(
+        liveDataStorage: liveStorage,
+        persistentDataStorage: persistentStorage,
+      );
+      expect(storage.liveStorage, liveStorage);
+      expect(storage.persistentStorage, persistentStorage);
     });
   });
+}
+
+class _SimpleLiveStorage extends LiveDataStorage with ChangeNotifier {
+  @override
+  final List<EntryModel> data = [];
+  @override
+  final Map<String, Type> types = {};
+  @override
+  void add({required EntryModel log}) => data.add(log);
+  @override
+  void clear() => data.clear();
+  @override
+  Stream<EntryModel> get onDeleteEntry => Stream.empty();
 }
