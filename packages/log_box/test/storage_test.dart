@@ -5,10 +5,11 @@ import 'package:log_box/src/storage/base/live_data_storage.dart';
 import 'package:log_box/src/storage/storage.dart';
 import 'package:mocktail/mocktail.dart';
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 
 class MockPersistentStorage extends Mock implements PersistentDataStorage {}
-abstract class FakeLiveDataStorage extends LiveDataStorage with ChangeNotifier {}
+
+abstract class FakeLiveDataStorage extends LiveDataStorage {}
+
 class MockLiveDataStorage extends Mock implements FakeLiveDataStorage {}
 
 class FakeEntryModel extends Fake implements EntryModel {
@@ -31,11 +32,15 @@ void main() {
       liveStorage = MockLiveDataStorage();
       persistentStorage = MockPersistentStorage();
       onDeleteController = StreamController<EntryModel>.broadcast();
-      
-      when(() => liveStorage.onDeleteEntry).thenAnswer((_) => onDeleteController.stream);
+
+      when(
+        () => liveStorage.onDeleteEntry,
+      ).thenAnswer((_) => onDeleteController.stream);
       when(() => liveStorage.dispose()).thenReturn(null);
-      
-      when(() => persistentStorage.add(log: any(named: 'log'))).thenAnswer((_) async {});
+
+      when(
+        () => persistentStorage.add(log: any(named: 'log')),
+      ).thenAnswer((_) async {});
       when(() => persistentStorage.dispose()).thenAnswer((_) async {});
       when(() => persistentStorage.clear()).thenAnswer((_) async {});
     });
@@ -51,9 +56,9 @@ void main() {
       );
       final log = FakeEntryModel('1');
       onDeleteController.add(log);
-      
+
       await Future.delayed(Duration(milliseconds: 10));
-      
+
       verify(() => persistentStorage.add(log: log)).called(1);
       await storage.dispose();
     });
@@ -62,9 +67,9 @@ void main() {
       final storage = Storage(liveDataStorage: liveStorage);
       final log = FakeEntryModel('1');
       onDeleteController.add(log);
-      
+
       await Future.delayed(Duration(milliseconds: 10));
-      
+
       // Should not throw
       await storage.dispose();
     });
@@ -72,11 +77,11 @@ void main() {
     test('add entry when persistent storage is null', () async {
       final storageNoP = Storage(liveDataStorage: liveStorage);
       final log = FakeEntryModel('1');
-      
+
       when(() => liveStorage.add(log: any(named: 'log'))).thenReturn(null);
 
       storageNoP.add(log: log);
-      
+
       verify(() => liveStorage.add(log: log)).called(1);
     });
 
@@ -90,9 +95,9 @@ void main() {
       when(() => liveStorage.add(log: any(named: 'log'))).thenReturn(null);
 
       storage.add(log: log);
-      
+
       await Future.delayed(Duration(milliseconds: 10));
-      
+
       verify(() => liveStorage.add(log: log)).called(1);
       verifyNever(() => persistentStorage.add(log: any(named: 'log')));
     });
@@ -106,9 +111,9 @@ void main() {
       when(() => persistentStorage.get('1')).thenAnswer((_) async => log);
 
       storage.add(log: log);
-      
+
       await Future.delayed(Duration(milliseconds: 10));
-      
+
       verify(() => persistentStorage.add(log: log)).called(1);
       verifyNever(() => liveStorage.add(log: any(named: 'log')));
     });
@@ -121,7 +126,7 @@ void main() {
       when(() => liveStorage.clear()).thenReturn(null);
 
       storage.clear();
-      
+
       verify(() => persistentStorage.clear()).called(1);
       verify(() => liveStorage.clear()).called(1);
     });
@@ -131,7 +136,7 @@ void main() {
       when(() => liveStorage.clear()).thenReturn(null);
 
       storage.clear();
-      
+
       verify(() => liveStorage.clear()).called(1);
     });
 
@@ -142,7 +147,7 @@ void main() {
       );
 
       await storage.dispose();
-      
+
       verify(() => liveStorage.dispose()).called(1);
       verify(() => persistentStorage.dispose()).called(1);
     });
@@ -151,7 +156,7 @@ void main() {
       final storage = Storage(liveDataStorage: liveStorage);
 
       await storage.dispose();
-      
+
       verify(() => liveStorage.dispose()).called(1);
     });
 
@@ -161,16 +166,18 @@ void main() {
         liveDataStorage: realLiveStorage,
         persistentDataStorage: persistentStorage,
       );
-      
+
       final log1 = FakeEntryModel('1');
       final log2 = FakeEntryModel('1');
-      
+
       realLiveStorage.data.add(log1);
-      when(() => persistentStorage.getStream('1')).thenAnswer((_) => Stream.value(log2));
+      when(
+        () => persistentStorage.getStream('1'),
+      ).thenAnswer((_) => Stream.value(log2));
 
       final stream = storage.stream('1');
       final results = await stream.take(2).toList();
-      
+
       expect(results, containsAll([log1, log2]));
     });
 
@@ -178,12 +185,12 @@ void main() {
       final realLiveStorage = _SimpleLiveStorage();
       final storage = Storage(liveDataStorage: realLiveStorage);
       final log1 = FakeEntryModel('1');
-      
+
       realLiveStorage.data.add(log1);
 
       final stream = storage.stream('1');
       final first = await stream.first;
-      
+
       expect(first, log1);
     });
 
@@ -198,7 +205,7 @@ void main() {
   });
 }
 
-class _SimpleLiveStorage extends LiveDataStorage with ChangeNotifier {
+class _SimpleLiveStorage extends LiveDataStorage {
   @override
   final List<EntryModel> data = [];
   @override
