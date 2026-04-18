@@ -10,7 +10,6 @@ class MemoryStorage with ChangeNotifier implements LiveDataStorage {
   final LinkedHashMap<String, EntryModel> _logs;
   final int _capacity;
   final StreamController<EntryModel> _controller;
-  bool _isDisposed = false;
 
   MemoryStorage({int capacity = 1000})
     : _logs = LinkedHashMap(),
@@ -19,9 +18,6 @@ class MemoryStorage with ChangeNotifier implements LiveDataStorage {
 
   @override
   void add({required EntryModel log}) {
-    if (_isDisposed) {
-      throw StateError('MemoryStorage was used after being disposed.');
-    }
     _logs.update(log.id, (old) => old.merge(log), ifAbsent: () => log);
     if (_logs.keys.length > _capacity) {
       final key = _logs.keys.firstOrNull;
@@ -36,9 +32,6 @@ class MemoryStorage with ChangeNotifier implements LiveDataStorage {
 
   @override
   void clear() {
-    if (_isDisposed) {
-      throw StateError('MemoryStorage was used after being disposed.');
-    }
     _logs.values.forEach(_controller.add);
     _logs.clear();
     notifyListeners();
@@ -57,17 +50,7 @@ class MemoryStorage with ChangeNotifier implements LiveDataStorage {
 
   @override
   void dispose() {
-    _isDisposed = true;
     _controller.close();
     super.dispose();
-  }
-
-  @override
-  void notifyListeners() {
-    if (_isDisposed) return;
-    Future.microtask(() {
-      if (_isDisposed) return;
-      super.notifyListeners();
-    });
   }
 }

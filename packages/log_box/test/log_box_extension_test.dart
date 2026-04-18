@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:log_box/log_box.dart';
-import 'package:log_box/src/extension/log_box_extension.dart';
 
 void main() {
   group('LogBoxExtension', () {

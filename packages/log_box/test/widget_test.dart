@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:log_box/log_box.dart';
 import 'package:log_box/src/widget/human_readable_widget.dart';
 import 'package:log_box/src/widget/searchable_text_widget.dart';
-import 'dart:typed_data';
 import 'package:flutter/services.dart';
 
 void main() {

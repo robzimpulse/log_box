@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:log_box/log_box.dart';
-import 'package:log_box/src/extension/navigation_extension.dart';
 import 'package:log_box/src/screen/detail_screen.dart';
 import 'package:log_box/src/screen/live_dashboard_screen.dart';
 import 'package:log_box/src/screen/paginated_dashboard_screen.dart';

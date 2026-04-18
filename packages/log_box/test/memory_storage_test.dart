@@ -70,7 +70,7 @@ void main() {
     // Subsequent adds might fail or stream might be closed
     expect(
       () => storage.add(log: LogEntryModel(message: 'm')),
-      throwsStateError,
+      throwsAssertionError,
     );
   });
 }
