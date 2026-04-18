@@ -5,9 +5,12 @@ on:
   push:
     paths:
       - 'packages/log_box_persistent_storage_drift/**'
+    branches:
+      - 'master'
   pull_request:
     paths:
       - 'packages/log_box_persistent_storage_drift/**'
+    types: [ opened, reopened, synchronize ]
 
 jobs:
   test:
