@@ -5,9 +5,12 @@ on:
   push:
     paths:
       - 'packages/log_box_navigation_logger/**'
+    branches:
+      - 'master'
   pull_request:
     paths:
       - 'packages/log_box_navigation_logger/**'
+    types: [ opened, reopened, synchronize ]
 
 jobs:
   test:

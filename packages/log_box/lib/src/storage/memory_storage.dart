@@ -53,9 +53,4 @@ class MemoryStorage with ChangeNotifier implements LiveDataStorage {
     _controller.close();
     super.dispose();
   }
-
-  @override
-  void notifyListeners() {
-    Future.microtask(() => super.notifyListeners());
-  }
 }
