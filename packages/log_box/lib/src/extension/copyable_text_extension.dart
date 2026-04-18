@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 extension CopyableTextExtension on String {
-  void copyToClipboard({
+  Future<void> copyToClipboard({
     required BuildContext context,
     String message = 'Copied to clipboard',
   }) async {
