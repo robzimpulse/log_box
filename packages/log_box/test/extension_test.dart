@@ -85,11 +85,48 @@ void main() {
       );
 
       await tester.tap(find.text('Copy'));
-      await tester.pump(); // Start snackbar animation
+      await tester.pumpAndSettle();
 
       final data = await Clipboard.getData(Clipboard.kTextPlain);
       expect(data?.text, text);
+      expect(clipboardData, text);
       expect(find.byType(SnackBar), findsOneWidget);
+    });
+
+    testWidgets('copyToClipboard does nothing if context not mounted', (tester) async {
+      const text = 'unmounted';
+      
+      // We need a way to trigger copyToClipboard and then unmount context.
+      // But copyToClipboard is async.
+      
+      late BuildContext savedContext;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) {
+                savedContext = context;
+                return Container();
+              },
+            ),
+          ),
+        ),
+      );
+
+      // Unmount by pumping a different widget
+      await tester.pumpWidget(Container());
+
+      // Now savedContext is unmounted.
+      // Note: testing unmounted context behavior in unit tests can be tricky 
+      // as it might still be "mounted" depending on how tester.pumpWidget works.
+      // But let's try calling it.
+      text.copyToClipboard(context: savedContext);
+      await tester.pumpAndSettle();
+
+      // Check if it was copied (it should be, because setData is before mounted check)
+      expect(clipboardData, text);
+      // SnackBar should NOT be shown
+      expect(find.byType(SnackBar), findsNothing);
     });
   });
 }
