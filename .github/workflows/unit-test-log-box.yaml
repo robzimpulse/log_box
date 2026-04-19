@@ -30,6 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     strategy:
+      fail-fast: false
       matrix:
         package: ${{ fromJson(needs.setup-matrix.outputs.packages) }}
     outputs:
@@ -68,6 +69,7 @@ jobs:
     needs: [setup-matrix]
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         package: ${{ fromJson(needs.setup-matrix.outputs.packages) }}
     outputs:
@@ -105,6 +107,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     strategy:
+      fail-fast: false
       matrix:
         package: ${{ fromJson(needs.setup-matrix.outputs.packages) }}
     steps:
