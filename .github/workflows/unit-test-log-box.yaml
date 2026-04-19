@@ -21,8 +21,8 @@ jobs:
       - name: "Git Checkout"
         uses: actions/checkout@v4
         with:
-          branch: master
           fetch-depth: 1
+          ref: main
 
       - name: "Install Flutter"
         uses: subosito/flutter-action@v2
