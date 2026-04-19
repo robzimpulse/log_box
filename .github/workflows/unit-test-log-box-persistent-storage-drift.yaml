@@ -19,7 +19,7 @@ permissions:
 jobs:
   baseline:
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
+    if: always() && github.event_name == 'pull_request'
     outputs:
       total_coverage: ${{ steps.coverage_extraction.outputs.total_coverage }}
     steps:
