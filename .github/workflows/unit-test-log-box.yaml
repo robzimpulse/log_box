@@ -15,6 +15,7 @@ on:
 jobs:
   baseline:
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
     outputs:
       total_coverage: ${{ steps.coverage_extraction.outputs.total_coverage }}
     steps:
@@ -56,7 +57,8 @@ jobs:
           echo "### 📊 Coverage Report" >> $GITHUB_STEP_SUMMARY
           echo "* **Package:** log_box" >> $GITHUB_STEP_SUMMARY
           echo "* **Line Coverage:** ${TOTAL_COVERAGE}%" >> $GITHUB_STEP_SUMMARY
-  test:
+
+  unit_test:
     runs-on: ubuntu-latest
     outputs:
       total_coverage: ${{ steps.coverage_extraction.outputs.total_coverage }}
@@ -98,3 +100,43 @@ jobs:
           echo "### 📊 Coverage Report" >> $GITHUB_STEP_SUMMARY
           echo "* **Package:** log_box" >> $GITHUB_STEP_SUMMARY
           echo "* **Line Coverage:** ${TOTAL_COVERAGE}%" >> $GITHUB_STEP_SUMMARY
+
+  compare_coverage:
+    runs-on: ubuntu-latest
+    needs: [baseline, unit_test]
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: "Report Coverage Comparison"
+        run: |
+          BASELINE_COVERAGE=${{ needs.baseline.outputs.total_coverage }}
+          UNIT_TEST_COVERAGE=${{ needs.unit_test.outputs.total_coverage }}
+          
+          # Calculate the difference
+          # Using 'bc -l' for floating-point arithmetic
+          COVERAGE_DIFF=$(echo "$UNIT_TEST_COVERAGE - $BASELINE_COVERAGE" | bc -l)
+          
+          # Format the difference to one decimal place for readability
+          # We use printf for formatting, and capture its output
+          DIFF_PERCENTAGE=$(printf "%.1f" "$COVERAGE_DIFF")
+          
+          echo "### ⚖️ Coverage Comparison Report" >> $GITHUB_STEP_SUMMARY
+          echo "* **Baseline Coverage:** ${BASELINE_COVERAGE}%" >> $GITHUB_STEP_SUMMARY
+          echo "* **Unit Test Coverage:** ${UNIT_TEST_COVERAGE}%" >> $GITHUB_STEP_SUMMARY
+          
+          # Report the difference
+          if (( $(echo "$DIFF_PERCENTAGE > 0" | bc -l) )); then
+            echo "* **Difference:** +${DIFF_PERCENTAGE}% (Coverage increased)" >> $GITHUB_STEP_SUMMARY
+          elif (( $(echo "$DIFF_PERCENTAGE < 0" | bc -l) )); then
+            echo "* **Difference:** ${DIFF_PERCENTAGE}% (Coverage decreased)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "* **Difference:** ${DIFF_PERCENTAGE}% (Coverage unchanged)" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Optional: Add logic to fail the build if coverage drops significantly
+          if (( $(echo "$UNIT_TEST_COVERAGE < $BASELINE_COVERAGE" | bc -l) )); then
+            echo "❌ Coverage has decreased from ${BASELINE_COVERAGE}% to ${UNIT_TEST_COVERAGE}%." >> $GITHUB_STEP_SUMMARY
+            echo "Coverage decreased. Failing job."
+            exit 1
+          else
+            echo "✅ Coverage is maintained or improved (${BASELINE_COVERAGE}% -> ${UNIT_TEST_COVERAGE}%)." >> $GITHUB_STEP_SUMMARY
+          fi
