@@ -1,4 +1,4 @@
-name: Unit Test Log Box
+name: Unit Test Log Box Dio Logger
 
 on:
   workflow_dispatch:
