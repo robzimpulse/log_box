@@ -32,3 +32,4 @@ build/
 
 # ignoring pubspec lock since we haven't publish it to pub.dev
 pubspec.lock
+*.info
