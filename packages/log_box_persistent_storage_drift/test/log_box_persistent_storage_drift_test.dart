@@ -1,10 +1,7 @@
-import 'dart:async';
-import 'dart:convert';
-
 import 'package:drift/drift.dart' hide isNull, isNotNull;
-import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:log_box/log_box.dart';
+import 'package:log_box_persistent_storage_drift/memory_executor.dart';
 import 'package:log_box_persistent_storage_drift/src/database/executor/base.dart';
 import 'package:log_box_persistent_storage_drift/src/drift_persistent_storage.dart';
 import 'package:log_box_persistent_storage_drift/src/database/database.dart';
@@ -37,13 +34,11 @@ class MockEntryModel extends Mock implements EntryModel {
 
 void main() {
   late DriftPersistentStorage storage;
-  late MockExecutor mockExecutor;
+  late MemoryExecutor mockExecutor;
   late LogBoxPersistentDatabase database;
 
   setUp(() {
-    mockExecutor = MockExecutor();
-    final queryExecutor = NativeDatabase.memory();
-    when(() => mockExecutor.executor).thenReturn(queryExecutor);
+    mockExecutor = MemoryExecutor();
     
     storage = DriftPersistentStorage(
       executor: mockExecutor,
