@@ -15,6 +15,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    outputs:
+      total_coverage: ${{ steps.coverage_extraction.outputs.total_coverage }}
     steps:
       - name: "Git Checkout"
         uses: actions/checkout@v4
@@ -33,4 +35,23 @@ jobs:
 
       - name: 'Run Test'
         working-directory: ./packages/log_box
-        run: flutter test
+        run: flutter test --coverage
+
+      - name: "Extract Coverage Percentage"
+        working-directory: ./packages/log_box
+        run: |
+          # Install lcov to use the lcov --summary command
+          sudo apt-get update
+          sudo apt-get install -y lcov
+          
+          # Extract the percentage
+          # We use lcov summary and awk to isolate the 'lines' percentage
+          TOTAL_COVERAGE=$(lcov --summary coverage/lcov.info | grep lines | cut -d ' ' -f 4 | cut -d '%' -f 1)
+          
+          # Set the output for this step
+          echo "total_coverage=$TOTAL_COVERAGE" >> $GITHUB_OUTPUT
+
+          # Post to the Step Summary so it's visible in the GitHub UI
+          echo "### 📊 Coverage Report" >> $GITHUB_STEP_SUMMARY
+          echo "* **Package:** log_box" >> $GITHUB_STEP_SUMMARY
+          echo "* **Line Coverage:** ${TOTAL_COVERAGE}%" >> $GITHUB_STEP_SUMMARY
