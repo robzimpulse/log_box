@@ -105,7 +105,7 @@ jobs:
   compare_coverage:
     needs: [setup-matrix, baseline, unit_test]
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
+    if: always() && github.event_name == 'pull_request' && needs.setup-matrix.result == 'success'
     strategy:
       fail-fast: false
       matrix:
