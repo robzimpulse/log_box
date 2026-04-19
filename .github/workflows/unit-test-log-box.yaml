@@ -23,7 +23,7 @@ jobs:
       - id: set-matrix
         run: |
           # You can manually list them or use a script to auto-detect directories
-          echo 'packages=["log_box", "log_box_dio_logger", "log_box_nav_observer"]' >> $GITHUB_OUTPUT
+          echo 'packages=["log_box", "log_box_dio_logger", "log_box_navigation_observer", "log_box_in_app_webview_logger", "log_box_persistent_storage_drift"]' >> $GITHUB_OUTPUT
 
   baseline:
     needs: [setup-matrix]
