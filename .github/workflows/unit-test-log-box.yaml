@@ -3,9 +3,13 @@ name: Unit Test Log Box
 on:
   workflow_dispatch:
   push:
+    paths:
+      - 'packages/log_box/**'
     branches:
       - 'master'
   pull_request:
+    paths:
+      - 'packages/log_box/**'
     types: [opened, reopened, synchronize]
 
 permissions:
@@ -13,28 +17,10 @@ permissions:
   pull-requests: write
 
 jobs:
-  # Define the matrix setup
-  # Add or remove packages here as they are created in your /packages directory
-  setup-matrix:
-    runs-on: ubuntu-latest
-    outputs:
-      packages: ${{ steps.set-matrix.outputs.packages }}
-    steps:
-      - id: set-matrix
-        run: |
-          # You can manually list them or use a script to auto-detect directories
-          echo 'packages=["log_box", "log_box_dio_logger", "log_box_navigation_logger", "log_box_in_app_webview_logger", "log_box_persistent_storage_drift"]' >> $GITHUB_OUTPUT
-
   baseline:
-    needs: [setup-matrix]
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
-    strategy:
-      fail-fast: false
-      matrix:
-        package: ${{ fromJson(needs.setup-matrix.outputs.packages) }}
     outputs:
-      # This creates a map of package-name to coverage value
       total_coverage: ${{ steps.coverage_extraction.outputs.total_coverage }}
     steps:
       - name: "Git Checkout"
@@ -50,28 +36,35 @@ jobs:
           cache: true
 
       - name: "Install Packages"
-        working-directory: ./packages/${{ matrix.package }}
+        working-directory: ./packages/log_box
         run: flutter pub get
 
       - name: 'Run Test'
-        working-directory: ./packages/${{ matrix.package }}
+        working-directory: ./packages/log_box
         run: flutter test --coverage
 
       - id: coverage_extraction
         name: "Extract Coverage Percentage"
-        working-directory: ./packages/${{ matrix.package }}
+        working-directory: ./packages/log_box
         run: |
-          sudo apt-get update && sudo apt-get install -y lcov
+          # Install lcov to use the lcov --summary command
+          sudo apt-get update
+          sudo apt-get install -y lcov
+
+          # Extract the percentage
+          # We use lcov summary and awk to isolate the 'lines' percentage
           TOTAL_COVERAGE=$(lcov --summary coverage/lcov.info | grep lines | cut -d ' ' -f 4 | cut -d '%' -f 1)
+
+          # Set the output for this step
           echo "total_coverage=$TOTAL_COVERAGE" >> $GITHUB_OUTPUT
 
+          # Post to the Step Summary so it's visible in the GitHub UI
+          echo "### 📊 Coverage Report" >> $GITHUB_STEP_SUMMARY
+          echo "* **Package:** log_box" >> $GITHUB_STEP_SUMMARY
+          echo "* **Line Coverage:** ${TOTAL_COVERAGE}%" >> $GITHUB_STEP_SUMMARY
+
   unit_test:
-    needs: [setup-matrix]
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        package: ${{ fromJson(needs.setup-matrix.outputs.packages) }}
     outputs:
       total_coverage: ${{ steps.coverage_extraction.outputs.total_coverage }}
     steps:
@@ -87,45 +80,58 @@ jobs:
           cache: true
 
       - name: "Install Packages"
-        working-directory: ./packages/${{ matrix.package }}
+        working-directory: ./packages/log_box
         run: flutter pub get
 
       - name: 'Run Test'
-        working-directory: ./packages/${{ matrix.package }}
+        working-directory: ./packages/log_box
         run: flutter test --coverage
 
       - id: coverage_extraction
         name: "Extract Coverage Percentage"
-        working-directory: ./packages/${{ matrix.package }}
+        working-directory: ./packages/log_box
         run: |
-          sudo apt-get update && sudo apt-get install -y lcov
+          # Install lcov to use the lcov --summary command
+          sudo apt-get update
+          sudo apt-get install -y lcov
+          
+          # Extract the percentage
+          # We use lcov summary and awk to isolate the 'lines' percentage
           TOTAL_COVERAGE=$(lcov --summary coverage/lcov.info | grep lines | cut -d ' ' -f 4 | cut -d '%' -f 1)
+          
+          # Set the output for this step
           echo "total_coverage=$TOTAL_COVERAGE" >> $GITHUB_OUTPUT
 
+          # Post to the Step Summary so it's visible in the GitHub UI
+          echo "### 📊 Coverage Report" >> $GITHUB_STEP_SUMMARY
+          echo "* **Package:** log_box" >> $GITHUB_STEP_SUMMARY
+          echo "* **Line Coverage:** ${TOTAL_COVERAGE}%" >> $GITHUB_STEP_SUMMARY
+
   compare_coverage:
-    needs: [setup-matrix, baseline, unit_test]
     runs-on: ubuntu-latest
-    if: always() && github.event_name == 'pull_request' && needs.setup-matrix.result == 'success'
-    strategy:
-      fail-fast: false
-      matrix:
-        package: ${{ fromJson(needs.setup-matrix.outputs.packages) }}
+    needs: [baseline, unit_test]
+    if: github.event_name == 'pull_request'
     steps:
+
       - name: 'Compare Results'
         id: compare
         run: |
-          # Use the 'needs' context to find the specific matrix instance output
-          # Syntax: needs.<job_id>.outputs.<output_name> (Note: outputs from matrix jobs are indexed by matrix properties)
-          BASE=${{ needs.baseline.outputs.total_coverage }}
-          PR=${{ needs.unit_test.outputs.total_coverage }}
+          # Fallback to 0.00 if outputs are missing or null
+          BASE=${{ needs.baseline.outputs.total_coverage || '0.00' }}
+          PR=${{ needs.unit_test.outputs.total_coverage || '0.00' }}
 
-          # If either is empty, default to 0
-          BASE=${BASE:-0.00}
-          PR=${PR:-0.00}
-
+          # Floating point math via awk
           DIFF=$(awk "BEGIN {print $PR - $BASE}")
-          if (( $(echo "$DIFF < 0" | bc -l) )); then ICON="📉"; elif (( $(echo "$DIFF > 0" | bc -l) )); then ICON="📈"; DIFF="+$DIFF"; else ICON="➖"; fi
-          
+
+          if (( $(echo "$DIFF < 0" | bc -l) )); then
+            ICON="📉"
+          elif (( $(echo "$DIFF > 0" | bc -l) )); then
+            ICON="📈"
+            DIFF="+$DIFF"
+          else
+            ICON="➖"
+          fi
+
           echo "base_val=$BASE" >> $GITHUB_OUTPUT
           echo "pr_val=$PR" >> $GITHUB_OUTPUT
           echo "diff=$DIFF" >> $GITHUB_OUTPUT
@@ -137,7 +143,7 @@ jobs:
         with:
           issue-number: ${{ github.event.pull_request.number }}
           comment-author: 'github-actions[bot]'
-          body-includes: 'CI/CD Pipeline Results (${{ matrix.package }})'
+          body-includes: 'CI/CD Pipeline Results'
 
       - name: 'Create or Update Comment'
         uses: peter-evans/create-or-update-comment@v4
@@ -146,13 +152,13 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           edit-mode: replace
           body: |
-            # CI/CD Pipeline Results (${{ matrix.package }})
+            # CI/CD Pipeline Results (log_box)
 
             | Metric | Main (Base) | PR (Current) | Diff |
             |:---:|:---:|:---:|:---|
             | **Total Coverage** | ${{ steps.compare.outputs.base_val }}% | ${{ steps.compare.outputs.pr_val }}% | ${{ steps.compare.outputs.icon }} **${{ steps.compare.outputs.diff }}%** |
 
             ### Status Summary
-            * **Unit Tests**: ✅ Passed
+            * **Unit Tests**: ${{ needs.unit_test.result == 'success' && '✅ Passed' || '❌ Failed' }}
 
             [View Detailed Logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
