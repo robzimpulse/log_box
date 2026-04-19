@@ -13,6 +13,49 @@ on:
     types: [opened, reopened, synchronize]
 
 jobs:
+  baseline:
+    runs-on: ubuntu-latest
+    outputs:
+      total_coverage: ${{ steps.coverage_extraction.outputs.total_coverage }}
+    steps:
+      - name: "Git Checkout"
+        uses: actions/checkout@v4
+        with:
+          branch: master
+          fetch-depth: 1
+
+      - name: "Install Flutter"
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.8'
+          cache: true
+
+      - name: "Install Packages"
+        working-directory: ./packages/log_box
+        run: flutter pub get
+
+      - name: 'Run Test'
+        working-directory: ./packages/log_box
+        run: flutter test --coverage
+
+      - name: "Extract Coverage Percentage"
+        working-directory: ./packages/log_box
+        run: |
+          # Install lcov to use the lcov --summary command
+          sudo apt-get update
+          sudo apt-get install -y lcov
+
+          # Extract the percentage
+          # We use lcov summary and awk to isolate the 'lines' percentage
+          TOTAL_COVERAGE=$(lcov --summary coverage/lcov.info | grep lines | cut -d ' ' -f 4 | cut -d '%' -f 1)
+
+          # Set the output for this step
+          echo "total_coverage=$TOTAL_COVERAGE" >> $GITHUB_OUTPUT
+
+          # Post to the Step Summary so it's visible in the GitHub UI
+          echo "### 📊 Coverage Report" >> $GITHUB_STEP_SUMMARY
+          echo "* **Package:** log_box" >> $GITHUB_STEP_SUMMARY
+          echo "* **Line Coverage:** ${TOTAL_COVERAGE}%" >> $GITHUB_STEP_SUMMARY
   test:
     runs-on: ubuntu-latest
     outputs:
@@ -21,7 +64,7 @@ jobs:
       - name: "Git Checkout"
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: "Install Flutter"
         uses: subosito/flutter-action@v2
