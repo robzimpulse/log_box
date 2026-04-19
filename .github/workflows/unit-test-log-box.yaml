@@ -12,6 +12,11 @@ on:
       - 'packages/log_box/**'
     types: [opened, reopened, synchronize]
 
+permissions:
+  contents: read
+  pull-requests: write
+
+
 jobs:
   baseline:
     runs-on: ubuntu-latest
@@ -148,7 +153,7 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           edit-mode: replace
           body: |
-            # CI/CD Pipeline Results 🧪
+            # CI/CD Pipeline Results (log_box)
 
             | Metric | Main (Base) | PR (Current) | Diff |
             |:---:|:---:|:---:|:---|
