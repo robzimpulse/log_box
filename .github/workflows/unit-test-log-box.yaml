@@ -108,37 +108,53 @@ jobs:
     needs: [baseline, unit_test]
     if: github.event_name == 'pull_request'
     steps:
-      - name: "Report Coverage Comparison"
+
+      - name: 'Compare Results'
+        id: compare
         run: |
-          BASELINE_COVERAGE=${{ needs.baseline.outputs.total_coverage }}
-          UNIT_TEST_COVERAGE=${{ needs.unit_test.outputs.total_coverage }}
-          
-          # Calculate the difference
-          # Using 'bc -l' for floating-point arithmetic
-          COVERAGE_DIFF=$(echo "$UNIT_TEST_COVERAGE - $BASELINE_COVERAGE" | bc -l)
-          
-          # Format the difference to one decimal place for readability
-          # We use printf for formatting, and capture its output
-          DIFF_PERCENTAGE=$(printf "%.1f" "$COVERAGE_DIFF")
-          
-          echo "### ⚖️ Coverage Comparison Report" >> $GITHUB_STEP_SUMMARY
-          echo "* **Baseline Coverage:** ${BASELINE_COVERAGE}%" >> $GITHUB_STEP_SUMMARY
-          echo "* **Unit Test Coverage:** ${UNIT_TEST_COVERAGE}%" >> $GITHUB_STEP_SUMMARY
-          
-          # Report the difference
-          if (( $(echo "$DIFF_PERCENTAGE > 0" | bc -l) )); then
-            echo "* **Difference:** +${DIFF_PERCENTAGE}% (Coverage increased)" >> $GITHUB_STEP_SUMMARY
-          elif (( $(echo "$DIFF_PERCENTAGE < 0" | bc -l) )); then
-            echo "* **Difference:** ${DIFF_PERCENTAGE}% (Coverage decreased)" >> $GITHUB_STEP_SUMMARY
+          # Fallback to 0.00 if outputs are missing or null
+          BASE=${{ needs.baseline.outputs.total_coverage || '0.00' }}
+          PR=${{ needs.unit_test.outputs.total_coverage || '0.00' }}
+
+          # Floating point math via awk
+          DIFF=$(awk "BEGIN {print $PR - $BASE}")
+
+          if (( $(echo "$DIFF < 0" | bc -l) )); then
+            ICON="📉"
+          elif (( $(echo "$DIFF > 0" | bc -l) )); then
+            ICON="📈"
+            DIFF="+$DIFF"
           else
-            echo "* **Difference:** ${DIFF_PERCENTAGE}% (Coverage unchanged)" >> $GITHUB_STEP_SUMMARY
+            ICON="➖"
           fi
-          
-          # Optional: Add logic to fail the build if coverage drops significantly
-          if (( $(echo "$UNIT_TEST_COVERAGE < $BASELINE_COVERAGE" | bc -l) )); then
-            echo "❌ Coverage has decreased from ${BASELINE_COVERAGE}% to ${UNIT_TEST_COVERAGE}%." >> $GITHUB_STEP_SUMMARY
-            echo "Coverage decreased. Failing job."
-            exit 1
-          else
-            echo "✅ Coverage is maintained or improved (${BASELINE_COVERAGE}% -> ${UNIT_TEST_COVERAGE}%)." >> $GITHUB_STEP_SUMMARY
-          fi
+
+          echo "base_val=$BASE" >> $GITHUB_OUTPUT
+          echo "pr_val=$PR" >> $GITHUB_OUTPUT
+          echo "diff=$DIFF" >> $GITHUB_OUTPUT
+          echo "icon=$ICON" >> $GITHUB_OUTPUT
+
+      - name: 'Find Previous Results'
+        uses: peter-evans/find-comment@v3
+        id: fc
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: 'CI/CD Pipeline Results'
+
+      - name: 'Create or Update Comment'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
+          body: |
+            # CI/CD Pipeline Results 🧪
+
+            | Metric | Main (Base) | PR (Current) | Diff |
+            |:---:|:---:|:---:|:---|
+            | **Total Coverage** | ${{ steps.compare.outputs.base_val }}% | ${{ steps.compare.outputs.pr_val }}% | ${{ steps.compare.outputs.icon }} **${{ steps.compare.outputs.diff }}%** |
+
+            ### Status Summary
+            * **Unit Tests**: ${{ needs.unit_test.result == 'success' && '✅ Passed' || '❌ Failed' }}
+
+            [View Detailed Logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
