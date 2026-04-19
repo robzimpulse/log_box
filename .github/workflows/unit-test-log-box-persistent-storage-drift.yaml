@@ -144,7 +144,7 @@ jobs:
         with:
           issue-number: ${{ github.event.pull_request.number }}
           comment-author: 'github-actions[bot]'
-          body-includes: 'CI/CD Pipeline Results'
+          body-includes: 'CI/CD Pipeline Results (log_box_persistent_storage_drift)'
 
       - name: 'Create or Update Comment'
         uses: peter-evans/create-or-update-comment@v4
