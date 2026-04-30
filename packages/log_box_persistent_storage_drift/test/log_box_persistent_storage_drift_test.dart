@@ -67,8 +67,8 @@ void main() {
     });
 
     test('add merges with existing log', () async {
-      final log1 = DriftQueryEntryModel(id: 'merge-id', operations: []);
-      final log2 = DriftQueryEntryModel(id: 'merge-id', operations: []);
+      final log1 = DriftQueryEntryModel(id: 'merge-id', operations: [], loading: true);
+      final log2 = DriftQueryEntryModel(id: 'merge-id', operations: [], loading: false);
       
       await storage.add(log: log1);
       await storage.add(log: log2);

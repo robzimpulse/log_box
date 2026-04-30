@@ -16,6 +16,7 @@ DriftQueryEntryModel _$DriftQueryEntryModelFromJson(
   operations: (json['operations'] as List<dynamic>)
       .map((e) => DriftQueryOperationModel.fromJson(e as Map<String, dynamic>))
       .toList(),
+  loading: json['loading'] as bool,
 );
 
 Map<String, dynamic> _$DriftQueryEntryModelToJson(
@@ -24,4 +25,5 @@ Map<String, dynamic> _$DriftQueryEntryModelToJson(
   'id': instance.id,
   'timestamp': instance.timestamp.toIso8601String(),
   'operations': instance.operations.map((e) => e.toJson()).toList(),
+  'loading': instance.loading,
 };
