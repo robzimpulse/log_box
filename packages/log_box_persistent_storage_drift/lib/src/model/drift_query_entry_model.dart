@@ -11,6 +11,7 @@ part 'drift_query_entry_model.g.dart';
 @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class DriftQueryEntryModel extends EntryModel {
   final List<DriftQueryOperationModel> operations;
+  final bool loading;
 
   Duration get duration {
     return operations.fold(
@@ -21,7 +22,12 @@ class DriftQueryEntryModel extends EntryModel {
 
   List<LogNode> get tree => operations.tree;
 
-  DriftQueryEntryModel({super.id, super.timestamp, required this.operations});
+  DriftQueryEntryModel({
+    super.id,
+    super.timestamp,
+    required this.operations,
+    required this.loading,
+  });
 
   @override
   bool contains(String keyword) {
@@ -34,9 +40,7 @@ class DriftQueryEntryModel extends EntryModel {
   @override
   DriftQueryEntryModel merge(other) {
     if (other is! DriftQueryEntryModel) return this;
-    return DriftQueryEntryModel(
-      operations: [...operations, ...other.operations],
-    );
+    return other;
   }
 
   @override
@@ -126,6 +130,14 @@ class DriftQueryEntryModel extends EntryModel {
           children: [
             Icon(Icons.storage, size: 16),
             const SizedBox(width: 8),
+            if (loading == true) ...[
+              const SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(),
+              ),
+              const SizedBox(width: 8),
+            ],
             Expanded(
               child: Text(
                 'Database Queries',
