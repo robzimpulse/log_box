@@ -7,19 +7,23 @@ import '../screen/live_dashboard_screen.dart';
 import '../screen/detail_screen.dart';
 
 extension NavigationExtension on LogBox {
+  static const liveDashboardPath = '/logbox/dashboard/live';
+  static const paginatedDashboardPath = '/logbox/dashboard/paginated';
+  static const detailPath = '/logbox/details';
+
   static const MapEntry<String, RouteSettings> _liveDashboard = MapEntry(
-    '/logbox/dashboard/live',
-    RouteSettings(name: '/logbox/dashboard/live'),
+    liveDashboardPath,
+    RouteSettings(name: liveDashboardPath),
   );
 
   static const MapEntry<String, RouteSettings> _paginatedDashboard = MapEntry(
-    '/logbox/dashboard/paginated',
-    RouteSettings(name: '/logbox/dashboard/paginated'),
+    paginatedDashboardPath,
+    RouteSettings(name: paginatedDashboardPath),
   );
 
   static const MapEntry<String, RouteSettings> _detail = MapEntry(
-    '/logbox/details',
-    RouteSettings(name: '/logbox/details'),
+    detailPath,
+    RouteSettings(name: detailPath),
   );
 
   void entry({
