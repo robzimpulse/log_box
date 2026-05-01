@@ -29,7 +29,7 @@ class DriftLogGrouper {
       DriftQueryEntryModel(
         id: _id,
         operations: [..._stack],
-        loading: _depth <= 0,
+        loading: _depth > 0,
       ),
     );
 
