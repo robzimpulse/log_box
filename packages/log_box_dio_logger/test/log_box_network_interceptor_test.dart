@@ -61,7 +61,7 @@ void main() {
 
       final captured = verify(() => mockStorage.add(log: captureAny(named: 'log'))).captured.first as NetworkEntryModel;
       expect(captured.request?.size, utf8.encode(data.toString()).length);
-      expect(captured.request?.body, isNull);
+      expect(captured.request?.body, jsonEncode(data));
     });
 
     test('captures FormData with fields and files', () {

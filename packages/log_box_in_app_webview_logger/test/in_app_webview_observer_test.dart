@@ -210,7 +210,7 @@ void main() {
       ).called(1);
     });
 
-    test('onReceivedError updates storage (with known bug: event is onProgressChanged)', () {
+    test('onReceivedError updates storage', () {
       final request = {'url': 'https://example.com'};
       final error = {'description': 'failed'};
       final extra = {'key': 'value'};
@@ -224,7 +224,7 @@ void main() {
             that: isA<WebviewEntryModel>().having(
               (e) => e.events.first.event,
               'event',
-              WebviewEvent.onProgressChanged, // Bug in source code
+              WebviewEvent.onReceivedError,
             ).having(
               (e) => e.events.first.extra,
               'extra',
