@@ -35,6 +35,15 @@ jobs:
           flutter-version: '3.32.8'
           cache: true
 
+      - name: "Install Melos"
+        run: dart pub global activate melos "^6.3.2"
+
+      # Resolves intra-repo git dependencies (e.g. log_box) to this checkout
+      # instead of the remote master ref, so shared version constraints stay
+      # consistent within the PR.
+      - name: "Refresh Workspace"
+        run: melos run refresh
+
       - name: "Install Packages"
         working-directory: ./packages/log_box_in_app_webview_logger
         run: flutter pub get
@@ -79,6 +88,15 @@ jobs:
         with:
           flutter-version: '3.32.8'
           cache: true
+
+      - name: "Install Melos"
+        run: dart pub global activate melos "^6.3.2"
+
+      # Resolves intra-repo git dependencies (e.g. log_box) to this checkout
+      # instead of the remote master ref, so shared version constraints stay
+      # consistent within the PR.
+      - name: "Refresh Workspace"
+        run: melos run refresh
 
       - name: "Install Packages"
         working-directory: ./packages/log_box_in_app_webview_logger
