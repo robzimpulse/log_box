@@ -66,3 +66,8 @@ The project follows a **Modular Monorepo Architecture** sharded by functionality
   - **Location:** Various models
   - **Context:** The project uses high SDK constraints, likely leveraging Dart 3.x features like Extension Types for performance or API ergonomics.
   - **Troubleshooting:** Ensure your IDE is using the Flutter version specified in `.fvmrc` to avoid syntax errors.
+
+- **Intra-Repo Git Dependencies vs. CI on Version-Bump PRs**
+  - **Location:** `packages/*/pubspec.yaml` (all extension packages) + `.github/workflows/unit-test-*.yaml`
+  - **Context:** Extension packages (e.g. `log_box_dio_logger`) declare `log_box` as a git dependency pinned to `ref: master` of this same repository. Per-package CI runs plain `flutter pub get`, which resolves `log_box` from git `master` — NOT the PR branch. A single PR that bumps a shared dependency constraint (e.g. rxdart `^0.27.7` → `^0.28.0`) in both `log_box` and an extension package therefore fails version solving until it merges, because pre-1.0 caret ranges are disjoint. Local dev is unaffected: `melos bs`/`melos run refresh` overrides the git dep with a path dep via `pubspec_overrides.yaml`.
+  - **Troubleshooting:** Split shared-dependency bumps into per-module PRs merged sequentially: bump `log_box` first, then the extension packages (their CI resolves against the updated master). Between the two merges, the extension workflow's `baseline` job (which checks out master) is red — merge anyway; push-triggered runs have no baseline job. Also note: on a fresh clone, `dart pub get` at the repo root fails because pub also resolves `example/`, which mixes path deps on the extension packages with their git deps on `log_box`. Run `melos bs` or `melos run refresh` first to generate the path overrides.
