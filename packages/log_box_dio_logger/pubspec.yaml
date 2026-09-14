@@ -15,7 +15,7 @@ dependencies:
   equatable: ^2.0.5
   universal_io: ^2.2.2
   json_annotation: ^4.9.0
-  rxdart: ^0.27.7
+  rxdart: ^0.28.0
 
   log_box:
     git:
