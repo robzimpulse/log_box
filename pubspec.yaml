@@ -1,8 +1,29 @@
-name: log_box_workspace
+name: log_box
+description: "Just another extendable logger"
+version: 0.1.0
+publish_to: none
 
 environment:
   sdk: ">=3.8.0 <4.0.0"
   flutter: ">=3.29.3"
 
+dependencies:
+  flutter:
+    sdk: flutter
+  uuid: ^4.5.1
+  json_annotation: ^4.9.0
+  rxdart: ^0.28.0
+  go_router: ^17.0.0
+
+  super_paging:
+    git:
+      url: https://github.com/robzimpulse/super_paging
+      ref: fix_error_when_no_listener
+
 dev_dependencies:
-  melos: ^6.3.2
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  build_runner: ^2.3.3
+  json_serializable: ^6.6.1
+  mocktail: ^1.0.4

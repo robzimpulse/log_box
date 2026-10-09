@@ -35,3 +35,4 @@ pubspec.lock
 *.info
 # Local design docs and plans (not versioned)
 docs/
+coverage/
