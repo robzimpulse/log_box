@@ -1,6 +1,6 @@
 # Makefile — development and CI entry points for the log_box core package.
 #
-# Purpose: replaces the former Melos scripts. Every target runs against the
+# Purpose: single entry point for local dev and CI. Every target runs against the
 # core package at the repo root; get/upgrade/clean/refresh also cover the
 # example/ app. CI calls `make get`, `make coverage`, `make analyze`,
 # `make format-check` and `make test`.
