@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+// flutter_cache_manager exposes no public mime helper; use its internal one.
+// ignore: implementation_imports
 import 'package:flutter_cache_manager/src/web/mime_converter.dart';
 import 'package:universal_io/io.dart';
 
