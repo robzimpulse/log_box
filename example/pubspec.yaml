@@ -44,19 +44,19 @@ dependencies:
   log_box_dio_logger:
     git:
       url: https://github.com/robzimpulse/log_box_dio_logger.git
-      ref: master
+      ref: v0.0.1
   log_box_navigation_logger:
     git:
       url: https://github.com/robzimpulse/log_box_navigation_logger.git
-      ref: master
+      ref: v0.0.1
   log_box_in_app_webview_logger:
     git:
       url: https://github.com/robzimpulse/log_box_in_app_webview_logger.git
-      ref: master
+      ref: v0.0.1
   log_box_persistent_storage_drift:
     git:
       url: https://github.com/robzimpulse/log_box_persistent_storage_drift.git
-      ref: master
+      ref: v0.0.1
 
 dev_dependencies:
   flutter_test:
