@@ -1,0 +1,13 @@
+# build.yaml — build_runner configuration for the log_box core package.
+#
+# Purpose: core lives at the repo root, so without this file build_runner
+# would also scan example/ (including example/ios/.symlinks plugin sources)
+# and fail on their annotations. Restrict code generation to core's lib/.
+#
+# Usage: picked up automatically by `make generate`.
+targets:
+  $default:
+    sources:
+      - $package$
+      - pubspec.yaml
+      - lib/**

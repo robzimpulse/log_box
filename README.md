@@ -1,6 +1,6 @@
 # LogBox
 
-LogBox is a powerful, modular logging framework for Flutter applications, designed to help developers capture, store, and visualize application logs efficiently. It follows a modular monorepo architecture, allowing you to include only the loggers you need.
+LogBox is a powerful, modular logging framework for Flutter applications, designed to help developers capture, store, and visualize application logs efficiently. The core package lives in this repository; each logger extension lives in its own repository, so you include only the loggers you need.
 
 ## Core Features
 - **Modular Design:** Keep your core app lightweight by choosing only necessary extensions.
@@ -14,34 +14,52 @@ LogBox is a powerful, modular logging framework for Flutter applications, design
 
 ## 🏗 Architecture
 
-The project is managed as a monorepo using [Melos](https://melos.invertase.dev/).
+This repository contains the **core** `log_box` package (at the repo root) and an `example/` app.
 
-- **`packages/log_box`**: The core framework. Defines storage interfaces, base models, and the UI dashboard.
-- **`packages/log_box_dio_logger`**: Extension for capturing Dio network traffic.
-- **`packages/log_box_navigation_logger`**: Extension for capturing Navigator/GoRouter events.
-- **`packages/log_box_in_app_webview_logger`**: Extension for capturing `flutter_inappwebview` events.
-- **`packages/log_box_persistent_storage_drift`**: Implementation of persistent storage using Drift.
+- **`lib/`**: The core framework. Defines storage interfaces, base models, and the UI dashboard.
 - **`example/`**: Integration project showcasing all loggers and storage configurations.
+
+### Related repositories
+
+| Package | Repository | Purpose |
+| :--- | :--- | :--- |
+| `log_box_dio_logger` | https://github.com/robzimpulse/log_box_dio_logger | Captures Dio network traffic |
+| `log_box_navigation_logger` | https://github.com/robzimpulse/log_box_navigation_logger | Captures Navigator/GoRouter events |
+| `log_box_in_app_webview_logger` | https://github.com/robzimpulse/log_box_in_app_webview_logger | Captures `flutter_inappwebview` events |
+| `log_box_persistent_storage_drift` | https://github.com/robzimpulse/log_box_persistent_storage_drift | Persistent storage using Drift |
+
+---
+
+## 📦 Installation
+
+Packages are not published to pub.dev; depend on them via git tags:
+
+```yaml
+dependencies:
+  log_box:
+    git:
+      url: https://github.com/robzimpulse/log_box.git
+      ref: v0.1.0
+  log_box_dio_logger:
+    git:
+      url: https://github.com/robzimpulse/log_box_dio_logger.git
+      ref: v0.0.1
+```
+
+> **Migrating from the monorepo:** `log_box` moved from `packages/log_box` to the repository root. Remove `path: packages/log_box` from your git dependency and pin a tag instead of `master`.
 
 ---
 
 ## 📋 Prerequisites
 
-Before you begin, ensure you have the following installed:
-
 - **FVM (Flutter Version Management):** Recommended for managing Flutter versions.
-- **Flutter SDK:** ^3.32.8 (managed via FVM).
+- **Flutter SDK:** 3.32.8 (pinned in `.fvmrc`).
 - **Dart SDK:** ^3.8.0.
-- **Melos:** Required for monorepo management. Install via:
-  ```bash
-  dart pub global activate melos
-  ```
+- **make**
 
 ---
 
 ## 🚀 Local Development Setup
-
-Follow these steps to get your development environment ready:
 
 1. **Clone the repository:**
    ```bash
@@ -54,16 +72,14 @@ Follow these steps to get your development environment ready:
    fvm install
    ```
 
-3. **Bootstrap the project:**
-   This will link all local packages and install dependencies.
+3. **Fetch dependencies** (core + example):
    ```bash
-   melos bs
+   make get
    ```
 
-4. **Generate code:**
-   Many packages use `build_runner` for JSON serialization and Drift table generation.
+4. **Generate code** (JSON serialization):
    ```bash
-   melos run generate
+   make generate
    ```
 
 5. **Run the example app:**
@@ -71,6 +87,8 @@ Follow these steps to get your development environment ready:
    cd example
    fvm flutter run
    ```
+
+Run `make` to list all targets. Pass `FLUTTER="fvm flutter"` / `DART="fvm dart"` to use the FVM-pinned SDK, e.g. `make test FLUTTER="fvm flutter"`.
 
 ---
 
@@ -124,15 +142,15 @@ box.dashboard(context: context);
 Drift storage requires a `decoder` map to deserialize JSON blobs back into Dart models. If you add a new loggable model, you **must** add its `fromJson` factory to the `decoder` map during `LogBox` initialization.
 
 ### Drift Schema Migrations
-If you modify Drift tables in `packages/log_box_persistent_storage_drift`, you need to generate migrations:
+Drift tables live in [log_box_persistent_storage_drift](https://github.com/robzimpulse/log_box_persistent_storage_drift). Generate migrations there with:
 ```bash
-melos run generate:migration
+make generate-migration
 ```
 
-### Melos/FVM Sync Issues
-If local symlinks or Flutter versions get desynced, run the refresh script:
+### FVM Sync Issues
+If dependencies or Flutter versions get desynced, clean and re-fetch:
 ```bash
-melos run refresh
+make refresh
 ```
 
 ### Extension Type Usage
@@ -142,7 +160,20 @@ The project leverages Dart 3.x Extension Types. Ensure your IDE is using the Flu
 
 ## 🧪 Testing
 
-Run all tests across the monorepo:
 ```bash
-melos run test
+make test           # unit tests
+make coverage       # unit tests with coverage/lcov.info
+make analyze        # static analysis (core + example)
+make format-check   # formatting check
 ```
+
+CI (`.github/workflows/unit-test.yaml`) runs tests, coverage diff and lint on every PR and push to `master`.
+
+---
+
+## 🏷 Releasing
+
+1. In a PR, bump `version:` in `pubspec.yaml` and add a matching `## <version>` section to `CHANGELOG.md`.
+2. Merge it. `.github/workflows/release.yaml` runs the release gate (analyze, format check, tests) and creates the `v<version>` tag and GitHub Release.
+
+The release fails if `CHANGELOG.md` has no section for the new version.

@@ -128,10 +128,10 @@ class _WebviewScreenState extends State<WebviewScreen> {
         });''',
               );
 
-              print("jQuery loaded and ready to be used!");
+              debugPrint("jQuery loaded and ready to be used!");
             },
             onError: () {
-              print("jQuery not available! Some error occurred.");
+              debugPrint("jQuery not available! Some error occurred.");
             },
           ),
         );

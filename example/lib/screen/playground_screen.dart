@@ -83,7 +83,7 @@ class PlaygroundScreen extends StatelessWidget {
                     final cookies = await manager.getAllCookies();
 
                     for (final cookie in cookies) {
-                      print(cookie);
+                      debugPrint(cookie.toString());
                     }
                   },
                 );

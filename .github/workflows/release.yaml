@@ -1,0 +1,80 @@
+# release.yaml — CD: tag and publish a GitHub Release on version bump.
+#
+# Purpose: on every push to master, read `version:` from pubspec.yaml. If tag
+# v<version> does not exist yet, require a matching "## <version>" section in
+# CHANGELOG.md, re-run analyze/format/tests as a release gate, then create
+# the tag and GitHub Release with that section as notes. If the tag already
+# exists the workflow is a no-op.
+#
+# Usage: to release, open a PR that bumps `version:` in pubspec.yaml and adds
+# the matching CHANGELOG.md entry; merging it releases. Consumers then pin
+# `ref: v<version>` in their git dependency.
+
+name: Release
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'master'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    # Releases only from master, even when started manually on another branch.
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Git Checkout"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "Resolve Version"
+        id: version
+        run: |
+          # Strip optional quotes, trailing comment and CR from `version:`.
+          VERSION=$(sed -nE "s/^version:[[:space:]]*[\"']?([^\"'[:space:]#]+).*/\1/p" pubspec.yaml | tr -d '\r')
+          if [ -z "$VERSION" ]; then
+            echo "pubspec.yaml has no version: line" >&2
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          if git rev-parse -q --verify "refs/tags/v$VERSION" > /dev/null; then
+            echo "v$VERSION already released"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: "Extract Release Notes"
+        if: steps.version.outputs.skip == 'false'
+        run: .github/scripts/extract_changelog.sh "${{ steps.version.outputs.version }}" > "$RUNNER_TEMP/notes.md"
+
+      - name: "Install Flutter"
+        if: steps.version.outputs.skip == 'false'
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.8'
+          cache: true
+
+      - name: "Release Gate"
+        if: steps.version.outputs.skip == 'false'
+        run: |
+          make get
+          make analyze
+          make format-check
+          make test
+
+      - name: "Create Tag and Release"
+        if: steps.version.outputs.skip == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: gh release create "v$VERSION" --target "$GITHUB_SHA" --title "v$VERSION" --notes-file "$RUNNER_TEMP/notes.md"
