@@ -79,6 +79,11 @@ This repository holds the **core** `log_box` package at its root plus an integra
   - **Context:** With core at the repository root, build_runner treats `example/` (including `example/ios/.symlinks/plugins/*`) as core sources and fails on third-party annotations (`@HostApi`, `@GenerateMocks`).
   - **Troubleshooting:** Keep `build.yaml`'s `sources` restricted to `$package$`, `pubspec.yaml` and `lib/**`. If a generator ever needs `test/` inputs, add `test/**` explicitly — never widen to the whole directory.
 
+- **Pushing Workflow Changes (token scope)**
+  - **Location:** `.github/workflows/*` (this and every extension repository)
+  - **Context:** GitHub rejects pushes that create or modify workflow files unless the token has the `workflow` scope ("refusing to allow an OAuth App to create or update workflow ... without `workflow` scope"). Refreshing only the `gh` token is not enough when git still reads an older token from the macOS Keychain (`credential.helper=osxkeychain`).
+  - **Troubleshooting:** Run `gh auth refresh -h github.com -s workflow`, then `gh auth setup-git` so git uses the `gh` token for github.com. Verify with `gh auth status` (scopes list includes `workflow`).
+
 ## 6. Core Package Context
 
 ### Purpose:
