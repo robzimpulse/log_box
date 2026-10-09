@@ -27,6 +27,8 @@ concurrency:
 
 jobs:
   release:
+    # Releases only from master, even when started manually on another branch.
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
       - name: "Git Checkout"
@@ -37,7 +39,12 @@ jobs:
       - name: "Resolve Version"
         id: version
         run: |
-          VERSION=$(grep -E '^version:' pubspec.yaml | awk '{print $2}')
+          # Strip optional quotes, trailing comment and CR from `version:`.
+          VERSION=$(sed -nE "s/^version:[[:space:]]*[\"']?([^\"'[:space:]#]+).*/\1/p" pubspec.yaml | tr -d '\r')
+          if [ -z "$VERSION" ]; then
+            echo "pubspec.yaml has no version: line" >&2
+            exit 1
+          fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           if git rev-parse -q --verify "refs/tags/v$VERSION" > /dev/null; then
             echo "v$VERSION already released"
