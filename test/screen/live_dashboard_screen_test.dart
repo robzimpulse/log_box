@@ -11,12 +11,19 @@ import 'package:log_box/src/storage/storage.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockLogBox extends Mock implements LogBox {}
+
 class MockStorage extends Mock implements Storage {}
+
 class MockLiveDataStorage extends Mock implements LiveDataStorage {}
+
 class MockPersistentDataStorage extends Mock implements PersistentDataStorage {}
+
 class MockEntryModel extends Mock implements EntryModel {}
+
 class EntryModelA extends MockEntryModel {}
+
 class EntryModelB extends MockEntryModel {}
+
 class FakeBuildContext extends Fake implements BuildContext {}
 
 class FakeMapWithNull extends MapBase<String, Type> {
@@ -78,13 +85,15 @@ void main() {
     expect(find.byType(TextField), findsNothing);
   });
 
-  testWidgets('toggles search mode and preserves controller text', (tester) async {
+  testWidgets('toggles search mode and preserves controller text', (
+    tester,
+  ) async {
     await tester.pumpWidget(createWidget());
-    
+
     // Open search
     await tester.tap(find.byIcon(Icons.search));
     await tester.pump();
-    
+
     expect(find.byType(TextField), findsOneWidget);
     await tester.enterText(find.byType(TextField), 'persist');
     await tester.pump();
@@ -92,9 +101,9 @@ void main() {
     // Close search
     await tester.tap(find.byIcon(Icons.close));
     await tester.pump();
-    
+
     expect(find.text('Log Dashboard'), findsOneWidget);
-    
+
     // Open search again - should have 'persist'
     await tester.tap(find.byIcon(Icons.search));
     await tester.pump();
@@ -103,13 +112,13 @@ void main() {
 
   testWidgets('updates keyword when typing in search field', (tester) async {
     await tester.pumpWidget(createWidget());
-    
+
     await tester.tap(find.byIcon(Icons.search));
     await tester.pump();
-    
+
     await tester.enterText(find.byType(TextField), 'test');
     await tester.pump();
-    
+
     expect(find.text('No Data'), findsOneWidget);
   });
 
@@ -121,7 +130,7 @@ void main() {
   testWidgets('displays logs and handles filtering', (tester) async {
     final entry1 = MockEntryModel();
     final entry2 = MockEntryModel();
-    
+
     when(() => entry1.id).thenReturn('1');
     when(() => entry1.contains('test')).thenReturn(true);
     when(() => entry1.contains('')).thenReturn(true);
@@ -139,21 +148,23 @@ void main() {
     when(() => mockLiveStorage.data).thenReturn([entry1, entry2]);
 
     await tester.pumpWidget(createWidget());
-    
+
     expect(find.text('Log 1'), findsOneWidget);
     expect(find.text('Log 2'), findsOneWidget);
-    
+
     // Search for 'test'
     await tester.tap(find.byIcon(Icons.search));
     await tester.pump();
     await tester.enterText(find.byType(TextField), 'test');
     await tester.pump();
-    
+
     expect(find.text('Log 1'), findsOneWidget);
     expect(find.text('Log 2'), findsNothing);
   });
 
-  testWidgets('calls onTapEntry when log with detail is tapped', (tester) async {
+  testWidgets('calls onTapEntry when log with detail is tapped', (
+    tester,
+  ) async {
     final entry = MockEntryModel();
     EntryModel? tappedEntry;
     String? tappedKeyword;
@@ -164,19 +175,23 @@ void main() {
     when(() => entry.contains(any())).thenReturn(true);
     when(() => mockLiveStorage.data).thenReturn([entry]);
 
-    await tester.pumpWidget(createWidget(
-      onTapEntry: (e, k) {
-        tappedEntry = e;
-        tappedKeyword = k;
-      },
-    ));
+    await tester.pumpWidget(
+      createWidget(
+        onTapEntry: (e, k) {
+          tappedEntry = e;
+          tappedKeyword = k;
+        },
+      ),
+    );
 
     await tester.tap(find.text('Log'));
     expect(tappedEntry, entry);
     expect(tappedKeyword, '');
   });
 
-  testWidgets('does not call onTapEntry when log with no detail is tapped', (tester) async {
+  testWidgets('does not call onTapEntry when log with no detail is tapped', (
+    tester,
+  ) async {
     final entry = MockEntryModel();
     bool tapped = false;
 
@@ -186,34 +201,39 @@ void main() {
     when(() => entry.contains(any())).thenReturn(true);
     when(() => mockLiveStorage.data).thenReturn([entry]);
 
-    await tester.pumpWidget(createWidget(
-      onTapEntry: (_, __) => tapped = true,
-    ));
+    await tester.pumpWidget(createWidget(onTapEntry: (_, __) => tapped = true));
 
     await tester.tap(find.text('Log'));
     expect(tapped, false);
   });
 
-  testWidgets('shows storage icon and calls onTapPaginated if persistentStorage exists', (tester) async {
-    when(() => mockStorage.persistentStorage).thenReturn(mockPersistentStorage);
-    bool paginatedTapped = false;
+  testWidgets(
+    'shows storage icon and calls onTapPaginated if persistentStorage exists',
+    (tester) async {
+      when(
+        () => mockStorage.persistentStorage,
+      ).thenReturn(mockPersistentStorage);
+      bool paginatedTapped = false;
 
-    await tester.pumpWidget(createWidget(
-      onTapPaginated: () => paginatedTapped = true,
-    ));
+      await tester.pumpWidget(
+        createWidget(onTapPaginated: () => paginatedTapped = true),
+      );
 
-    final storageIcon = find.byIcon(Icons.storage);
-    expect(storageIcon, findsOneWidget);
-    
-    await tester.tap(storageIcon);
-    expect(paginatedTapped, true);
-  });
+      final storageIcon = find.byIcon(Icons.storage);
+      expect(storageIcon, findsOneWidget);
 
-  testWidgets('calls clear on liveStorage when delete icon is tapped', (tester) async {
+      await tester.tap(storageIcon);
+      expect(paginatedTapped, true);
+    },
+  );
+
+  testWidgets('calls clear on liveStorage when delete icon is tapped', (
+    tester,
+  ) async {
     when(() => mockLiveStorage.clear()).thenReturn(null);
-    
+
     await tester.pumpWidget(createWidget());
-    
+
     await tester.tap(find.byIcon(Icons.delete));
     verify(() => mockLiveStorage.clear()).called(1);
   });
@@ -221,7 +241,7 @@ void main() {
   testWidgets('handles type filtering', (tester) async {
     final entry1 = EntryModelA();
     final entry2 = EntryModelB();
-    
+
     when(() => entry1.contains(any())).thenReturn(true);
     when(() => entry1.tabLength(any())).thenReturn(0);
     when(() => entry1.title(any())).thenReturn(const Text('Log 1'));
@@ -232,24 +252,23 @@ void main() {
     when(() => entry2.title(any())).thenReturn(const Text('Log 2'));
     when(() => entry2.subtitle(any())).thenReturn(const Text('Sub 2'));
 
-    when(() => mockLiveStorage.types).thenReturn({
-      'TypeA': EntryModelA,
-      'TypeB': EntryModelB,
-    });
+    when(
+      () => mockLiveStorage.types,
+    ).thenReturn({'TypeA': EntryModelA, 'TypeB': EntryModelB});
     when(() => mockLiveStorage.data).thenReturn([entry1, entry2]);
 
     await tester.pumpWidget(createWidget());
-    
+
     expect(find.text('TypeA'), findsOneWidget);
     expect(find.text('TypeB'), findsOneWidget);
-    
+
     // Filter by TypeA
     await tester.tap(find.text('TypeA'));
     await tester.pump();
-    
+
     expect(find.text('Log 1'), findsOneWidget);
     expect(find.text('Log 2'), findsNothing);
-    
+
     // Deselect filter
     await tester.tap(find.text('TypeA'));
     await tester.pump();
@@ -265,7 +284,7 @@ void main() {
 
   testWidgets('PopScope handles pop correctly', (tester) async {
     await tester.pumpWidget(createWidget());
-    
+
     // Enter search mode
     await tester.tap(find.byIcon(Icons.search));
     await tester.pump();
@@ -275,16 +294,18 @@ void main() {
     final popScopeFinder = find.byWidgetPredicate((w) => w is PopScope);
     expect(popScopeFinder, findsAtLeast(1));
     final PopScope popScope = tester.widget(popScopeFinder.first);
-    
+
     // success = false
     popScope.onPopInvokedWithResult!(false, null);
     await tester.pump();
 
     expect(find.byType(TextField), findsNothing);
     expect(find.text('Log Dashboard'), findsOneWidget);
-    
+
     // success = true
-    final PopScope popScopeAfter = tester.widget(find.byWidgetPredicate((w) => w is PopScope).first);
+    final PopScope popScopeAfter = tester.widget(
+      find.byWidgetPredicate((w) => w is PopScope).first,
+    );
     popScopeAfter.onPopInvokedWithResult!(true, null);
     await tester.pump();
     expect(find.text('Log Dashboard'), findsOneWidget);

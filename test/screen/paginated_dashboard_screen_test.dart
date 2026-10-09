@@ -12,9 +12,13 @@ import 'package:mocktail/mocktail.dart';
 import 'package:super_paging/super_paging.dart';
 
 class MockLogBox extends Mock implements LogBox {}
+
 class MockStorage extends Mock implements Storage {}
+
 class MockPersistentDataStorage extends Mock implements PersistentDataStorage {}
+
 class MockEntryModel extends Mock implements EntryModel {}
+
 class FakeBuildContext extends Fake implements BuildContext {}
 
 class FakeMapWithNull extends MapBase<String, Type> {
@@ -39,7 +43,9 @@ void main() {
   setUpAll(() {
     registerFallbackValue(FakeBuildContext());
     registerFallbackValue(const Cursor());
-    registerFallbackValue(LoadParams<Cursor>(key: null, loadSize: 20, loadType: LoadType.refresh));
+    registerFallbackValue(
+      LoadParams<Cursor>(key: null, loadSize: 20, loadType: LoadType.refresh),
+    );
   });
 
   setUp(() {
@@ -50,8 +56,10 @@ void main() {
 
     when(() => mockLogBox.storage).thenReturn(mockStorage);
     when(() => mockStorage.persistentStorage).thenReturn(mockPersistentStorage);
-    when(() => mockPersistentStorage.types).thenAnswer((_) => typesController.stream);
-    
+    when(
+      () => mockPersistentStorage.types,
+    ).thenAnswer((_) => typesController.stream);
+
     when(() => mockPersistentStorage.load(any())).thenAnswer((_) async {
       return LoadResult.page(items: [], nextKey: null, prevKey: null);
     });
@@ -61,14 +69,9 @@ void main() {
     typesController.close();
   });
 
-  Widget createWidget({
-    void Function(EntryModel, String)? onTapEntry,
-  }) {
+  Widget createWidget({void Function(EntryModel, String)? onTapEntry}) {
     return MaterialApp(
-      home: PaginatedDashboardScreen(
-        box: mockLogBox,
-        onTapEntry: onTapEntry,
-      ),
+      home: PaginatedDashboardScreen(box: mockLogBox, onTapEntry: onTapEntry),
     );
   }
 
@@ -87,45 +90,48 @@ void main() {
 
   testWidgets('toggles search mode', (tester) async {
     await tester.pumpWidget(createWidget());
-    
+
     await tester.tap(find.byIcon(Icons.search));
     await tester.pump();
-    
+
     expect(find.byType(TextField), findsOneWidget);
-    
+
     await tester.tap(find.byIcon(Icons.close));
     await tester.pump();
-    
+
     expect(find.text('Log Dashboard'), findsOneWidget);
     await pumpNTimes(tester);
   });
 
   testWidgets('clears keyword when closing search', (tester) async {
     await tester.pumpWidget(createWidget());
-    
+
     await tester.tap(find.byIcon(Icons.search));
     await tester.pump();
-    
+
     await tester.enterText(find.byType(TextField), 'test');
     await tester.pump();
-    
+
     await tester.tap(find.byIcon(Icons.close));
     await tester.pump();
-    
+
     await tester.tap(find.byIcon(Icons.search));
     await tester.pump();
-    
+
     expect(find.byType(TextField), findsOneWidget);
-    expect(tester.widget<TextField>(find.byType(TextField)).controller?.text, '');
+    expect(
+      tester.widget<TextField>(find.byType(TextField)).controller?.text,
+      '',
+    );
     await pumpNTimes(tester);
   });
 
   testWidgets('triggers refresh on search submit', (tester) async {
     await tester.pumpWidget(createWidget());
-    
+
     await tester.tap(find.byIcon(Icons.search));
     await tester.pump();
-    
+
     await tester.enterText(find.byType(TextField), 'search query');
     await tester.testTextInput.receiveAction(TextInputAction.done);
     await pumpNTimes(tester);
@@ -133,11 +139,13 @@ void main() {
     verify(() => mockPersistentStorage.load(any())).called(greaterThan(0));
   });
 
-  testWidgets('calls clear on persistentStorage when delete icon is tapped', (tester) async {
+  testWidgets('calls clear on persistentStorage when delete icon is tapped', (
+    tester,
+  ) async {
     when(() => mockPersistentStorage.clear()).thenAnswer((_) async {});
-    
+
     await tester.pumpWidget(createWidget());
-    
+
     await tester.tap(find.byIcon(Icons.delete));
     verify(() => mockPersistentStorage.clear()).called(1);
     await pumpNTimes(tester);
@@ -145,12 +153,12 @@ void main() {
 
   testWidgets('handles types stream: loading, data, error', (tester) async {
     await tester.pumpWidget(createWidget());
-    
+
     expect(find.byType(CircularProgressIndicator), findsAtLeast(1));
 
     typesController.add({'TypeA': String, 'TypeB': int});
     await tester.pump();
-    
+
     expect(find.text('TypeA'), findsOneWidget);
     expect(find.text('TypeB'), findsOneWidget);
 
@@ -169,7 +177,7 @@ void main() {
     expect(find.text('TypeA'), findsOneWidget);
     await tester.tap(find.text('TypeA'));
     await pumpNTimes(tester);
-    
+
     final buttonFinder = find.widgetWithText(OutlinedButton, 'TypeA');
     final button = tester.widget<OutlinedButton>(buttonFinder);
     expect(button.style?.backgroundColor?.resolve({}), Colors.grey);
@@ -183,18 +191,21 @@ void main() {
     expect(buttonAfter.style?.backgroundColor?.resolve({}), isNull);
   });
 
-  testWidgets('displays "No Data Found" when empty and handles refresh button', (tester) async {
-    await tester.pumpWidget(createWidget());
-    await pumpNTimes(tester);
-    
-    expect(find.text('No Data Found'), findsOneWidget);
-    
-    await tester.tap(find.text('Refresh'));
-    await tester.pump();
-    
-    verify(() => mockPersistentStorage.load(any())).called(greaterThan(0));
-    await pumpNTimes(tester);
-  });
+  testWidgets(
+    'displays "No Data Found" when empty and handles refresh button',
+    (tester) async {
+      await tester.pumpWidget(createWidget());
+      await pumpNTimes(tester);
+
+      expect(find.text('No Data Found'), findsOneWidget);
+
+      await tester.tap(find.text('Refresh'));
+      await tester.pump();
+
+      verify(() => mockPersistentStorage.load(any())).called(greaterThan(0));
+      await pumpNTimes(tester);
+    },
+  );
 
   testWidgets('displays error in content', (tester) async {
     when(() => mockPersistentStorage.load(any())).thenAnswer((_) async {
@@ -203,21 +214,25 @@ void main() {
 
     await tester.pumpWidget(createWidget());
     await pumpNTimes(tester);
-    
+
     expect(find.text('Exception: Load Failed'), findsOneWidget);
     await pumpNTimes(tester);
   });
 
   testWidgets('displays loading in content', (tester) async {
     final completer = Completer<LoadResult<Cursor, EntryModel>>();
-    when(() => mockPersistentStorage.load(any())).thenAnswer((_) => completer.future);
+    when(
+      () => mockPersistentStorage.load(any()),
+    ).thenAnswer((_) => completer.future);
 
     await tester.pumpWidget(createWidget());
     await tester.pump();
-    
+
     expect(find.byType(CircularProgressIndicator), findsAtLeast(1));
 
-    completer.complete(LoadResult.page(items: [], nextKey: null, prevKey: null));
+    completer.complete(
+      LoadResult.page(items: [], nextKey: null, prevKey: null),
+    );
     await pumpNTimes(tester);
   });
 
@@ -233,11 +248,13 @@ void main() {
     });
 
     EntryModel? tappedEntry;
-    await tester.pumpWidget(createWidget(onTapEntry: (e, k) => tappedEntry = e));
+    await tester.pumpWidget(
+      createWidget(onTapEntry: (e, k) => tappedEntry = e),
+    );
     await pumpNTimes(tester);
 
     expect(find.text('Entry Title'), findsOneWidget);
-    
+
     await tester.tap(find.text('Entry Title'));
     expect(tappedEntry, entry);
   });
@@ -263,14 +280,14 @@ void main() {
 
   testWidgets('PopScope handles pop and toggles search', (tester) async {
     await tester.pumpWidget(createWidget());
-    
+
     await tester.tap(find.byIcon(Icons.search));
     await tester.pump();
     expect(find.byType(TextField), findsOneWidget);
 
     final popScopeFinder = find.byWidgetPredicate((w) => w is PopScope);
     final PopScope popScope = tester.widget(popScopeFinder);
-    
+
     popScope.onPopInvokedWithResult!(false, null);
     await tester.pump();
 
@@ -287,7 +304,9 @@ void main() {
     await pumpNTimes(tester);
   });
 
-  testWidgets('displays "No Data" when pager is null (no persistent storage)', (tester) async {
+  testWidgets('displays "No Data" when pager is null (no persistent storage)', (
+    tester,
+  ) async {
     when(() => mockStorage.persistentStorage).thenReturn(null);
     await tester.pumpWidget(createWidget());
     expect(find.text('No Data'), findsOneWidget);
@@ -307,13 +326,13 @@ void main() {
     await tester.pumpWidget(createWidget());
     await tester.tap(find.byIcon(Icons.search));
     await tester.pump();
-    
+
     await tester.enterText(find.byType(TextField), 'new keyword');
     await tester.pump();
-    
+
     await tester.testTextInput.receiveAction(TextInputAction.done);
     await pumpNTimes(tester);
-    
+
     verify(() => mockPersistentStorage.load(any())).called(greaterThan(0));
   });
 }

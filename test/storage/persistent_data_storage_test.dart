@@ -9,8 +9,16 @@ import 'package:super_paging/super_paging.dart';
 class MockEntryModel extends Mock implements EntryModel {}
 
 class TestPersistentDataStorage extends PersistentDataStorage {
-  final Future<List<EntryModel>> Function({required Cursor cursor, required int limit})? onFetch;
-  final Stream<List<EntryModel>> Function({required Cursor cursor, required int limit})? onFetchStream;
+  final Future<List<EntryModel>> Function({
+    required Cursor cursor,
+    required int limit,
+  })?
+  onFetch;
+  final Stream<List<EntryModel>> Function({
+    required Cursor cursor,
+    required int limit,
+  })?
+  onFetchStream;
 
   TestPersistentDataStorage({this.onFetch, this.onFetchStream});
 
@@ -33,7 +41,10 @@ class TestPersistentDataStorage extends PersistentDataStorage {
   Stream<Map<String, Type>> get types => Stream.empty();
 
   @override
-  Future<List<EntryModel>> fetch({required Cursor cursor, int limit = 20}) async {
+  Future<List<EntryModel>> fetch({
+    required Cursor cursor,
+    int limit = 20,
+  }) async {
     if (onFetch != null) {
       return onFetch!(cursor: cursor, limit: limit);
     }
@@ -41,7 +52,10 @@ class TestPersistentDataStorage extends PersistentDataStorage {
   }
 
   @override
-  Stream<List<EntryModel>> fetchStream({required Cursor cursor, int limit = 20}) {
+  Stream<List<EntryModel>> fetchStream({
+    required Cursor cursor,
+    int limit = 20,
+  }) {
     if (onFetchStream != null) {
       return onFetchStream!(cursor: cursor, limit: limit);
     }
@@ -52,8 +66,13 @@ class TestPersistentDataStorage extends PersistentDataStorage {
 void main() {
   group('Cursor', () {
     test('copyWith should work correctly', () {
-      const cursor = Cursor(id: '1', keyword: 'test', types: ['a'], direction: PageDirection.after);
-      
+      const cursor = Cursor(
+        id: '1',
+        keyword: 'test',
+        types: ['a'],
+        direction: PageDirection.after,
+      );
+
       final copy = cursor.copyWith(
         id: '2',
         keyword: 'new',
@@ -93,8 +112,13 @@ void main() {
         },
       );
 
-      final params = LoadParams<Cursor>(key: null, loadSize: 20, loadType: LoadType.refresh);
-      final result = await storage.load(params) as LoadResultPage<Cursor, EntryModel>;
+      final params = LoadParams<Cursor>(
+        key: null,
+        loadSize: 20,
+        loadType: LoadType.refresh,
+      );
+      final result =
+          await storage.load(params) as LoadResultPage<Cursor, EntryModel>;
 
       expect(result.items, [entry1]);
       expect(result.nextKey?.id, 'id1');
@@ -108,8 +132,13 @@ void main() {
         },
       );
 
-      final params = LoadParams<Cursor>(key: const Cursor(id: 'start'), loadSize: 20, loadType: LoadType.refresh);
-      final result = await storage.load(params) as LoadResultPage<Cursor, EntryModel>;
+      final params = LoadParams<Cursor>(
+        key: const Cursor(id: 'start'),
+        loadSize: 20,
+        loadType: LoadType.refresh,
+      );
+      final result =
+          await storage.load(params) as LoadResultPage<Cursor, EntryModel>;
 
       expect(result.items, [entry1, entry2]);
       expect(result.nextKey?.id, 'id2');
@@ -118,36 +147,39 @@ void main() {
       expect(result.prevKey?.direction, PageDirection.before);
     });
 
-    test('load should trigger fetchStream when result is empty and direction is before', () async {
-      final controller = StreamController<List<EntryModel>>();
-      final storage = TestPersistentDataStorage(
-        onFetch: ({required cursor, required limit}) async {
-          return [];
-        },
-        onFetchStream: ({required cursor, required limit}) {
-          return controller.stream;
-        },
-      );
+    test(
+      'load should trigger fetchStream when result is empty and direction is before',
+      () async {
+        final controller = StreamController<List<EntryModel>>();
+        final storage = TestPersistentDataStorage(
+          onFetch: ({required cursor, required limit}) async {
+            return [];
+          },
+          onFetchStream: ({required cursor, required limit}) {
+            return controller.stream;
+          },
+        );
 
-      final params = LoadParams<Cursor>(
-        key: const Cursor(id: 'some', direction: PageDirection.before),
-        loadSize: 20,
-        loadType: LoadType.refresh,
-      );
+        final params = LoadParams<Cursor>(
+          key: const Cursor(id: 'some', direction: PageDirection.before),
+          loadSize: 20,
+          loadType: LoadType.refresh,
+        );
 
-      final futureResult = storage.load(params);
-      
-      controller.add([]); // Should be skipped by firstWhere
-      controller.add([entry1]);
-      
-      final result = await futureResult as LoadResultPage<Cursor, EntryModel>;
+        final futureResult = storage.load(params);
 
-      expect(result.items, [entry1]);
-      expect(result.nextKey?.id, 'id1');
-      expect(result.prevKey?.id, 'id1');
-      
-      await controller.close();
-    });
+        controller.add([]); // Should be skipped by firstWhere
+        controller.add([entry1]);
+
+        final result = await futureResult as LoadResultPage<Cursor, EntryModel>;
+
+        expect(result.items, [entry1]);
+        expect(result.nextKey?.id, 'id1');
+        expect(result.prevKey?.id, 'id1');
+
+        await controller.close();
+      },
+    );
 
     test('load should return error when fetch fails', () async {
       final exception = Exception('fetch failed');
@@ -157,12 +189,17 @@ void main() {
         },
       );
 
-      final params = LoadParams<Cursor>(key: null, loadSize: 20, loadType: LoadType.refresh);
-      final result = await storage.load(params) as LoadResultError<Cursor, EntryModel>;
+      final params = LoadParams<Cursor>(
+        key: null,
+        loadSize: 20,
+        loadType: LoadType.refresh,
+      );
+      final result =
+          await storage.load(params) as LoadResultError<Cursor, EntryModel>;
 
       expect(result.error, exception);
     });
-    
+
     test('load should handle empty result when direction is after', () async {
       final storage = TestPersistentDataStorage(
         onFetch: ({required cursor, required limit}) async {
@@ -170,8 +207,13 @@ void main() {
         },
       );
 
-      final params = LoadParams<Cursor>(key: const Cursor(direction: PageDirection.after), loadSize: 20, loadType: LoadType.refresh);
-      final result = await storage.load(params) as LoadResultPage<Cursor, EntryModel>;
+      final params = LoadParams<Cursor>(
+        key: const Cursor(direction: PageDirection.after),
+        loadSize: 20,
+        loadType: LoadType.refresh,
+      );
+      final result =
+          await storage.load(params) as LoadResultPage<Cursor, EntryModel>;
 
       expect(result.items, isEmpty);
       expect(result.nextKey, isNull);

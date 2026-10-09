@@ -11,7 +11,7 @@ void main() {
 
     test('log adds LogEntryModel to storage', () {
       logBox.log('test message', name: 'test name', extra: {'key': 'value'});
-      
+
       final logs = logBox.storage.liveStorage.data;
       expect(logs.length, 1);
       expect(logs.first, isA<LogEntryModel>());
@@ -28,7 +28,7 @@ void main() {
       });
 
       expect(result, 'done');
-      
+
       final logs = logBox.storage.liveStorage.data;
       // 1. Start
       // 2. Inside trace (merged because of same ID)
@@ -36,13 +36,13 @@ void main() {
       // Since MemoryStorage merges by ID, we should have 1 entry with multiple logs if merged correctly,
       // OR multiple entries if not.
       // TraceLogEntryModel.merge: return TraceLogEntryModel(name: name, logs: [...other.logs, ...logs]);
-      
+
       expect(logs.length, 1);
       expect(logs.first, isA<TraceLogEntryModel>());
       final trace = logs.first as TraceLogEntryModel;
       expect(trace.name, 'test tracer');
-      
-      // logs: [Finish, Inside trace, Start] due to reverse order in merge? 
+
+      // logs: [Finish, Inside trace, Start] due to reverse order in merge?
       // Let's check merge logic in TraceLogEntryModel: logs: [...other.logs, ...logs]
       // Initial: [Start]
       // After trace('Inside'): [...[Inside], ...[Start]] = [Inside, Start]

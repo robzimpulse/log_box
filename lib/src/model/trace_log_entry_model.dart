@@ -58,7 +58,10 @@ class TraceLogEntryModel extends EntryModel {
 
   MapEntry<Tab, Widget> _overview(BuildContext context, {String? searchTerm}) {
     return MapEntry(
-      const Tab(text: 'Overview', icon: Icon(Icons.info, color: Colors.white)),
+      const Tab(
+        text: 'Overview',
+        icon: Icon(Icons.info, color: Colors.white),
+      ),
       CustomScrollView(
         slivers: [
           SliverToBoxAdapter(child: SizedBox(height: 8)),
@@ -165,7 +168,10 @@ class TraceLogEntryModel extends EntryModel {
     }
 
     return MapEntry(
-      const Tab(text: 'Events', icon: Icon(Icons.event, color: Colors.white)),
+      const Tab(
+        text: 'Events',
+        icon: Icon(Icons.event, color: Colors.white),
+      ),
       CustomScrollView(
         slivers: [
           SliverToBoxAdapter(child: SizedBox(height: 8)),

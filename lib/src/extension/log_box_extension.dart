@@ -22,7 +22,9 @@ extension LogBoxExtension on LogBox {
     );
 
     final result = await process((log) {
-      storage.add(log: TraceLogEntryModel(id: id, name: name, logs: [log]));
+      storage.add(
+        log: TraceLogEntryModel(id: id, name: name, logs: [log]),
+      );
     });
 
     storage.add(

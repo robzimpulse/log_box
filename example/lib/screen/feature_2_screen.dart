@@ -16,5 +16,4 @@ class Feature2Screen extends StatelessWidget {
       ),
     );
   }
-
 }

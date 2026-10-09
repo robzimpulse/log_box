@@ -30,7 +30,7 @@ void main() {
       // Allow some time for stream events
       await Future.delayed(Duration.zero);
       expect(index, 3);
-      
+
       await subscription.cancel();
     });
 

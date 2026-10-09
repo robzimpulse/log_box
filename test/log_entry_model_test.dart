@@ -62,11 +62,13 @@ void main() {
     });
 
     testWidgets('title widget', (tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Scaffold(
-          body: Builder(builder: (context) => entry1.title(context)),
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(builder: (context) => entry1.title(context)),
+          ),
         ),
-      ));
+      );
 
       expect(find.text('name entry 1'), findsOneWidget);
       expect(find.text('message entry 1'), findsOneWidget);
@@ -74,16 +76,20 @@ void main() {
     });
 
     testWidgets('tabs widgets', (tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Scaffold(
-          body: Builder(builder: (context) {
-            final tabs = entry1.tabs(context);
-            return Column(
-              children: tabs.values.map((w) => Expanded(child: w)).toList(),
-            );
-          }),
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) {
+                final tabs = entry1.tabs(context);
+                return Column(
+                  children: tabs.values.map((w) => Expanded(child: w)).toList(),
+                );
+              },
+            ),
+          ),
         ),
-      ));
+      );
 
       expect(find.text('Name'), findsAtLeast(1));
       expect(find.text('name entry 1'), findsAtLeast(1));
@@ -99,11 +105,13 @@ void main() {
     });
 
     testWidgets('subtitle widget', (tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Scaffold(
-          body: Builder(builder: (context) => entry1.subtitle(context)),
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(builder: (context) => entry1.subtitle(context)),
+          ),
         ),
-      ));
+      );
       expect(find.text(entry1.timestamp.toIso8601String()), findsOneWidget);
     });
   });

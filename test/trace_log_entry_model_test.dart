@@ -6,7 +6,7 @@ import 'package:log_box/src/model/trace_log_entry_model.dart';
 void main() {
   final log1 = LogEntryModel(message: 'log 1', name: 'name 1');
   final log2 = LogEntryModel(message: 'log 2', name: 'name 2');
-  
+
   final trace1 = TraceLogEntryModel(
     id: 't1',
     name: 'trace 1',
@@ -61,30 +61,38 @@ void main() {
     });
 
     testWidgets('title widget', (tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Scaffold(
-          body: Builder(builder: (context) => trace1.title(context)),
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(builder: (context) => trace1.title(context)),
+          ),
         ),
-      ));
+      );
 
       expect(find.text('trace 1'), findsOneWidget);
       expect(find.byIcon(Icons.event), findsOneWidget);
     });
 
     testWidgets('tabs widgets', (tester) async {
-      await tester.pumpWidget(MaterialApp(
-        home: Scaffold(
-          body: Builder(builder: (context) {
-            final tabs = trace1.tabs(context);
-            return SizedBox(
-              height: 600,
-              child: Column(
-                children: tabs.values.map((w) => Expanded(child: w)).toList(),
-              ),
-            );
-          }),
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) {
+                final tabs = trace1.tabs(context);
+                return SizedBox(
+                  height: 600,
+                  child: Column(
+                    children: tabs.values
+                        .map((w) => Expanded(child: w))
+                        .toList(),
+                  ),
+                );
+              },
+            ),
+          ),
         ),
-      ));
+      );
 
       expect(find.text('Name'), findsAtLeast(1));
       expect(find.text('Timestamp'), findsAtLeast(1));
@@ -93,21 +101,27 @@ void main() {
     });
 
     testWidgets('tabs widgets with search term', (tester) async {
-       await tester.pumpWidget(MaterialApp(
-        home: Scaffold(
-          body: Builder(builder: (context) {
-            final tabs = trace1.tabs(context, searchTerm: 'log 1');
-            return SizedBox(
-              height: 600,
-              child: Column(
-                children: tabs.values.map((w) => Expanded(child: w)).toList(),
-              ),
-            );
-          }),
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) {
+                final tabs = trace1.tabs(context, searchTerm: 'log 1');
+                return SizedBox(
+                  height: 600,
+                  child: Column(
+                    children: tabs.values
+                        .map((w) => Expanded(child: w))
+                        .toList(),
+                  ),
+                );
+              },
+            ),
+          ),
         ),
-      ));
-       // Should find the search indicator (the red dot)
-       expect(find.byType(Container), findsAtLeast(1));
+      );
+      // Should find the search indicator (the red dot)
+      expect(find.byType(Container), findsAtLeast(1));
     });
   });
 }

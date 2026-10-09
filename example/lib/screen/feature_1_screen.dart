@@ -25,5 +25,4 @@ class Feature1Screen extends StatelessWidget {
       ),
     );
   }
-
 }

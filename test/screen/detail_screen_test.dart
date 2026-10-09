@@ -9,10 +9,15 @@ import 'package:log_box/src/storage/storage.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockLogBox extends Mock implements LogBox {}
+
 class MockStorage extends Mock implements Storage {}
+
 class MockEntryModel extends Mock implements EntryModel {}
+
 class FakeBuildContext extends Fake implements BuildContext {}
+
 class FakeRoute extends Fake implements Route<dynamic> {}
+
 class FakeLogBox extends Fake implements LogBox {}
 
 void main() {
@@ -33,11 +38,12 @@ void main() {
     mockEntryModel = MockEntryModel();
 
     when(() => mockLogBox.storage).thenReturn(mockStorage);
-    
+
     // Default behaviors for EntryModel
     when(() => mockEntryModel.tabLength(any())).thenReturn(1);
-    when(() => mockEntryModel.tabs(any(), searchTerm: any(named: 'searchTerm')))
-        .thenReturn({const Tab(text: 'Tab 1'): const Text('Content 1')});
+    when(
+      () => mockEntryModel.tabs(any(), searchTerm: any(named: 'searchTerm')),
+    ).thenReturn({const Tab(text: 'Tab 1'): const Text('Content 1')});
     when(() => mockEntryModel.menus(any(), any())).thenReturn([]);
   });
 
@@ -48,11 +54,7 @@ void main() {
   }) {
     when(() => mockStorage.stream(id)).thenAnswer((_) => stream);
     return MaterialApp(
-      home: DetailScreen(
-        id: id,
-        box: mockLogBox,
-        keyword: keyword,
-      ),
+      home: DetailScreen(id: id, box: mockLogBox, keyword: keyword),
     );
   }
 
@@ -100,48 +102,53 @@ void main() {
     await tester.pump();
 
     expect(find.byType(TextField), findsOneWidget);
-    
+
     // Exit search mode
     await tester.tap(find.byIcon(Icons.close));
     await tester.pump();
 
     expect(find.text('Detail Log'), findsOneWidget);
     expect(find.byIcon(Icons.search), findsOneWidget);
-    
+
     // Verify tabs called with null searchTerm when search is closed
-    verify(() => mockEntryModel.tabs(any(), searchTerm: null)).called(greaterThan(0));
+    verify(
+      () => mockEntryModel.tabs(any(), searchTerm: null),
+    ).called(greaterThan(0));
   });
 
   testWidgets('updates to empty keyword in didUpdateWidget', (tester) async {
     final key = GlobalKey();
-    when(() => mockStorage.stream('1')).thenAnswer((_) => Stream.value(mockEntryModel));
+    when(
+      () => mockStorage.stream('1'),
+    ).thenAnswer((_) => Stream.value(mockEntryModel));
 
-    await tester.pumpWidget(MaterialApp(
-      home: DetailScreen(
-        key: key,
-        id: '1',
-        box: mockLogBox,
-        keyword: 'something',
+    await tester.pumpWidget(
+      MaterialApp(
+        home: DetailScreen(
+          key: key,
+          id: '1',
+          box: mockLogBox,
+          keyword: 'something',
+        ),
       ),
-    ));
+    );
     await tester.pumpAndSettle();
     expect(find.byType(TextField), findsOneWidget);
 
-    await tester.pumpWidget(MaterialApp(
-      home: DetailScreen(
-        key: key,
-        id: '1',
-        box: mockLogBox,
-        keyword: '',
+    await tester.pumpWidget(
+      MaterialApp(
+        home: DetailScreen(key: key, id: '1', box: mockLogBox, keyword: ''),
       ),
-    ));
+    );
     await tester.pumpAndSettle();
 
     expect(find.text('Detail Log'), findsOneWidget);
     expect(find.byIcon(Icons.search), findsOneWidget);
   });
 
-  testWidgets('preserves search controller text when toggling search', (tester) async {
+  testWidgets('preserves search controller text when toggling search', (
+    tester,
+  ) async {
     await tester.pumpWidget(createWidget(stream: Stream.value(mockEntryModel)));
     await tester.pumpAndSettle();
 
@@ -154,13 +161,15 @@ void main() {
     // Exit search mode
     await tester.tap(find.byIcon(Icons.close));
     await tester.pump();
-    
+
     // Enter search mode again
     await tester.tap(find.byIcon(Icons.search));
     await tester.pump();
 
     expect(find.widgetWithText(TextField, 'persist'), findsOneWidget);
-    verify(() => mockEntryModel.tabs(any(), searchTerm: 'persist')).called(greaterThan(0));
+    verify(
+      () => mockEntryModel.tabs(any(), searchTerm: 'persist'),
+    ).called(greaterThan(0));
   });
 
   testWidgets('updates keyword when typing in search field', (tester) async {
@@ -173,11 +182,17 @@ void main() {
     await tester.enterText(find.byType(TextField), 'test query');
     await tester.pump();
 
-    verify(() => mockEntryModel.tabs(any(), searchTerm: 'test query')).called(greaterThan(0));
+    verify(
+      () => mockEntryModel.tabs(any(), searchTerm: 'test query'),
+    ).called(greaterThan(0));
   });
 
-  testWidgets('initializes with keyword and starts in search mode', (tester) async {
-    await tester.pumpWidget(createWidget(keyword: 'initial', stream: Stream.value(mockEntryModel)));
+  testWidgets('initializes with keyword and starts in search mode', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      createWidget(keyword: 'initial', stream: Stream.value(mockEntryModel)),
+    );
     await tester.pump();
 
     expect(find.byType(TextField), findsOneWidget);
@@ -187,44 +202,60 @@ void main() {
 
   testWidgets('updates when widget keyword changes', (tester) async {
     final key = GlobalKey();
-    
-    when(() => mockStorage.stream('1')).thenAnswer((_) => Stream.value(mockEntryModel));
 
-    await tester.pumpWidget(MaterialApp(
-      home: DetailScreen(
-        key: key,
-        id: '1',
-        box: mockLogBox,
-        keyword: 'first',
+    when(
+      () => mockStorage.stream('1'),
+    ).thenAnswer((_) => Stream.value(mockEntryModel));
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: DetailScreen(
+          key: key,
+          id: '1',
+          box: mockLogBox,
+          keyword: 'first',
+        ),
       ),
-    ));
+    );
     await tester.pumpAndSettle();
 
     expect(find.byType(TextField), findsOneWidget);
-    expect(tester.widget<TextField>(find.byType(TextField)).controller?.text, 'first');
+    expect(
+      tester.widget<TextField>(find.byType(TextField)).controller?.text,
+      'first',
+    );
 
-    await tester.pumpWidget(MaterialApp(
-      home: DetailScreen(
-        key: key,
-        id: '1',
-        box: mockLogBox,
-        keyword: 'second',
+    await tester.pumpWidget(
+      MaterialApp(
+        home: DetailScreen(
+          key: key,
+          id: '1',
+          box: mockLogBox,
+          keyword: 'second',
+        ),
       ),
-    ));
+    );
     await tester.pumpAndSettle();
 
     expect(find.byType(TextField), findsOneWidget);
-    expect(tester.widget<TextField>(find.byType(TextField)).controller?.text, 'second');
+    expect(
+      tester.widget<TextField>(find.byType(TextField)).controller?.text,
+      'second',
+    );
   });
 
   testWidgets('pops navigator when back button is pressed', (tester) async {
     final observer = MockNavigatorObserver();
-    when(() => mockStorage.stream('1')).thenAnswer((_) => Stream.value(mockEntryModel));
+    when(
+      () => mockStorage.stream('1'),
+    ).thenAnswer((_) => Stream.value(mockEntryModel));
 
-    await tester.pumpWidget(MaterialApp(
-      navigatorObservers: [observer],
-      home: DetailScreen(id: '1', box: mockLogBox),
-    ));
+    await tester.pumpWidget(
+      MaterialApp(
+        navigatorObservers: [observer],
+        home: DetailScreen(id: '1', box: mockLogBox),
+      ),
+    );
     await tester.pump();
 
     await tester.tap(find.byIcon(Icons.arrow_back));
@@ -234,9 +265,9 @@ void main() {
   });
 
   testWidgets('renders custom menus from EntryModel', (tester) async {
-    when(() => mockEntryModel.menus(any(), any())).thenReturn([
-      const IconButton(onPressed: null, icon: Icon(Icons.share)),
-    ]);
+    when(
+      () => mockEntryModel.menus(any(), any()),
+    ).thenReturn([const IconButton(onPressed: null, icon: Icon(Icons.share))]);
 
     await tester.pumpWidget(createWidget(stream: Stream.value(mockEntryModel)));
     await tester.pump();

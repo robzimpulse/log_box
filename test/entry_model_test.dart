@@ -45,12 +45,14 @@ void main() {
     testWidgets('subtitle renders timestamp', (tester) async {
       final ts = DateTime(2023, 1, 1, 12, 0);
       final entry = MockEntryModel(timestamp: ts);
-      
-      await tester.pumpWidget(MaterialApp(
-        home: Scaffold(
-          body: Builder(builder: (context) => entry.subtitle(context)),
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(builder: (context) => entry.subtitle(context)),
+          ),
         ),
-      ));
+      );
 
       expect(find.text(ts.toIso8601String()), findsOneWidget);
     });

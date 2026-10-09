@@ -44,10 +44,9 @@ class HighlightedTextWidget extends StatelessWidget {
     final List<InlineSpan> widgets = [];
     final String lowerCaseText = text.toLowerCase();
     final String lowerCaseSearchTerm = term.toLowerCase();
-    final List<String> parts =
-        lowerCaseSearchTerm.isEmpty
-            ? [lowerCaseText]
-            : lowerCaseText.split(lowerCaseSearchTerm);
+    final List<String> parts = lowerCaseSearchTerm.isEmpty
+        ? [lowerCaseText]
+        : lowerCaseText.split(lowerCaseSearchTerm);
 
     int startIndex = 0;
 
